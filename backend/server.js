@@ -14,6 +14,10 @@ const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
   "http://localhost:3002",
+  "https://oibre-service-provider-frontend.vercel.app",
+  "https://oibre-customer-frontend.vercel.app",
+  "https://oibre-admin-frontend.vercel.app",
+  "https://oibre-services-provider-web-fronten.vercel.app",
 
   process.env.REACT_APP_ADMIN_API_URL?.replace(/\/$/, ""),
   process.env.REACT_APP_CUSTOMER_API_URL?.replace(/\/$/, ""),
