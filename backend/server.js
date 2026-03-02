@@ -40,6 +40,8 @@ app.use(
     credentials: true
   })
 );
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Disable ETag and caching for API responses
 app.disable("etag");
