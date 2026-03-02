@@ -9,11 +9,33 @@ const app = express();
 // ===============================
 // MIDDLEWARE
 // ===============================
-app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:3000", "http://localhost:3001", "http://localhost:3002"],
-  credentials: true
-}));
-app.use(express.json());
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://localhost:3002",
+
+  process.env.REACT_APP_ADMIN_API_URL?.replace(/\/$/, ""),
+  process.env.REACT_APP_CUSTOMER_API_URL?.replace(/\/$/, ""),
+  process.env.REACT_APP_PROVIDER_API_URL?.replace(/\/$/, ""),
+  process.env.REACT_APP_PROVIDER_WEB_API_URL?.replace(/\/$/, "")
+].filter(Boolean);
+
+console.log("Allowed Origins:", allowedOrigins);
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.log("Blocked by CORS:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true
+  })
+);
 
 // Disable ETag and caching for API responses
 app.disable("etag");
