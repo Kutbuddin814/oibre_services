@@ -38,25 +38,28 @@ const createMailer = () => {
 
   // If SMTP is not configured, return null so caller can fallback to dev logging.
   if (!host || !port || !user || !pass) {
-    console.warn("SMTP credentials are not configured. Email sending will be disabled (dev fallback).");
+    console.warn("❌ SMTP credentials are not configured. Email sending will be disabled (dev fallback).");
     return null;
   }
 
+  console.log(`📧 Creating SMTP transporter for ${host}:${port}`);
+
   const isSecure = port === 465;
-  const isPort587 = port === 587;
+  const requireTLS = port === 587;
 
   return nodemailer.createTransport({
     host,
     port,
     secure: isSecure,
-    requireTLS: isPort587,
-    auth: { user, pass },
-    connectionTimeout: 5000,
-    socketTimeout: 5000,
-    pool: {
-      maxConnections: 1,
-      maxMessages: 5,
-      rateDelta: 2000
+    requireTLS: requireTLS,
+    auth: { 
+      user: String(user).trim(), 
+      pass: String(pass).trim() 
+    },
+    connectionTimeout: 10000,
+    socketTimeout: 10000,
+    tls: {
+      rejectUnauthorized: false
     }
   });
 };
@@ -257,8 +260,20 @@ router.post(
         warning: "Email not sent - SMTP not configured"
       });
     } catch (err) {
-      console.error("EMAIL OTP SEND ERROR:", err.message);
-      res.status(500).json({ message: "Failed to send OTP" });
+      console.error("❌ EMAIL OTP SEND ERROR:", err.message);
+      console.error("Error details:", err);
+      
+      // More helpful error message
+      let errorMsg = "Failed to send OTP";
+      if (err.message.includes("ECONNREFUSED")) {
+        errorMsg = "Email server connection failed. Check SMTP credentials.";
+      } else if (err.message.includes("Invalid credentials")) {
+        errorMsg = "Email SMTP credentials are invalid.";
+      } else if (err.message.includes("timeout")) {
+        errorMsg = "Email server timeout. Please try again.";
+      }
+      
+      res.status(500).json({ message: errorMsg });
     }
   }
 );
