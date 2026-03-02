@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../config/axios";
 import { useNavigate } from "react-router-dom";
 import "../styles/CustomerProfile.css";
 
@@ -23,8 +23,8 @@ export default function CustomerProfile() {
       return;
     }
 
-    axios
-      .get("http://localhost:5000/api/customers/me", {
+    api
+      .get("/customers/me", {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -81,7 +81,7 @@ export default function CustomerProfile() {
     try {
       setSaving(true);
       setEditError("");
-      const res = await axios.put("http://localhost:5000/api/customers/profile", payload, {
+      const res = await api.put("/customers/profile", payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const updated = res.data?.customer || null;

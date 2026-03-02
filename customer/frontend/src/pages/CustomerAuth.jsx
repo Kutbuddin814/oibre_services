@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../config/axios";
 import { useNavigate } from "react-router-dom";
 import { signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "../firebase";
@@ -69,8 +69,8 @@ export default function CustomerAuth() {
 
       if (isLogin) {
         // GOOGLE LOGIN
-        const res = await axios.post(
-          "http://localhost:5000/api/customers/google-login",
+        const res = await api.post(
+          "/customers/google-login",
           { email: user.email }
         );
 
@@ -85,8 +85,8 @@ export default function CustomerAuth() {
       } else {
         // GOOGLE SIGNUP — CHECK EMAIL
         try {
-          await axios.post(
-            "http://localhost:5000/api/customers/google-login",
+          await api.post(
+            "/customers/google-login",
             { email: user.email }
           );
 
@@ -118,8 +118,8 @@ export default function CustomerAuth() {
 
     try {
       if (isLogin) {
-        const res = await axios.post(
-          "http://localhost:5000/api/customers/login",
+        const res = await api.post(
+          "/customers/login",
           {
             mobile: form.mobile,
             password: form.password
@@ -142,8 +142,8 @@ export default function CustomerAuth() {
           }
         }
 
-        await axios.post(
-          "http://localhost:5000/api/customers/register",
+        await api.post(
+          "/customers/register",
           { ...form, emailOtpId: emailOtp.otpId }
         );
 
@@ -232,8 +232,8 @@ export default function CustomerAuth() {
                         try {
                           setOtpMessage("Sending OTP...");
                           setEmailOtp((prev) => ({ ...prev, sending: true, error: "" }));
-                          const res = await axios.post(
-                            "http://localhost:5000/api/customers/email-otp/send",
+                          const res = await api.post(
+                            "/customers/email-otp/send",
                             { email: form.email }
                           );
                           
@@ -300,8 +300,8 @@ export default function CustomerAuth() {
                             }
                             try {
                               setEmailOtp((prev) => ({ ...prev, verifying: true, error: "" }));
-                              const res = await axios.post(
-                                "http://localhost:5000/api/customers/email-otp/verify",
+                              const res = await api.post(
+                                "/customers/email-otp/verify",
                                 { email: form.email, otp: emailOtp.code.trim() }
                               );
                               setEmailOtp((prev) => ({

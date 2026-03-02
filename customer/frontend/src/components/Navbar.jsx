@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../config/axios";
 import MapPicker from "./MapPicker";
 
 export default function Navbar() {
@@ -49,8 +49,8 @@ export default function Navbar() {
         locality: locationData.locality || locationData.label || "Unknown"
       };
 
-      const res = await axios.put(
-        "http://localhost:5000/api/customers/location",
+      const res = await api.put(
+        "/customers/location",
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -72,7 +72,7 @@ export default function Navbar() {
     }
 
     try {
-      const res = await axios.get("http://localhost:5000/api/notifications", {
+      const res = await api.get("/notifications", {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNotifications(res.data || []);
@@ -119,8 +119,8 @@ export default function Navbar() {
         }
 
         // Then fetch fresh data from API
-        axios
-          .get("http://localhost:5000/api/customers/me", {
+        api
+          .get("/customers/me", {
             headers: { Authorization: `Bearer ${token}` }
           })
           .then((res) => {
@@ -274,8 +274,8 @@ export default function Navbar() {
     if (!token || !notificationId) return;
 
     try {
-      await axios.put(
-        `http://localhost:5000/api/notifications/read/${notificationId}`,
+      await api.put(
+        `/notifications/read/${notificationId}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -339,8 +339,8 @@ export default function Navbar() {
 
     try {
       setChangePasswordLoading(true);
-      const res = await axios.put(
-        "http://localhost:5000/api/customers/change-password",
+      const res = await api.put(
+        "/customers/change-password",
         {
           currentPassword: passwordForm.currentPassword,
           newPassword: passwordForm.newPassword

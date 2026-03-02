@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
-import axios from "axios";
+import api from "../config/axios";
 import "../styles/home.css";
 import EmployeesOfMonth from "../components/EmployeesOfMonth";
 import LocationModal from "../components/LocationModal";
@@ -32,7 +32,7 @@ export default function Home() {
 
   const token = localStorage.getItem("customerToken");
   const providerPortalUrl =
-    import.meta.env.VITE_PROVIDER_WEB_URL || "http://localhost:3000";
+    import.meta.env.VITE_PROVIDER_URL || "http://localhost:3000";
 
   const carouselData = [
     {
@@ -90,8 +90,8 @@ export default function Home() {
 
   const fetchCustomerData = async () => {
     try {
-      const res = await axios.get(
-        "http://localhost:5000/api/customers/profile",
+      const res = await api.get(
+        "/customers/profile",
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setCustomerData(res.data);
@@ -140,8 +140,8 @@ export default function Home() {
         locality: locationData.locality || locationData.label || "Unknown"
       };
 
-      const res = await axios.put(
-        "http://localhost:5000/api/customers/location",
+      const res = await api.put(
+        "/customers/location",
         payload,
         { headers: { Authorization: `Bearer ${authToken}` } }
       );
@@ -318,8 +318,8 @@ export default function Home() {
 
     const fetchNotifications = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/notifications",
+        const res = await api.get(
+          "/notifications",
           {
             headers: { Authorization: `Bearer ${token}` }
           }
@@ -338,8 +338,8 @@ export default function Home() {
   /* ================= MARK AS READ ================= */
   const markAsRead = async (id) => {
     try {
-      await axios.put(
-        `http://localhost:5000/api/notifications/read/${id}`,
+      await api.put(
+        `/notifications/read/${id}`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` }

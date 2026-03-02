@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import api from "../config/axios";
 import "../styles/Contact.css";
 
 const initialForm = {
@@ -46,8 +46,8 @@ export default function Contact() {
       console.warn("Could not parse cached customerData", err);
     }
 
-    axios
-      .get("http://localhost:5000/api/customers/me", {
+    api
+      .get("/customers/me", {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then((res) => {
@@ -112,7 +112,7 @@ export default function Contact() {
     try {
       setLoading(true);
       setServerError("");
-      await axios.post("http://localhost:5000/api/contact", {
+      await api.post("/contact", {
         name: form.name.trim(),
         email: form.email.trim(),
         phone: form.phone.trim(),

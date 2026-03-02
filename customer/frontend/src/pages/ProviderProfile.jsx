@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../config/axios";
 import "../styles/providerProfile.css";
 
 export default function ProviderProfile() {
@@ -126,9 +126,7 @@ export default function ProviderProfile() {
     setEditingRating(Number(review.rating || 5));
     setEditingImage(null);
     setRemoveEditedImage(false);
-    setEditingImagePreview(
-      review.image ? `http://localhost:5000/uploads/${review.image}` : ""
-    );
+    setEditingImagePreview(review.image || "");
   };
 
   const cancelEditReview = () => {

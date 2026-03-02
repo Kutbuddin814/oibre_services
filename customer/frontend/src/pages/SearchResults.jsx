@@ -1,6 +1,6 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
-import axios from "axios";
+import api from "../config/axios";
 import "../styles/search.css";
 
 const TIME_SLOTS = [
@@ -83,7 +83,7 @@ export default function SearchResults() {
         const token = localStorage.getItem("customerToken");
         if (token) {
           try {
-            const profile = await axios.get("http://localhost:5000/api/customers/profile", {
+            const profile = await api.get("/customers/profile", {
               headers: { Authorization: `Bearer ${token}` }
             });
             const coords = profile.data?.location?.coordinates || [];
@@ -111,8 +111,8 @@ export default function SearchResults() {
 
       if (location && location.lat && location.lng) {
         // Use stored location
-        const res = await axios.get(
-          "http://localhost:5000/api/providers",
+        const res = await api.get(
+          "/providers",
           {
             params: {
               lat: location.lat,
@@ -128,8 +128,8 @@ export default function SearchResults() {
         // If user has a registered locality (no coords), prefer using it
         if (location && (location.locality || location.address)) {
           try {
-            const res = await axios.get(
-              "http://localhost:5000/api/providers",
+            const res = await api.get(
+              "/providers",
               {
                 params: { serviceCategory: query }
               }
@@ -156,8 +156,8 @@ export default function SearchResults() {
               const lat = pos.coords.latitude;
               const lng = pos.coords.longitude;
 
-              const res = await axios.get(
-                "http://localhost:5000/api/providers",
+              const res = await api.get(
+                "/providers",
                 {
                   params: {
                     lat,
@@ -172,8 +172,8 @@ export default function SearchResults() {
             },
             async () => {
               // fallback if location denied
-              const res = await axios.get(
-                "http://localhost:5000/api/providers",
+              const res = await api.get(
+                "/providers",
                 {
                   params: { serviceCategory: query }
                 }

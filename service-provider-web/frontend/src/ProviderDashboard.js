@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "./config/axios";
 import { useNavigate } from "react-router-dom";
 import { convertTo12HourFormat } from "./utils/timeUtils";
 import "./ProviderStyles.css";
@@ -108,8 +108,8 @@ const ProviderDashboard = () => {
   };
 
   const refreshRequests = async () => {
-    const res = await axios.get(
-      "http://localhost:5000/api/provider/requests/my-requests",
+    const res = await api.get(
+      "/provider/requests/my-requests",
       {
         headers: { Authorization: `Bearer ${token}` }
       }
@@ -177,8 +177,8 @@ const ProviderDashboard = () => {
     setLocationSaving(true);
 
     try {
-      const res = await axios.put(
-        "http://localhost:5000/api/provider/location",
+      const res = await api.put(
+        "/provider/location",
         { address, lat, lng },
         {
           headers: { Authorization: `Bearer ${token}` }
@@ -262,8 +262,8 @@ const ProviderDashboard = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/provider/me",
+        const res = await api.get(
+          "/provider/me",
           {
             headers: { Authorization: `Bearer ${token}` }
           }
@@ -378,8 +378,8 @@ const ProviderDashboard = () => {
     }
 
     try {
-      await axios.put(
-        `http://localhost:5000/api/provider/requests/update/${req._id}`,
+      await api.put(
+        `/provider/requests/update/${req._id}`,
         {
           visitDate: req.visitDate,
           visitTime: req.visitTime,
@@ -399,8 +399,8 @@ const ProviderDashboard = () => {
 
   const updateRequestStatus = async (req, status) => {
     try {
-      await axios.put(
-        `http://localhost:5000/api/provider/requests/update/${req._id}`,
+      await api.put(
+        `/provider/requests/update/${req._id}`,
         { status },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -413,8 +413,8 @@ const ProviderDashboard = () => {
   const sendCompletionOtp = async (req) => {
     try {
       setSendingOtpId(req._id);
-      const res = await axios.put(
-        `http://localhost:5000/api/provider/requests/update/${req._id}`,
+      const res = await api.put(
+        `/provider/requests/update/${req._id}`,
         { status: "completed" },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -437,8 +437,8 @@ const ProviderDashboard = () => {
 
     try {
       setVerifyingOtpId(req._id);
-      await axios.post(
-        `http://localhost:5000/api/provider/requests/verify-completion/${req._id}`,
+      await api.post(
+        `/provider/requests/verify-completion/${req._id}`,
         { otp },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -490,8 +490,8 @@ const ProviderDashboard = () => {
 
     try {
       setChangingPassword(true);
-      const res = await axios.put(
-        "http://localhost:5000/api/provider/change-password",
+      const res = await api.put(
+        "/provider/change-password",
         { currentPassword, newPassword },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -513,8 +513,8 @@ const ProviderDashboard = () => {
 
     try {
       setCancelling(true);
-      await axios.put(
-        `http://localhost:5000/api/provider/requests/update/${cancelTargetRequest._id}`,
+      await api.put(
+        `/provider/requests/update/${cancelTargetRequest._id}`,
         { providerNote: reason, status: "cancelled" },
         { headers: { Authorization: `Bearer ${token}` } }
       );

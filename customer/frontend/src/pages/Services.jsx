@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../config/axios";
 import "../styles/Services.css";
 
 const INITIAL_VISIBLE_COUNT = 6;
@@ -61,7 +61,7 @@ export default function Services() {
       try {
         setLoading(true);
         setError("");
-        const res = await axios.get("http://localhost:5000/api/services");
+        const res = await api.get("/services");
         setServices(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error("Failed to load services:", err);

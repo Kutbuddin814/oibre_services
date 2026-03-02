@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../config/axios";
 import { useNavigate } from "react-router-dom";
 import { convertTo12HourFormat } from "../utils/timeUtils";
 import "../styles/MyOrders.css";
@@ -32,8 +32,8 @@ export default function MyOrders() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/customer/requests/my-requests",
+        const res = await api.get(
+          "/customer/requests/my-requests",
           {
             headers: { Authorization: `Bearer ${token}` }
           }
@@ -74,7 +74,7 @@ export default function MyOrders() {
         formData.append("image", feedbackImage);
       }
 
-      await axios.post("http://localhost:5000/api/reviews/create", formData, {
+      await api.post("/reviews/create", formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
