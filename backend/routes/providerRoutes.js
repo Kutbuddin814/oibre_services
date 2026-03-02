@@ -231,40 +231,40 @@ router.post(
       const otpHash = await bcrypt.hash(otp, 10);
       const expiresAt = new Date(Date.now() + OTP_TTL_MS);
 
-
-      await EmailOtp.create({
+      // Save OTP to database FIRST
+      const otpRecord = await EmailOtp.create({
         email,
         otpHash,
         expiresAt
       });
 
-      const sendResult = await sendOtpEmail({ to: email, otp });
-
-      if (sendResult.sentByEmail) {
-        return res.json({ message: "OTP sent successfully to your email" });
-      }
-
-      // If email not sent because SMTP isn't configured
-      if (process.env.NODE_ENV === "production") {
-        console.error("❌ PRODUCTION: Email cannot be sent. SMTP credentials not configured!");
-        return res.status(500).json({ 
-          message: "Email service is temporarily unavailable. Please contact support."
-        });
-      }
-
-      // Development mode fallback
-      console.log(`🔧 DEV MODE: OTP=${otp} for ${email}`);
-      return res.json({ 
-        message: "OTP generated (dev mode). Check server logs for OTP.",
-        otp: otp,
-        warning: "Email not sent - SMTP not configured"
+      // Try to send email, but don't fail the request if it doesn't work
+      const sendResult = await sendOtpEmail({ to: email, otp }).catch((err) => {
+        console.error("⚠️ Email failed, but OTP saved to DB:", err.message);
+        return { sentByEmail: false, warning: err.message };
       });
+
+      // ALWAYS return success if OTP was saved to DB (email can be retried)
+      const response = {
+        message: sendResult.sentByEmail 
+          ? "OTP sent successfully to your email" 
+          : "OTP generated. Check your email (or spam folder)",
+        otpId: otpRecord._id,
+        emailSent: sendResult.sentByEmail
+      };
+
+      // Add OTP to response only in dev/test mode
+      if (process.env.NODE_ENV !== "production") {
+        response.otp = otp;
+      }
+
+      return res.json(response);
     } catch (err) {
       console.error("❌ EMAIL OTP SEND ERROR:", err.message);
       console.error("Error details:", err);
       
       // More helpful error message
-      let errorMsg = "Failed to send OTP";
+      let errorMsg = "Failed to generate OTP";
       if (err.message.includes("ECONNREFUSED")) {
         errorMsg = "Email server connection failed. Check SMTP credentials.";
       } else if (err.message.includes("Invalid credentials")) {
