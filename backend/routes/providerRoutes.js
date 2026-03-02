@@ -42,11 +42,22 @@ const createMailer = () => {
     return null;
   }
 
+  const isSecure = port === 465;
+  const isPort587 = port === 587;
+
   return nodemailer.createTransport({
     host,
     port,
-    secure: port === 465,
-    auth: { user, pass }
+    secure: isSecure,
+    requireTLS: isPort587,
+    auth: { user, pass },
+    connectionTimeout: 5000,
+    socketTimeout: 5000,
+    pool: {
+      maxConnections: 1,
+      maxMessages: 5,
+      rateDelta: 2000
+    }
   });
 };
 

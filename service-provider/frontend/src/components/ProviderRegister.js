@@ -497,7 +497,7 @@ const ProviderRegister = ({ onSuccess }) => {
                   const res = await api.post(
                     "/providers/email-otp/send",
                     { email: formData.email },
-                    { timeout: 10000 }
+                    { timeout: 30000 }
                   );
                   console.log("/email-otp/send response", res?.data);
 
