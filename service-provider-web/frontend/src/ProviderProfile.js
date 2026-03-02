@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../config/axios";
 import { useNavigate } from "react-router-dom";
 import "./ProviderStyles.css";
 
@@ -37,8 +37,8 @@ const ProviderProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/provider/me",
+        const res = await api.get(
+          "/provider/me",
           {
             headers: {
               Authorization: `Bearer ${token}`
@@ -61,7 +61,7 @@ const ProviderProfile = () => {
     const fetchServices = async () => {
       try {
         setLoadingServices(true);
-        const res = await axios.get("http://localhost:5000/api/admin/services");
+        const res = await api.get("/admin/services");
         const list = Array.isArray(res.data) ? res.data : [];
         setServiceOptions(list.map((s) => s.name).filter(Boolean));
       } catch (err) {
@@ -85,8 +85,8 @@ const ProviderProfile = () => {
     setRemovalSubmitting(true);
 
     try {
-      await axios.post(
-        "http://localhost:5000/api/provider/removal-requests",
+      await api.post(
+        "/provider/removal-requests",
         { reason: removalReason.trim() },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -133,8 +133,8 @@ const ProviderProfile = () => {
     setEditSaving(true);
 
     try {
-      const res = await axios.put(
-        "http://localhost:5000/api/provider/me",
+      const res = await api.put(
+        "/provider/me",
         { mobile, serviceCategory, experience },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -226,8 +226,8 @@ const ProviderProfile = () => {
     setLocationSaving(true);
 
     try {
-      const res = await axios.put(
-        "http://localhost:5000/api/provider/location",
+      const res = await api.put(
+        "/provider/location",
         { address, lat, lng },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -407,7 +407,7 @@ const ProviderProfile = () => {
   if (!provider) return null;
 
   const profileImageUrl = provider.profilePhoto
-    ? `http://localhost:5000/uploads/${encodeURIComponent(
+    ? `https://oibre-backend-main.onrender.com/uploads/${encodeURIComponent(
         provider.profilePhoto
       )}`
     : null;

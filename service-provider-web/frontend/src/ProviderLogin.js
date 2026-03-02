@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../config/axios";
 import { useNavigate } from "react-router-dom";
 import "./ProviderStyles.css";
 
@@ -20,8 +20,8 @@ const ProviderLogin = () => {
       const normalizedEmail = String(email || "").trim().toLowerCase();
       const normalizedPassword = String(password || "").trim();
 
-      const res = await axios.post(
-        "http://localhost:5000/api/provider/auth/login",
+      const res = await api.post(
+        "/provider/auth/login",
         { email: normalizedEmail, password: normalizedPassword }
       );
 
