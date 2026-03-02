@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../config/axios";
 import "../styles/ProviderRegister.css";
 
 /* VALIDATION HELPERS */
@@ -116,7 +116,7 @@ const ProviderRegister = ({ onSuccess }) => {
   const fetchServices = async () => {
     try {
       setLoadingServices(true);
-      const res = await axios.get("http://localhost:5000/api/services");
+      const res = await api.get("/services");
       const list = Array.isArray(res.data) ? res.data : [];
       setServices(list);
     } catch (err) {
@@ -396,9 +396,9 @@ const ProviderRegister = ({ onSuccess }) => {
 
       data.append("profilePhoto", files.profilePhoto);
       data.append("skillCertificate", files.skillCertificate);
-
-      const res = await axios.post(
-        "http://localhost:5000/api/providers/register",
+      
+      const res = await api.post(
+        "/providers/register",
         data,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
@@ -469,10 +469,11 @@ const ProviderRegister = ({ onSuccess }) => {
                 try {
                   console.log("calling /exists");
                   setOtpMessage("Checking email availability...");
-                  const check = await axios.get("http://localhost:5000/api/providers/exists", {
+                  const check = await api.get("/providers/exists", {
                     params: { email: formData.email },
                     timeout: 5000
                   });
+
                   console.log("/exists response", check?.data);
                   if (check.data?.exists) {
                     const msg = check.data.status === "approved"
@@ -493,8 +494,8 @@ const ProviderRegister = ({ onSuccess }) => {
                   console.log("calling /email-otp/send");
                   setOtpMessage("Sending OTP...");
                   setEmailOtp((prev) => ({ ...prev, sending: true }));
-                  const res = await axios.post(
-                    "http://localhost:5000/api/providers/email-otp/send",
+                  const res = await api.post(
+                    "/providers/email-otp/send",
                     { email: formData.email },
                     { timeout: 10000 }
                   );
@@ -566,8 +567,8 @@ const ProviderRegister = ({ onSuccess }) => {
                     try {
                       setError("");
                       setEmailOtp((prev) => ({ ...prev, verifying: true, error: "" }));
-                      const res = await axios.post(
-                        "http://localhost:5000/api/providers/email-otp/verify",
+                      const res = await api.post(
+                        "/providers/email-otp/verify",
                         { email: formData.email, otp: emailOtp.code.trim() }
                       );
                       setEmailOtp((prev) => ({
