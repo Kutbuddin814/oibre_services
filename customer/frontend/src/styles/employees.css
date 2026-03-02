@@ -1,0 +1,151 @@
+.eom-showcase {
+  padding: 70px 6%;
+  text-align: center;
+  background: #fafafa;
+}
+
+.eom-heading {
+  font-size: 2.1rem;
+  font-weight: 700;
+}
+
+.eom-subheading {
+  margin-top: 6px;
+  color: #666;
+  margin-bottom: 40px;
+}
+
+.eom-card-hero {
+  max-width: 760px;
+  margin: auto;
+  display: flex;
+  background: #ffffff;
+  border-radius: 26px;
+  overflow: hidden;
+  box-shadow: 0 30px 70px rgba(0,0,0,0.14);
+  animation: eomFadeSlide 0.8s ease;
+}
+
+@keyframes eomFadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.eom-image {
+  flex: 1;
+  min-height: 360px;
+}
+
+.eom-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.eom-info {
+  flex: 1;
+  padding: 40px 34px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.eom-badge {
+  display: inline-block;
+  background: #111;
+  color: #fff;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  width: fit-content;
+  margin-bottom: 16px;
+}
+
+.eom-info h3 {
+  font-size: 1.9rem;
+  margin-bottom: 6px;
+}
+
+.eom-role {
+  font-size: 1.05rem;
+  color: #444;
+}
+
+.eom-exp {
+  margin-top: 10px;
+  color: #666;
+}
+
+.eom-rating {
+  margin-top: 14px;
+  font-weight: 600;
+}
+
+.eom-dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ccc;
+  cursor: pointer;
+}
+
+.dot.active {
+  background: #111;
+}
+
+@media (max-width: 768px) {
+  .eom-card-hero {
+    flex-direction: column;
+    border-radius: 18px;
+  }
+
+  .eom-image {
+    min-height: 240px;
+  }
+
+  .eom-info {
+    padding: 22px 18px;
+    text-align: center;
+  }
+
+  .eom-info h3 {
+    font-size: 1.55rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .eom-showcase {
+    padding: 44px 12px;
+  }
+
+  .eom-heading {
+    font-size: 1.6rem;
+  }
+
+  .eom-subheading {
+    margin-bottom: 20px;
+  }
+
+  .eom-image {
+    min-height: 210px;
+  }
+
+  .eom-badge {
+    font-size: 12px;
+    padding: 5px 12px;
+  }
+}

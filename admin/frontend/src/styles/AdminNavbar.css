@@ -1,0 +1,297 @@
+/* =======================
+   ADMIN NAVBAR
+======================= */
+
+.admin-navbar {
+  background: linear-gradient(135deg, #111827 0%, #1F2937 100%);
+  color: #FFFFFF;
+  padding: 0 24px;
+  height: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.menu-btn {
+  background: none;
+  border: none;
+  color: #FFFFFF;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.menu-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.navbar-logo {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logout-btn {
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: transparent;
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.change-password-btn {
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.change-password-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.admin-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.admin-profile:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.profile-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #4F46E5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.profile-name {
+  font-weight: 600;
+  font-size: 14px;
+  margin: 0;
+}
+
+.profile-role {
+  font-size: 12px;
+  color: #D1D5DB;
+  margin: 0;
+}
+
+.admin-password-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.55);
+  z-index: 130;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.admin-password-modal {
+  width: min(440px, 95vw);
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 16px 42px rgba(2, 6, 23, 0.35);
+  padding: 20px;
+}
+
+.admin-password-modal h3 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  color: #0f172a;
+}
+
+.admin-password-modal p {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: #475569;
+}
+
+.admin-password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-password-form label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.admin-password-form input {
+  height: 40px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 0 12px;
+  font-size: 14px;
+}
+
+.admin-password-form input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.admin-password-form .password-input-wrap {
+  position: relative;
+}
+
+.admin-password-form .password-input-wrap input {
+  width: 100%;
+  padding-right: 42px;
+}
+
+.admin-password-form .password-toggle-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  padding: 2px;
+  line-height: 1;
+  font-size: 16px;
+}
+
+.admin-password-error {
+  margin-top: 6px;
+  border: 1px solid #fecaca;
+  background: #fee2e2;
+  color: #991b1b;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.admin-password-success {
+  margin-top: 6px;
+  border: 1px solid #bbf7d0;
+  background: #dcfce7;
+  color: #166534;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.admin-password-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.admin-password-actions button {
+  height: 38px;
+  border-radius: 10px;
+  border: none;
+  padding: 0 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-password-actions button[type="button"] {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.admin-password-actions button[type="submit"] {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.admin-password-actions button:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .admin-navbar {
+    padding: 0 16px;
+  }
+
+  .profile-info {
+    display: none;
+  }
+
+  .change-password-btn {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 560px) {
+  .admin-navbar {
+    padding: 0 10px;
+    gap: 8px;
+  }
+
+  .navbar-logo {
+    font-size: 16px;
+  }
+
+  .navbar-right {
+    gap: 6px;
+  }
+
+  .change-password-btn,
+  .logout-btn {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+
+  .profile-avatar {
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
+  }
+}

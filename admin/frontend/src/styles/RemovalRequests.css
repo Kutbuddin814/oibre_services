@@ -1,0 +1,140 @@
+/* Removal Requests Page */
+
+.removal-requests {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.removal-requests .page-header {
+  margin-bottom: 24px;
+}
+
+.removal-requests .page-header h2 {
+  font-size: 26px;
+  margin: 0 0 6px 0;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.removal-requests .page-header p {
+  color: #666;
+  margin: 0;
+  font-size: 14px;
+}
+
+.removal-requests .filter-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.removal-requests .filter-btn {
+  padding: 8px 14px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.removal-requests .filter-btn.active {
+  background: #111827;
+  color: #fff;
+  border-color: #111827;
+}
+
+.removal-requests-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.removal-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.removal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.removal-header h3 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  color: #111827;
+}
+
+.removal-email {
+  margin: 0;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.removal-requests .status-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.removal-requests .status-badge.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.removal-requests .status-badge.approved {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.removal-requests .status-badge.rejected {
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+
+.removal-reason {
+  font-size: 13px;
+  color: #374151;
+  margin: 8px 0;
+}
+
+.removal-date {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.removal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.removal-actions .btn-approve,
+.removal-actions .btn-reject {
+  flex: 1;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.removal-actions .btn-approve {
+  background: #111827;
+  color: #fff;
+}
+
+.removal-actions .btn-reject {
+  background: #fee2e2;
+  color: #7f1d1d;
+}

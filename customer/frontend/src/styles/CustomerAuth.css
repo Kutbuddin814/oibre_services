@@ -1,0 +1,328 @@
+/* Customer Auth - Email OTP Verification */
+
+/* Email Input Styling */
+.customer-email-input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 15px;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.customer-email-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+.customer-email-input:disabled {
+  background: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.password-input-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.password-input-wrap .customer-email-input {
+  padding-right: 42px;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 2px;
+  line-height: 1;
+  font-size: 16px;
+}
+
+/* Email verified state - green styling */
+.customer-email-input-verified {
+  border-color: #10b981 !important;
+  background: #f0fdf4;
+}
+
+.customer-email-input-verified:focus {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+
+/* OTP Row */
+.customer-otp-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.customer-otp-row input {
+  flex: 1 1 auto;
+  min-width: 120px;
+  margin-bottom: 0;
+}
+
+.customer-otp-btn {
+  width: auto;
+  padding: 12px 18px;
+  border-radius: 8px;
+  border: none;
+  background: #111827;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.customer-otp-btn:hover:not(:disabled) {
+  background: #1f2937;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.customer-otp-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Verified state - button shows "✓ Verified" */
+.customer-otp-btn-verified {
+  background: #10b981 !important;
+}
+
+.customer-otp-btn-verified:disabled {
+  background: #10b981 !important;
+  opacity: 1;
+}
+
+.customer-otp-input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  border-radius: 8px;
+  border: 2px solid #d1d5db;
+  background: #fff;
+  box-sizing: border-box;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.customer-otp-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+  border-width: 2px;
+}
+
+.customer-otp-input-error {
+  border-color: #ef4444 !important;
+  background: #fef2f2 !important;
+  color: #991b1b;
+}
+
+.customer-otp-input-error:focus {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+@keyframes customer-shake-error {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-6px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(6px);
+  }
+}
+
+.customer-shake-error {
+  animation: customer-shake-error 0.6s ease-in-out;
+}
+
+.customer-otp-status {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #f3f4f6;
+  border-left: 3px solid #9ca3af;
+  animation: customer-slideDown 0.3s ease;
+}
+
+@keyframes customer-slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.customer-otp-status.error {
+  background: #fee2e2;
+  color: #991b1b;
+  border-left-color: #dc2626;
+}
+
+.customer-otp-status.success {
+  background: #dcfce7;
+  color: #166534;
+  border-left-color: #16a34a;
+}
+
+.customer-otp-error-message {
+  font-size: 13px;
+  color: #991b1b;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-left: 3px solid #dc2626;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-top: 8px;
+  animation: customer-slideDown 0.3s ease, customer-shake-popup 0.4s ease;
+  font-weight: 500;
+}
+
+@keyframes customer-shake-popup {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+/* Form Styling */
+.customer-auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Button Styling */
+.customer-signup-btn {
+  width: 100%;
+  padding: 12px 18px;
+  background: #111827;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 6px;
+}
+
+.customer-signup-btn:hover {
+  background: #1f2937;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.customer-signup-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Google Button */
+.customer-google-btn {
+  width: 100%;
+  padding: 12px 18px;
+  border: 1.5px solid #e5e7eb;
+  background: #fff;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+  margin-top: 6px;
+}
+
+.customer-google-btn:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
+}
+
+/* Container & Layout */
+.customer-auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  padding: 20px;
+}
+
+.customer-auth-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
+  padding: 40px;
+}
+
+.customer-auth-title {
+  font-size: 26px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 30px;
+  color: #111827;
+}
+
+.customer-auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.customer-auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.customer-auth-divider-line {
+  flex: 1;
+  height: 1px;
+  background: #e5e7eb;
+}
+
+.customer-auth-divider-text {
+  font-size: 12px;
+  color: #9ca3af;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}

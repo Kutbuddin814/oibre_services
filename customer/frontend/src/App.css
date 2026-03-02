@@ -1,0 +1,26 @@
+/* 
+  App.css is intentionally minimal.
+
+  All real styles are split into:
+  /src/styles/
+   - base.css
+   - navbar.css
+   - home.css
+   - search.css
+   - carousel.css
+   - footer.css
+
+  This file exists only to keep React happy
+  and for any future app-level overrides.
+*/
+
+/* Optional global helper classes (safe to keep) */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.hidden {
+  display: none;
+}

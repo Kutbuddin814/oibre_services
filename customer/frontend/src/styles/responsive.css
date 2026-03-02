@@ -1,0 +1,111 @@
+/* Customer app - shared mobile responsiveness */
+
+html,
+body,
+#root {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 900px) {
+  .search-layout {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .filters {
+    position: static;
+  }
+
+  .back-button {
+    position: static;
+    margin: 12px 12px 0;
+    width: fit-content;
+  }
+}
+
+@media (max-width: 768px) {
+  .home {
+    padding-top: 24px;
+  }
+
+  .hero h1 {
+    font-size: 28px;
+    line-height: 1.2;
+  }
+
+  .hero p {
+    font-size: 14px;
+  }
+
+  .search-wrapper,
+  .search-box {
+    flex-direction: column;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .search-button,
+  .search-btn {
+    width: 100%;
+    min-height: 46px;
+  }
+
+  .services-grid,
+  .results-grid,
+  .professional-grid,
+  .why-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-divider::before {
+    width: 88%;
+  }
+
+  .eom-showcase {
+    padding: 44px 14px;
+  }
+
+  .eom-heading {
+    font-size: 1.7rem;
+  }
+
+  .eom-info h3 {
+    font-size: 1.45rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .orders-page,
+  .search-layout,
+  .results-header,
+  .professionals,
+  .carousel-section,
+  .why-choose {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .order-card,
+  .result-card,
+  .professional-card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .footer-container {
+    padding: 30px 14px;
+  }
+
+  .footer-brand {
+    font-size: 18px;
+  }
+}
