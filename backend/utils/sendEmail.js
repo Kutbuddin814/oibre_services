@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-// Create transporter only if credentials are available
+// Get transporter - created lazily to avoid ESM issues with newer Node.js versions
 const getTransporter = () => {
   const emailUser = process.env.EMAIL_USER;
   const emailPass = process.env.EMAIL_PASS;
@@ -23,8 +23,6 @@ const getTransporter = () => {
     socketTimeout: 10000
   });
 };
-
-const transporter = getTransporter();
 
 // Professional email header CSS
 const emailHeaderStyles = `
@@ -65,6 +63,7 @@ const emailHeaderStyles = `
    APPROVAL EMAIL (WITH PASSWORD)
 ================================ */
 const sendApprovalEmail = async (to, name, password) => {
+  const transporter = getTransporter();
   if (!transporter) {
     console.warn("⚠️ Email not sent - transporter not configured. To:", to);
     return { sent: false, reason: "Email transporter not configured" };
@@ -145,6 +144,7 @@ const sendApprovalEmail = async (to, name, password) => {
    REJECTION EMAIL
 ================================ */
 const sendRejectionEmail = async (to, name, reason) => {
+  const transporter = getTransporter();
   if (!transporter) {
     console.warn("⚠️ Email not sent - transporter not configured. To:", to);
     return { sent: false, reason: "Email transporter not configured" };
@@ -209,6 +209,7 @@ const sendRejectionEmail = async (to, name, reason) => {
    BLOCK EMAIL
 ================================ */
 const sendBlockEmail = async (to, name, reason) => {
+  const transporter = getTransporter();
   if (!transporter) {
     console.warn("⚠️ Email not sent - transporter not configured. To:", to);
     return { sent: false, reason: "Email transporter not configured" };
@@ -280,6 +281,7 @@ const sendBlockEmail = async (to, name, reason) => {
    UNBLOCK EMAIL
 ================================ */
 const sendUnblockEmail = async (to, name) => {
+  const transporter = getTransporter();
   if (!transporter) {
     console.warn("⚠️ Email not sent - transporter not configured. To:", to);
     return { sent: false, reason: "Email transporter not configured" };
@@ -337,6 +339,7 @@ const sendUnblockEmail = async (to, name) => {
    REMOVAL APPROVED EMAIL
 ================================ */
 const sendRemovalApprovedEmail = async (to, name, adminNote) => {
+  const transporter = getTransporter();
   if (!transporter) {
     console.warn("⚠️ Email not sent - transporter not configured. To:", to);
     return { sent: false, reason: "Email transporter not configured" };
@@ -404,6 +407,7 @@ const sendRemovalApprovedEmail = async (to, name, adminNote) => {
    PROVIDER PASSWORD RESET EMAIL
 ================================ */
 const sendPasswordResetEmail = async (to, name, password) => {
+  const transporter = getTransporter();
   if (!transporter) {
     console.warn("⚠️ Email not sent - transporter not configured. To:", to);
     return { sent: false, reason: "Email transporter not configured" };
@@ -476,6 +480,7 @@ const sendPasswordResetEmail = async (to, name, password) => {
    CONTACT REPLY EMAIL
 ================================ */
 const sendContactReplyEmail = async ({ to, customerName, subject, adminMessage }) => {
+  const transporter = getTransporter();
   if (!transporter) {
     console.warn("⚠️ Email not sent - transporter not configured. To:", to);
     return { sent: false, reason: "Email transporter not configured" };
