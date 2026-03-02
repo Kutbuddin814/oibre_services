@@ -12,6 +12,8 @@ const transporter = nodemailer.createTransport({
   greetingTimeout: 10000,
   socketTimeout: 10000
 });
+const info = await transporter.sendMail(mailOptions);
+console.log("Email info:", info);
 
 // Professional email header CSS
 const emailHeaderStyles = `
