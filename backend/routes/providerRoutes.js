@@ -56,8 +56,9 @@ const sendOtpEmail = async ({ to, otp }) => {
 
   if (!transporter) {
     // Development fallback: log OTP to console. Do NOT enable this behaviour in production.
-    console.warn(`DEV OTP for ${to}: ${otp}`);
-    return { sentByEmail: false };
+    console.warn(`⚠️ DEV OTP for ${to}: ${otp}`);
+    console.warn(`⚠️ Email sending disabled! Configure SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS in .env`);
+    return { sentByEmail: false, warning: "Email credentials not configured" };
   }
 
   const subject = "Oibre - Service Provider Registration Verification Code";
@@ -132,16 +133,19 @@ const sendOtpEmail = async ({ to, otp }) => {
     </html>
   `;
 
-  transporter.sendMail({
-    from,
-    to,
-    subject,
-    html
-  }).catch((err) => {
-    console.error("PROVIDER OTP EMAIL ERROR:", err?.message || err);
-  });
-
-  return { sentByEmail: true };
+  try {
+    await transporter.sendMail({
+      from,
+      to,
+      subject,
+      html
+    });
+    console.log(`✅ OTP email sent successfully to ${to}`);
+    return { sentByEmail: true };
+  } catch (err) {
+    console.error("❌ PROVIDER OTP EMAIL ERROR:", err?.message || err);
+    return { sentByEmail: false, error: err?.message };
+  }
 };
 
 const generateOtp = () => String(crypto.randomInt(100000, 999999));
@@ -223,12 +227,24 @@ router.post(
       const sendResult = await sendOtpEmail({ to: email, otp });
 
       if (sendResult.sentByEmail) {
-        return res.json({ message: "OTP generated and email is being sent" });
+        return res.json({ message: "OTP sent successfully to your email" });
       }
 
-      // If email not sent because SMTP isn't configured, return the OTP in dev only
-      const devOtp = process.env.NODE_ENV !== "production" ? otp : undefined;
-      return res.json({ message: "OTP generated (dev). Check server logs.", otp: devOtp });
+      // If email not sent because SMTP isn't configured
+      if (process.env.NODE_ENV === "production") {
+        console.error("❌ PRODUCTION: Email cannot be sent. SMTP credentials not configured!");
+        return res.status(500).json({ 
+          message: "Email service is temporarily unavailable. Please contact support."
+        });
+      }
+
+      // Development mode fallback
+      console.log(`🔧 DEV MODE: OTP=${otp} for ${email}`);
+      return res.json({ 
+        message: "OTP generated (dev mode). Check server logs for OTP.",
+        otp: otp,
+        warning: "Email not sent - SMTP not configured"
+      });
     } catch (err) {
       console.error("EMAIL OTP SEND ERROR:", err.message);
       res.status(500).json({ message: "Failed to send OTP" });
