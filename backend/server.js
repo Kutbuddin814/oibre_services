@@ -26,7 +26,7 @@ const allowedOrigins = [
 ].filter(Boolean);
 
 console.log("Allowed Origins:", allowedOrigins);
-
+app.options('*', cors());
 app.use(
   cors({
     origin: function (origin, callback) {
