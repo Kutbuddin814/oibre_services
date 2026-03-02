@@ -47,7 +47,7 @@ const emailHeaderStyles = `
    APPROVAL EMAIL (WITH PASSWORD)
 ================================ */
 const sendApprovalEmail = async (to, name, password) => {
-  const loginLink = "http://localhost:3002";
+  const loginLink = "https://oibre-services-provider-web-fronten.vercel.app";
 
   const mailOptions = {
     from: process.env.EMAIL_USER,
@@ -331,7 +331,7 @@ const sendRemovalApprovedEmail = async (to, name, adminNote) => {
    PROVIDER PASSWORD RESET EMAIL
 ================================ */
 const sendPasswordResetEmail = async (to, name, password) => {
-  const loginLink = "http://localhost:3002";
+  const loginLink = "https://oibre-services-provider-web-fronten.vercel.app";
 
   const mailOptions = {
     from: process.env.EMAIL_USER,
