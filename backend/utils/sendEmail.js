@@ -1,19 +1,30 @@
 const nodemailer = require("nodemailer");
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  },
-  logger: true,
-  debug: true,
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 10000
-});
-const info = await transporter.sendMail(mailOptions);
-console.log("Email info:", info);
+// Create transporter only if credentials are available
+const getTransporter = () => {
+  const emailUser = process.env.EMAIL_USER;
+  const emailPass = process.env.EMAIL_PASS;
+
+  if (!emailUser || !emailPass) {
+    console.warn("⚠️ Email credentials not configured. Emails will not be sent.");
+    return null;
+  }
+
+  return nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: emailUser,
+      pass: emailPass
+    },
+    logger: true,
+    debug: true,
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000
+  });
+};
+
+const transporter = getTransporter();
 
 // Professional email header CSS
 const emailHeaderStyles = `
@@ -54,6 +65,11 @@ const emailHeaderStyles = `
    APPROVAL EMAIL (WITH PASSWORD)
 ================================ */
 const sendApprovalEmail = async (to, name, password) => {
+  if (!transporter) {
+    console.warn("⚠️ Email not sent - transporter not configured. To:", to);
+    return { sent: false, reason: "Email transporter not configured" };
+  }
+
   const loginLink = "https://oibre-services-provider-web-fronten.vercel.app";
 
   const mailOptions = {
@@ -116,13 +132,24 @@ const sendApprovalEmail = async (to, name, password) => {
     `
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+    return { sent: true };
+  } catch (error) {
+    console.error("❌ Failed to send approval email:", error.message);
+    return { sent: false, reason: error.message };
+  }
 };
 
 /* ===============================
    REJECTION EMAIL
 ================================ */
 const sendRejectionEmail = async (to, name, reason) => {
+  if (!transporter) {
+    console.warn("⚠️ Email not sent - transporter not configured. To:", to);
+    return { sent: false, reason: "Email transporter not configured" };
+  }
+
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to,
@@ -169,13 +196,24 @@ const sendRejectionEmail = async (to, name, reason) => {
     `
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+    return { sent: true };
+  } catch (error) {
+    console.error("❌ Failed to send rejection email:", error.message);
+    return { sent: false, reason: error.message };
+  }
 };
 
 /* ===============================
    BLOCK EMAIL
 ================================ */
 const sendBlockEmail = async (to, name, reason) => {
+  if (!transporter) {
+    console.warn("⚠️ Email not sent - transporter not configured. To:", to);
+    return { sent: false, reason: "Email transporter not configured" };
+  }
+
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to,
@@ -229,13 +267,24 @@ const sendBlockEmail = async (to, name, reason) => {
     `
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+    return { sent: true };
+  } catch (error) {
+    console.error("❌ Failed to send block email:", error.message);
+    return { sent: false, reason: error.message };
+  }
 };
 
 /* ===============================
    UNBLOCK EMAIL
 ================================ */
 const sendUnblockEmail = async (to, name) => {
+  if (!transporter) {
+    console.warn("⚠️ Email not sent - transporter not configured. To:", to);
+    return { sent: false, reason: "Email transporter not configured" };
+  }
+
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to,
@@ -275,13 +324,24 @@ const sendUnblockEmail = async (to, name) => {
     `
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+    return { sent: true };
+  } catch (error) {
+    console.error("❌ Failed to send unblock email:", error.message);
+    return { sent: false, reason: error.message };
+  }
 };
 
 /* ===============================
    REMOVAL APPROVED EMAIL
 ================================ */
 const sendRemovalApprovedEmail = async (to, name, adminNote) => {
+  if (!transporter) {
+    console.warn("⚠️ Email not sent - transporter not configured. To:", to);
+    return { sent: false, reason: "Email transporter not configured" };
+  }
+
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to,
@@ -331,13 +391,24 @@ const sendRemovalApprovedEmail = async (to, name, adminNote) => {
     `
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+    return { sent: true };
+  } catch (error) {
+    console.error("❌ Failed to send removal email:", error.message);
+    return { sent: false, reason: error.message };
+  }
 };
 
 /* ===============================
    PROVIDER PASSWORD RESET EMAIL
 ================================ */
 const sendPasswordResetEmail = async (to, name, password) => {
+  if (!transporter) {
+    console.warn("⚠️ Email not sent - transporter not configured. To:", to);
+    return { sent: false, reason: "Email transporter not configured" };
+  }
+
   const loginLink = "https://oibre-services-provider-web-fronten.vercel.app";
 
   const mailOptions = {
@@ -392,19 +463,30 @@ const sendPasswordResetEmail = async (to, name, password) => {
     `
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+    return { sent: true };
+  } catch (error) {
+    console.error("❌ Failed to send password reset email:", error.message);
+    return { sent: false, reason: error.message };
+  }
 };
 
 /* ===============================
    CONTACT REPLY EMAIL
 ================================ */
 const sendContactReplyEmail = async ({ to, customerName, subject, adminMessage }) => {
+  if (!transporter) {
+    console.warn("⚠️ Email not sent - transporter not configured. To:", to);
+    return { sent: false, reason: "Email transporter not configured" };
+  }
+
   const safe = (value = "") =>
     String(value)
       .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
+      .replace(/</g, "<")
+      .replace(/>/g, ">")
+      .replace(/"/g, "\u0022")
       .replace(/'/g, "&#39;");
 
   const safeName = safe(customerName || "Customer");
@@ -449,7 +531,13 @@ const sendContactReplyEmail = async ({ to, customerName, subject, adminMessage }
     `
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+    return { sent: true };
+  } catch (error) {
+    console.error("❌ Failed to send contact reply email:", error.message);
+    return { sent: false, reason: error.message };
+  }
 };
 
 module.exports = {

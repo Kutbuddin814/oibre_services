@@ -1,0 +1,43 @@
+Allowed Origins: [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://localhost:3002',
+  'https://oibre-service-provider-frontend.vercel.app',
+  'https://oibre-customer-frontend.vercel.app',
+  'https://oibre-admin-frontend.vercel.app',
+  'https://oibre-services-provider-web-fronten.vercel.app'
+]
+[2026-03-02 14:12:11] DEBUG Creating transport: nodemailer (6.10.1; +https://nodemailer.com/; SMTP/6.10.1[client:6.10.1])
+❌ MongoDB Connection Failed: MongooseServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+    at _handleConnectionErrors (c:\Users\user\Desktop\Oibre\Oibre\Oibre\backend\node_modules\mongoose\lib\connection.js:1169:11)
+    at NativeConnection.openUri (c:\Users\user\Desktop\Oibre\Oibre\Oibre\backend\node_modules\mongoose\lib\connection.js:1100:11) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'Unknown',
+    servers: Map(1) { 'localhost:27017' => [ServerDescription] },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: null,
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  cause: TopologyDescription {
+    type: 'Unknown',
+    servers: Map(1) { 'localhost:27017' => [ServerDescription] },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: null,
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  }
+}
