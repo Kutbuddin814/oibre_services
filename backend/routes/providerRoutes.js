@@ -178,6 +178,38 @@ router.get("/", async (req, res) => {
         .lean();
     }
 
+    // ✅ Calculate distance and final price for each provider
+    providers = providers.map((provider) => {
+      let distanceKm = null;
+
+      if (!isNaN(latitude) && !isNaN(longitude)) {
+        const R = 6371; // Earth's radius in kilometers
+        const dLat =
+          (latitude - provider.location.coordinates[1]) * Math.PI / 180;
+        const dLng =
+          (longitude - provider.location.coordinates[0]) * Math.PI / 180;
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(provider.location.coordinates[1] * Math.PI / 180) *
+            Math.cos(latitude * Math.PI / 180) *
+            Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        const c = 2 * Math.asin(Math.sqrt(a));
+        distanceKm = Math.round(R * c * 10) / 10;
+      }
+
+      const basePrice = provider.basePrice || 200;
+      const distanceCharge = distanceKm
+        ? Math.max(50, Math.round(distanceKm * 5))
+        : 0;
+      const finalPrice = basePrice + distanceCharge;
+
+      return {
+        ...provider,
+        distanceKm,
+        finalPrice
+      };
+    });
+
     res.json(providers);
   } catch (err) {
     console.error("SEARCH PROVIDERS ERROR:", err.message);
