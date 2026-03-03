@@ -158,11 +158,8 @@ router.get("/", async (req, res) => {
     if (latitude && longitude && isFinite(latitude) && isFinite(longitude)) {
       // Location provided - use geospatial search
       query = query.where("location").near({
-        $geometry: {
-          type: "Point",
-          coordinates: [longitude, latitude]
-        },
-        $maxDistance: 20000 // optional (20km)
+        type: "Point",
+        coordinates: [longitude, latitude]
       });
     }
     // If no location, just return providers matching category (sorted by best rating)
