@@ -152,16 +152,19 @@ router.get("/", async (req, res) => {
     let query = ServiceProvider.find(filter);
 
     // If location is provided, sort by distance
-    if (lat && lng) {
-      const latitude = parseFloat(lat);
-      const longitude = parseFloat(lng);
+    const latitude = lat ? parseFloat(lat) : null;
+    const longitude = lng ? parseFloat(lng) : null;
 
-      if (isFinite(latitude) && isFinite(longitude)) {
-        query = query.where("location").near({
-          type: "Point",
-          coordinates: [longitude, latitude]
-        });
-      }
+    if (latitude && longitude && isFinite(latitude) && isFinite(longitude)) {
+      // Location provided - use geospatial search
+      query = query.where("location").near({
+        type: "Point",
+        coordinates: [longitude, latitude]
+      });
+    }
+    // If no location, just return providers matching category (sorted by best rating)
+    else {
+      query = query.sort({ averageRating: -1 });
     }
 
     const providers = await query.select("-password").limit(50).lean();
