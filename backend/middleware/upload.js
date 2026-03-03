@@ -34,9 +34,11 @@ const createCloudinaryStorage = () => {
           resource_type: "raw",
           format: "pdf",
           public_id: publicId,
-          type: "upload",
-          auth_token: false, // Make sure PDFs don't require auth tokens
-          access_mode: "public" // Explicitly set as public
+          access_control: [
+            {
+              access_type: "anonymous"
+            }
+          ]
         };
       }
       

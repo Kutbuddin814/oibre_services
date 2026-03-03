@@ -132,19 +132,13 @@ router.get("/provider-requests", async (req, res) => {
       // Handle skillCertificate - check if it's already a Cloudinary URL
       if (reqObj.skillCertificate) {
         if (reqObj.skillCertificate.startsWith('http')) {
-          // Already a full Cloudinary URL - ensure it displays inline for PDFs
-          if (reqObj.skillCertificate.includes('/raw/upload/') && !reqObj.skillCertificate.includes('fl_attachment')) {
-            // PDF stored as raw - add fl_attachment flag to display inline
-            reqObj.skillCertificate = reqObj.skillCertificate.replace(
-              '/raw/upload/',
-              '/raw/upload/fl_attachment:false/'
-            );
-          }
+          // Already a full Cloudinary URL - use as-is (no transformations for raw files)
+          reqObj.skillCertificate = reqObj.skillCertificate;
         } else if (isCloudinaryConfigured && reqObj.skillCertificate.trim()) {
           // Cloudinary is configured but stored as just the public_id
           // Assume it's a PDF since we handle PDFs differently
           const publicId = reqObj.skillCertificate.trim();
-          reqObj.skillCertificate = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/raw/upload/fl_attachment:false/oibre/${publicId}.pdf`;
+          reqObj.skillCertificate = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/raw/upload/oibre/${publicId}.pdf`;
         } else if (!isCloudinaryConfigured) {
           // Local storage
           reqObj.skillCertificate = `${baseURL}/uploads/${reqObj.skillCertificate}`;
