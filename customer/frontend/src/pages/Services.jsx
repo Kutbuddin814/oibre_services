@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../config/axios";
-import { BACKEND_BASE_URL } from "../config/api";
 import "../styles/Services.css";
 
 const INITIAL_VISIBLE_COUNT = 6;
-const DEFAULT_ICON = "🔧";
-const ICON_BASE_URL = `${BACKEND_BASE_URL}/uploads`;
+const DEFAULT_ICON = "\uD83D\uDD27";
+const ICON_BASE_URL = "http://localhost:5000/uploads";
 
 const SERVICE_ICON_FALLBACKS = {
   "ac service": "\u2744\uFE0F",
