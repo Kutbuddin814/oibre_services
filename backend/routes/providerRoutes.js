@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const multer = require("multer");
 const axios = require("axios");
 const dns = require("dns").promises;
+const { uploadWithCloudinary } = require("../middleware/upload");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const { sendBrevoEmail } = require("../utils/sendEmail");
@@ -130,18 +130,6 @@ const sendOtpEmail = async ({ to, otp }) => {
 };
 
 const generateOtp = () => String(crypto.randomInt(100000, 999999));
-
-/* ===============================
-   MULTER CONFIG
-=============================== */
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads"),
-  filename: (req, file, cb) => {
-    const ext = file.originalname.split(".").pop();
-    cb(null, `${Date.now()}-${file.fieldname}.${ext}`);
-  }
-});
-const upload = multer({ storage });
 
 /* ===============================
    FREE GEO CODING (OpenStreetMap)
@@ -304,10 +292,7 @@ router.get(
 
 router.post(
   "/register",
-  upload.fields([
-    { name: "profilePhoto", maxCount: 1 },
-    { name: "skillCertificate", maxCount: 1 }
-  ]),
+  uploadWithCloudinary,
   async (req, res) => {
     try {
       const {
@@ -467,8 +452,8 @@ router.post(
           coordinates
         },
 
-        profilePhoto: req.files?.profilePhoto?.[0]?.path || req.files?.profilePhoto?.[0]?.filename,
-        skillCertificate: req.files?.skillCertificate?.[0]?.path || req.files?.skillCertificate?.[0]?.filename,
+        profilePhoto: req.fileCloudinaryUrls?.profilePhoto || "",
+        skillCertificate: req.fileCloudinaryUrls?.skillCertificate || "",
 
         status: "pending",
         verified: false
