@@ -407,9 +407,11 @@ const ProviderProfile = () => {
   if (!provider) return null;
 
   const profileImageUrl = provider.profilePhoto
-    ? `https://oibre-backend-main.onrender.com/uploads/${encodeURIComponent(
-        provider.profilePhoto
-      )}`
+    ? provider.profilePhoto.startsWith('http')
+      ? provider.profilePhoto // Already a Cloudinary URL, use directly
+      : `https://oibre-backend-main.onrender.com/uploads/${encodeURIComponent(
+          provider.profilePhoto
+        )}` // Local storage fallback
     : null;
 
   return (
