@@ -5,6 +5,8 @@ const CustomerSchema = new mongoose.Schema(
     name: String,
     email: String,
     mobile: String,
+    password: { type: String, default: null, select: false },
+    googleId: String,
     address: String,
     locality: String,
     location: {
