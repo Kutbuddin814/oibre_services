@@ -34,10 +34,11 @@ router.put("/me", authMiddleware, upload.fields([
   { name: "skillCertificate", maxCount: 1 }
 ]), async (req, res) => {
   try {
-    const { mobile, experience } = req.body;
+    const { mobile, experience, availableTime } = req.body;
 
     const nextMobile = String(mobile || "").trim();
     const nextExperience = String(experience || "").trim();
+    const nextAvailableTime = String(availableTime || "").trim();
 
     if (!/^[6-9]\d{9}$/.test(nextMobile)) {
       return res.status(400).json({ message: "Please enter a valid 10-digit mobile number" });
@@ -54,7 +55,8 @@ router.put("/me", authMiddleware, upload.fields([
 
     const updateData = {
       mobile: nextMobile,
-      experience: nextExperience
+      experience: nextExperience,
+      availableTime: nextAvailableTime
     };
 
     // Add uploaded files to update data if present

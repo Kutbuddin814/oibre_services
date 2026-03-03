@@ -110,6 +110,7 @@ const ProviderProfile = () => {
     setEditForm({
       mobile: provider.mobile || "",
       experience: provider.experience || "",
+      availableTime: provider.availableTime || "",
       profilePhoto: null,
       skillCertificate: null
     });
@@ -120,6 +121,7 @@ const ProviderProfile = () => {
   const handleEditProfileSave = async () => {
     const mobile = String(editForm.mobile || "").trim();
     const experience = String(editForm.experience || "").trim();
+    const availableTime = String(editForm.availableTime || "").trim();
 
     if (!/^[6-9]\d{9}$/.test(mobile)) {
       setEditError("Please enter a valid 10-digit mobile number.");
@@ -133,6 +135,7 @@ const ProviderProfile = () => {
       const formData = new FormData();
       formData.append("mobile", mobile);
       formData.append("experience", experience);
+      formData.append("availableTime", availableTime);
 
       if (editForm.profilePhoto) {
         formData.append("profilePhoto", editForm.profilePhoto);
@@ -157,6 +160,7 @@ const ProviderProfile = () => {
       setEditForm({
         mobile: "",
         experience: "",
+        availableTime: "",
         profilePhoto: null,
         skillCertificate: null
       });
@@ -533,7 +537,7 @@ const ProviderProfile = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <h3>Edit Profile</h3>
-            <p>Update your phone number, experience, profile photo, and certificates.</p>
+            <p>Update your phone number, experience, available time, profile photo, and certificates.</p>
 
             <label className="provider-location-hint" style={{ display: "block", marginTop: 8 }}>
               Email (not editable)
@@ -586,6 +590,19 @@ const ProviderProfile = () => {
                 setEditForm((prev) => ({ ...prev, experience: e.target.value }))
               }
               placeholder="e.g. 5 years"
+            />
+
+            <label className="provider-location-hint" style={{ display: "block", marginTop: 8 }}>
+              Available Time
+            </label>
+            <input
+              type="text"
+              className="provider-location-search"
+              value={editForm.availableTime}
+              onChange={(e) =>
+                setEditForm((prev) => ({ ...prev, availableTime: e.target.value }))
+              }
+              placeholder="e.g. 9 AM - 6 PM"
             />
 
             <label className="provider-location-hint" style={{ display: "block", marginTop: 8 }}>
