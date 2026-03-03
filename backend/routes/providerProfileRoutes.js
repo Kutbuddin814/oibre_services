@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const ServiceProvider = require("../models/ServiceProvider");
 const RemovalRequest = require("../models/RemovalRequest");
 const authMiddleware = require("../middleware/authMiddleware");
-const upload = require("../middleware/upload");
+const { upload } = require("../middleware/upload");
 
 const router = express.Router();
 
