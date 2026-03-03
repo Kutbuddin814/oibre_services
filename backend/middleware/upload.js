@@ -15,10 +15,16 @@ cloudinary.config({
 const createCloudinaryStorage = () => {
   return new CloudinaryStorage({
     cloudinary: cloudinary,
-    params: {
-      folder: "oibre",
-      allowed_formats: ["jpg", "jpeg", "png", "pdf"],
-      resource_type: "auto"
+    params: async (req, file) => {
+      // Determine resource type based on file extension
+      const ext = file.originalname.split('.').pop().toLowerCase();
+      const resourceType = ext === 'pdf' ? 'raw' : 'auto';
+      
+      return {
+        folder: "oibre",
+        allowed_formats: ["jpg", "jpeg", "png", "pdf"],
+        resource_type: resourceType
+      };
     }
   });
 };
