@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const ServiceProvider = require("../models/ServiceProvider");
 const RemovalRequest = require("../models/RemovalRequest");
 const authMiddleware = require("../middleware/authMiddleware");
+const upload = require("../middleware/upload");
 
 const router = express.Router();
 
@@ -28,20 +29,18 @@ router.get("/me", authMiddleware, async (req, res) => {
 /* ===============================
    UPDATE LOGGED-IN PROVIDER PROFILE
 ================================ */
-router.put("/me", authMiddleware, async (req, res) => {
+router.put("/me", authMiddleware, upload.fields([
+  { name: "profilePhoto", maxCount: 1 },
+  { name: "skillCertificate", maxCount: 1 }
+]), async (req, res) => {
   try {
-    const { mobile, serviceCategory, experience } = req.body;
+    const { mobile, experience } = req.body;
 
     const nextMobile = String(mobile || "").trim();
-    const nextCategory = String(serviceCategory || "").trim();
     const nextExperience = String(experience || "").trim();
 
     if (!/^[6-9]\d{9}$/.test(nextMobile)) {
       return res.status(400).json({ message: "Please enter a valid 10-digit mobile number" });
-    }
-
-    if (!nextCategory) {
-      return res.status(400).json({ message: "Service category is required" });
     }
 
     const mobileTaken = await ServiceProvider.findOne({
@@ -53,13 +52,23 @@ router.put("/me", authMiddleware, async (req, res) => {
       return res.status(409).json({ message: "Mobile number already in use" });
     }
 
+    const updateData = {
+      mobile: nextMobile,
+      experience: nextExperience
+    };
+
+    // Add uploaded files to update data if present
+    if (req.files?.profilePhoto?.[0]) {
+      updateData.profilePhoto = req.files.profilePhoto[0].path;
+    }
+
+    if (req.files?.skillCertificate?.[0]) {
+      updateData.skillCertificate = req.files.skillCertificate[0].path;
+    }
+
     const provider = await ServiceProvider.findByIdAndUpdate(
       req.providerId,
-      {
-        mobile: nextMobile,
-        serviceCategory: nextCategory,
-        experience: nextExperience
-      },
+      updateData,
       { new: true, runValidators: true }
     ).select("-__v");
 

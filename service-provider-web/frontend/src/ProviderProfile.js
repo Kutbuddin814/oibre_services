@@ -23,8 +23,10 @@ const ProviderProfile = () => {
   const [editError, setEditError] = useState("");
   const [editForm, setEditForm] = useState({
     mobile: "",
-    serviceCategory: "",
-    experience: ""
+    experience: "",
+    availableTime: "",
+    profilePhoto: null,
+    skillCertificate: null
   });
   const [serviceOptions, setServiceOptions] = useState([]);
   const [loadingServices, setLoadingServices] = useState(false);
@@ -107,8 +109,9 @@ const ProviderProfile = () => {
     if (!provider) return;
     setEditForm({
       mobile: provider.mobile || "",
-      serviceCategory: provider.serviceCategory || "",
-      experience: provider.experience || ""
+      experience: provider.experience || "",
+      profilePhoto: null,
+      skillCertificate: null
     });
     setEditError("");
     setShowEditModal(true);
@@ -116,7 +119,6 @@ const ProviderProfile = () => {
 
   const handleEditProfileSave = async () => {
     const mobile = String(editForm.mobile || "").trim();
-    const serviceCategory = String(editForm.serviceCategory || "").trim();
     const experience = String(editForm.experience || "").trim();
 
     if (!/^[6-9]\d{9}$/.test(mobile)) {
@@ -124,23 +126,42 @@ const ProviderProfile = () => {
       return;
     }
 
-    if (!serviceCategory) {
-      setEditError("Service category is required.");
-      return;
-    }
-
     setEditError("");
     setEditSaving(true);
 
     try {
+      const formData = new FormData();
+      formData.append("mobile", mobile);
+      formData.append("experience", experience);
+
+      if (editForm.profilePhoto) {
+        formData.append("profilePhoto", editForm.profilePhoto);
+      }
+
+      if (editForm.skillCertificate) {
+        formData.append("skillCertificate", editForm.skillCertificate);
+      }
+
       const res = await api.put(
         "/provider/me",
-        { mobile, serviceCategory, experience },
-        { headers: { Authorization: `Bearer ${token}` } }
+        formData,
+        { 
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data"
+          } 
+        }
       );
 
       setProvider(res.data.provider);
+      setEditForm({
+        mobile: "",
+        experience: "",
+        profilePhoto: null,
+        skillCertificate: null
+      });
       setShowEditModal(false);
+      alert("Profile updated successfully!");
     } catch (err) {
       setEditError(err.response?.data?.message || "Failed to update profile.");
     } finally {
@@ -512,7 +533,7 @@ const ProviderProfile = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <h3>Edit Profile</h3>
-            <p>Update your phone number, category, and experience.</p>
+            <p>Update your phone number, experience, profile photo, and certificates.</p>
 
             <label className="provider-location-hint" style={{ display: "block", marginTop: 8 }}>
               Email (not editable)
@@ -521,6 +542,17 @@ const ProviderProfile = () => {
               type="text"
               className="provider-location-search"
               value={provider.email || ""}
+              disabled
+              style={{ background: "#f3f4f6", color: "#6b7280", cursor: "not-allowed" }}
+            />
+
+            <label className="provider-location-hint" style={{ display: "block", marginTop: 8 }}>
+              Service Category (not editable)
+            </label>
+            <input
+              type="text"
+              className="provider-location-search"
+              value={provider.serviceCategory || ""}
               disabled
               style={{ background: "#f3f4f6", color: "#6b7280", cursor: "not-allowed" }}
             />
@@ -544,32 +576,6 @@ const ProviderProfile = () => {
             />
 
             <label className="provider-location-hint" style={{ display: "block", marginTop: 8 }}>
-              Service Category
-            </label>
-            <select
-              className="provider-location-search"
-              value={editForm.serviceCategory}
-              onChange={(e) =>
-                setEditForm((prev) => ({ ...prev, serviceCategory: e.target.value }))
-              }
-            >
-              <option value="">
-                {loadingServices ? "Loading services..." : "Select service category"}
-              </option>
-              {serviceOptions.map((name) => (
-                <option key={name} value={name}>
-                  {name}
-                </option>
-              ))}
-              {editForm.serviceCategory &&
-                !serviceOptions.includes(editForm.serviceCategory) && (
-                  <option value={editForm.serviceCategory}>
-                    {editForm.serviceCategory}
-                  </option>
-                )}
-            </select>
-
-            <label className="provider-location-hint" style={{ display: "block", marginTop: 8 }}>
               Experience
             </label>
             <input
@@ -581,6 +587,46 @@ const ProviderProfile = () => {
               }
               placeholder="e.g. 5 years"
             />
+
+            <label className="provider-location-hint" style={{ display: "block", marginTop: 8 }}>
+              Profile Photo
+            </label>
+            <input
+              type="file"
+              className="provider-location-search"
+              accept="image/*"
+              onChange={(e) =>
+                setEditForm((prev) => ({
+                  ...prev,
+                  profilePhoto: e.target.files?.[0] || null
+                }))
+              }
+            />
+            {editForm.profilePhoto && (
+              <p style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>
+                Selected: {editForm.profilePhoto.name}
+              </p>
+            )}
+
+            <label className="provider-location-hint" style={{ display: "block", marginTop: 8 }}>
+              Skill Certificate
+            </label>
+            <input
+              type="file"
+              className="provider-location-search"
+              accept=".pdf,.jpg,.jpeg,.png"
+              onChange={(e) =>
+                setEditForm((prev) => ({
+                  ...prev,
+                  skillCertificate: e.target.files?.[0] || null
+                }))
+              }
+            />
+            {editForm.skillCertificate && (
+              <p style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>
+                Selected: {editForm.skillCertificate.name}
+              </p>
+            )}
 
             {editError && <div className="error-message">{editError}</div>}
 
