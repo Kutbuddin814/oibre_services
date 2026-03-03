@@ -132,11 +132,16 @@ router.get("/provider-requests", async (req, res) => {
       // Handle skillCertificate - check if it's already a Cloudinary URL
       if (reqObj.skillCertificate) {
         if (reqObj.skillCertificate.startsWith('http')) {
-          // Already a Cloudinary URL
-          reqObj.skillCertificate = reqObj.skillCertificate;
+          // Already a Cloudinary URL - add fl_inline flag for PDF viewing
+          if (reqObj.skillCertificate.includes('/image/upload/')) {
+            reqObj.skillCertificate = reqObj.skillCertificate.replace(
+              '/image/upload/',
+              '/image/upload/fl_inline/'
+            );
+          }
         } else if (isCloudinaryConfigured) {
-          // Cloudinary is configured but stored as filename - construct URL
-          reqObj.skillCertificate = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/oibre/${reqObj.skillCertificate}`;
+          // Cloudinary is configured but stored as filename - construct URL with fl_inline
+          reqObj.skillCertificate = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/fl_inline/oibre/${reqObj.skillCertificate}`;
         } else {
           // Local storage
           reqObj.skillCertificate = `${baseURL}/uploads/${reqObj.skillCertificate}`;
