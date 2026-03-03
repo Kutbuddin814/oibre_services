@@ -149,6 +149,13 @@ const ProviderRegister = ({ onSuccess }) => {
     const file = e.target.files[0];
     if (!file) return;
 
+    // File size validation (max 10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      setError(`File size must be less than 10MB. Your file is ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+      return;
+    }
+
     if (e.target.name === "profilePhoto" && !file.type.startsWith("image/")) {
       setError("Profile photo must be an image");
       return;
@@ -400,13 +407,18 @@ const ProviderRegister = ({ onSuccess }) => {
       const res = await api.post(
         "/providers/register",
         data,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        { 
+          headers: { "Content-Type": "multipart/form-data" },
+          timeout: 120000 // 2 minutes timeout for file upload
+        }
       );
 
       onSuccess();
 
     } catch (error) {
-      if (error.response?.status === 409) {
+      if (error.code === "ECONNABORTED") {
+        setError("Upload took too long. Please try again with a smaller file or better internet connection.");
+      } else if (error.response?.status === 409) {
         const { message } = error.response.data;
         setError(message);
 
@@ -788,7 +800,7 @@ const ProviderRegister = ({ onSuccess }) => {
         {error && <div className="error-message">{error}</div>}
 
         <button type="submit" disabled={loading || loadingServices}>
-          {loading ? "Submitting..." : "Submit for Approval"}
+          {loading ? "⏳ Uploading & Submitting... (this may take 1-2 minutes for large files)" : "Submit for Approval"}
         </button>
       </form>
     </div>

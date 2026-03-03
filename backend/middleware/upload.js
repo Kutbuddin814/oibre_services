@@ -32,8 +32,9 @@ const createCloudinaryStorage = () => {
         return {
           folder: "oibre",
           resource_type: "image",
+          public_id: publicId,
           format: "pdf",
-          public_id: publicId
+          type: "upload"
         };
       }
       
@@ -81,10 +82,22 @@ const isCloudinaryConfigured = process.env.CLOUDINARY_CLOUD_NAME &&
 
 if (isCloudinaryConfigured) {
   const storage = createCloudinaryStorage();
-  upload = multer({ storage, fileFilter });
+  upload = multer({ 
+    storage, 
+    fileFilter,
+    limits: {
+      fileSize: 10 * 1024 * 1024 // 10MB max file size
+    }
+  });
   console.log("Cloudinary Storage initialized");
 } else {
-  upload = multer({ storage: localStorage, fileFilter });
+  upload = multer({ 
+    storage: localStorage, 
+    fileFilter,
+    limits: {
+      fileSize: 10 * 1024 * 1024 // 10MB max file size
+    }
+  });
   console.log("Using local storage (Cloudinary not configured)");
 }
 
