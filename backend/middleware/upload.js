@@ -16,12 +16,21 @@ const createCloudinaryStorage = () => {
   return new CloudinaryStorage({
     cloudinary: cloudinary,
     params: async (req, file) => {
+      // Generate proper filename without extension (Cloudinary will add it)
+      const originalName = path.parse(file.originalname).name;
+      const timestamp = Date.now();
+      const publicId = `${originalName}_${timestamp}`;
+      
       // Use MIME type to determine resource type (more reliable than extension)
       if (file.mimetype === "application/pdf") {
         return {
           folder: "oibre",
           resource_type: "raw",
-          format: "pdf"
+          format: "pdf",
+          public_id: publicId,
+          type: "upload",
+          auth_token: false, // Make sure PDFs don't require auth tokens
+          access_mode: "public" // Explicitly set as public
         };
       }
       
@@ -29,7 +38,9 @@ const createCloudinaryStorage = () => {
       return {
         folder: "oibre",
         resource_type: "image",
-        allowed_formats: ["jpg", "jpeg", "png"]
+        allowed_formats: ["jpg", "jpeg", "png"],
+        public_id: publicId,
+        type: "upload"
       };
     }
   });

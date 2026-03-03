@@ -477,6 +477,25 @@ export default function ProviderProfile() {
         <h3>Certification</h3>
 
         {provider.skillCertificate ? (
+          // Check if it's a Cloudinary URL
+          provider.skillCertificate.startsWith('http') ? (
+            // Cloudinary URL - check if it's a PDF (raw or image)
+            provider.skillCertificate.includes('/raw/upload/') ? (
+              <a
+                href={provider.skillCertificate}
+                target="_blank"
+                rel="noreferrer"
+              >
+                📄 View Certificate (PDF)
+              </a>
+            ) : (
+              <img
+                src={provider.skillCertificate}
+                alt="Certificate"
+                className="certificate-image"
+              />
+            )
+          ) : // Local storage URL
           provider.skillCertificate.endsWith(".pdf") ? (
             <a
               href={`http://localhost:5000/uploads/${provider.skillCertificate}`}
