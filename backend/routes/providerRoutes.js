@@ -448,8 +448,8 @@ router.post(
           coordinates
         },
 
-        profilePhoto: req.files?.profilePhoto?.[0]?.filename,
-        skillCertificate: req.files?.skillCertificate?.[0]?.filename,
+        profilePhoto: req.files?.profilePhoto?.[0]?.path || req.files?.profilePhoto?.[0]?.filename,
+        skillCertificate: req.files?.skillCertificate?.[0]?.path || req.files?.skillCertificate?.[0]?.filename,
 
         status: "pending",
         verified: false

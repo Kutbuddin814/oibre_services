@@ -544,7 +544,7 @@ router.post("/services", uploadServiceIcon.single("iconImage"), async (req, res)
       name: name.trim(),
       description: description || "",
       icon: icon || "\uD83D\uDD27",
-      iconImage: req.file ? `service-icons/${req.file.filename}` : "",
+      iconImage: req.file?.path || req.file ? `service-icons/${req.file.filename}` : "",
       status: "active"
     });
 
@@ -566,7 +566,7 @@ router.patch("/services/:id", uploadServiceIcon.single("iconImage"), async (req,
     if (description !== undefined) updateData.description = description;
     if (icon) updateData.icon = icon;
     if (status) updateData.status = status;
-    if (req.file) updateData.iconImage = `service-icons/${req.file.filename}`;
+    if (req.file) updateData.iconImage = req.file?.path || `service-icons/${req.file.filename}`;
 
     const updatedService = await Service.findByIdAndUpdate(
       req.params.id,

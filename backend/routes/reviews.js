@@ -93,7 +93,7 @@ router.post("/create", customerAuth, upload.single("image"), async (req, res) =>
       booking: bookingIdStr,
       rating: numericRating,
       comment,
-      image: req.file ? `reviews/${req.file.filename}` : ""
+      image: req.file?.path || ""
     });
 
     await ServiceRequest.findByIdAndUpdate(bookingIdStr, {
@@ -144,7 +144,7 @@ router.patch("/:reviewId", customerAuth, upload.single("image"), async (req, res
     review.comment = comment;
     review.rating = numericRating;
     if (req.file) {
-      review.image = `reviews/${req.file.filename}`;
+      review.image = req.file.path || req.file.filename;
     } else if (removeImage) {
       review.image = "";
     }
