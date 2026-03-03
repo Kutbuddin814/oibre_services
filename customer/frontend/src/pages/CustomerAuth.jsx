@@ -107,8 +107,17 @@ export default function CustomerAuth() {
           });
         }
       }
-    } catch {
-      alert("Google authentication failed");
+    } catch (err) {
+      console.error("Google auth error:", err);
+      if (err.code === "auth/cancelled-popup-request") {
+        alert("Google sign-in was cancelled. Please try again.");
+      } else if (err.code === "auth/popup-blocked") {
+        alert("Sign-in popup was blocked. Please allow popups and try again.");
+      } else if (err.code === "auth/unauthorized-domain") {
+        alert("This domain is not authorized for Google Sign-In. Please contact support.");
+      } else {
+        alert("Google authentication failed: " + (err.message || "Unknown error"));
+      }
     }
   };
 
