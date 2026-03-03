@@ -2,25 +2,24 @@ const nodemailer = require("nodemailer");
 
 // Get transporter - created lazily to avoid ESM issues with newer Node.js versions
 const getTransporter = () => {
-  const emailUser = process.env.EMAIL_USER;
-  const emailPass = process.env.EMAIL_PASS;
+  const host = process.env.SMTP_HOST;
+  const port = process.env.SMTP_PORT;
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
 
-  if (!emailUser || !emailPass) {
-    console.warn("⚠️ Email credentials not configured. Emails will not be sent.");
+  if (!host || !port || !user || !pass) {
+    console.warn("⚠️ SMTP credentials not configured.");
     return null;
   }
 
   return nodemailer.createTransport({
-    service: "gmail",
+    host: host,
+    port: Number(port),
+    secure: false, // must be false for port 587
     auth: {
-      user: emailUser,
-      pass: emailPass
-    },
-    logger: true,
-    debug: true,
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 10000
+      user: user,
+      pass: pass
+    }
   });
 };
 
@@ -72,7 +71,7 @@ const sendApprovalEmail = async (to, name, password) => {
   const loginLink = "https://oibre-services-provider-web-fronten.vercel.app";
 
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: process.env.SMTP_FROM,
     to,
     subject: "Your Oibre Provider Account is Approved",
     html: `
@@ -151,7 +150,7 @@ const sendRejectionEmail = async (to, name, reason) => {
   }
 
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: process.env.SMTP_FROM,
     to,
     subject: "Your Oibre Provider Request - Update",
     html: `
@@ -216,7 +215,7 @@ const sendBlockEmail = async (to, name, reason) => {
   }
 
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: process.env.SMTP_FROM,
     to,
     subject: "Important: Your Oibre Provider Account Status",
     html: `
@@ -288,7 +287,7 @@ const sendUnblockEmail = async (to, name) => {
   }
 
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: process.env.SMTP_FROM,
     to,
     subject: "Your Oibre Provider Account Has Been Unblocked",
     html: `
@@ -346,7 +345,7 @@ const sendRemovalApprovedEmail = async (to, name, adminNote) => {
   }
 
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: process.env.SMTP_FROM,
     to,
     subject: "Your Oibre Provider Account Removal Request Was Approved",
     html: `
@@ -416,7 +415,7 @@ const sendPasswordResetEmail = async (to, name, password) => {
   const loginLink = "https://oibre-services-provider-web-fronten.vercel.app";
 
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: process.env.SMTP_FROM,
     to,
     subject: "Your Oibre Provider Login Password Was Reset",
     html: `
@@ -499,7 +498,7 @@ const sendContactReplyEmail = async ({ to, customerName, subject, adminMessage }
   const safeMessage = safe(adminMessage || "").replace(/\n/g, "<br/>");
 
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: process.env.SMTP_FROM,
     to,
     subject: `${subject || "Your message to Oibre"} - Oibre Support`,
     html: `

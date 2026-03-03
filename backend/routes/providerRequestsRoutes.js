@@ -157,7 +157,7 @@ router.put("/update/:id", authMiddleware, async (req, res) => {
           message: "Customer email is missing for this booking. Cannot send OTP."
         });
       }
-      if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      if (!process.env.SMTP_HOST || !process.env.SMTP_PORT || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
         return res.status(500).json({
           message: "Email service is not configured on provider backend."
         });
