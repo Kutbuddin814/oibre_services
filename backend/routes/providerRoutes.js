@@ -155,6 +155,109 @@ const getLatLng = async (address) => {
 };
 
 /* ===============================
+   SEARCH PROVIDERS BY LOCATION & CATEGORY
+=============================== */
+router.get("/", async (req, res) => {
+  try {
+    const { lat, lng, serviceCategory } = req.query;
+
+    let filter = { status: "approved" };
+
+    // Filter by service category if provided
+    if (serviceCategory && serviceCategory.trim()) {
+      const category = serviceCategory.trim().toLowerCase();
+      filter.$or = [
+        { serviceCategory: { $regex: category, $options: "i" } },
+        { otherService: { $regex: category, $options: "i" } }
+      ];
+    }
+
+    let query = ServiceProvider.find(filter);
+
+    // If location is provided, sort by distance
+    if (lat && lng) {
+      const latitude = parseFloat(lat);
+      const longitude = parseFloat(lng);
+
+      if (isFinite(latitude) && isFinite(longitude)) {
+        query = query.where("location").near({
+          type: "Point",
+          coordinates: [longitude, latitude]
+        });
+      }
+    }
+
+    const providers = await query.select("-password").limit(50).lean();
+
+    res.json(providers);
+  } catch (err) {
+    console.error("SEARCH PROVIDERS ERROR:", err.message);
+    res.status(500).json({ message: "Failed to search providers" });
+  }
+});
+
+/* ===============================
+   GET PROVIDER PROFILE WITH REVIEWS
+=============================== */
+router.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { lat, lng } = req.query;
+
+    const provider = await ServiceProvider.findById(id)
+      .select("-password")
+      .lean();
+
+    if (!provider) {
+      return res.status(404).json({ message: "Provider not found" });
+    }
+
+    // Fetch reviews for this provider
+    const Review = require("../models/Review");
+    const reviews = await Review.find({ provider: id })
+      .select("rating text customerName customerPhoto createdAt")
+      .lean()
+      .sort({ createdAt: -1 });
+
+    // Calculate distance if location is provided
+    let distanceKm = null;
+    if (lat && lng) {
+      const latitude = parseFloat(lat);
+      const longitude = parseFloat(lng);
+
+      if (isFinite(latitude) && isFinite(longitude)) {
+        // Haversine formula for distance calculation
+        const R = 6371; // Earth's radius in kilometers
+        const dLat = (latitude - provider.location.coordinates[1]) * Math.PI / 180;
+        const dLng = (longitude - provider.location.coordinates[0]) * Math.PI / 180;
+        const a = 
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(provider.location.coordinates[1] * Math.PI / 180) * 
+          Math.cos(latitude * Math.PI / 180) *
+          Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        const c = 2 * Math.asin(Math.sqrt(a));
+        distanceKm = Math.round(R * c * 10) / 10; // Round to 1 decimal place
+      }
+    }
+
+    // Calculate final price based on distance
+    const basePrice = provider.basePrice || 200;
+    const distanceCharge = distanceKm ? Math.max(50, Math.round(distanceKm * 5)) : 0;
+    const finalPrice = basePrice + distanceCharge;
+
+    res.json({
+      provider,
+      reviews,
+      distanceKm,
+      finalPrice
+    });
+  } catch (err) {
+    console.error("GET PROVIDER ERROR:", err.message);
+    res.status(500).json({ message: "Failed to fetch provider" });
+  }
+});
+
+/* ===============================
    REGISTER PROVIDER (FIELD SAFE)
 =============================== */
 router.post(
