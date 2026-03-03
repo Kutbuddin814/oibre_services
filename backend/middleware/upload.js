@@ -32,13 +32,7 @@ const createCloudinaryStorage = () => {
         return {
           folder: "oibre",
           resource_type: "raw",
-          format: "pdf",
-          public_id: publicId,
-          access_control: [
-            {
-              access_type: "anonymous"
-            }
-          ]
+          public_id: publicId
         };
       }
       

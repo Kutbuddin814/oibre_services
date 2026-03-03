@@ -115,34 +115,28 @@ router.get("/provider-requests", async (req, res) => {
     const requestsWithUrls = requests.map(request => {
       const reqObj = request.toObject();
       
-      // Handle profilePhoto - check if it's already a Cloudinary URL
+      // Handle profilePhoto - use URL as-is, don't rebuild
       if (reqObj.profilePhoto) {
         if (reqObj.profilePhoto.startsWith('http')) {
-          // Already a Cloudinary URL
+          // Already a Cloudinary URL - use it directly
           reqObj.profilePhoto = reqObj.profilePhoto;
-        } else if (isCloudinaryConfigured) {
-          // Cloudinary is configured but stored as filename or public_id
-          reqObj.profilePhoto = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/w_500/oibre/${reqObj.profilePhoto}`;
-        } else {
-          // Local storage
+        } else if (!isCloudinaryConfigured) {
+          // Local storage fallback
           reqObj.profilePhoto = `${baseURL}/uploads/${reqObj.profilePhoto}`;
         }
       }
       
-      // Handle skillCertificate - check if it's already a Cloudinary URL
+      // Handle skillCertificate - use URL as-is, don't rebuild
       if (reqObj.skillCertificate) {
         if (reqObj.skillCertificate.startsWith('http')) {
-          // Already a full Cloudinary URL - use as-is (no transformations for raw files)
+          // Already a full Cloudinary URL - use it directly
           reqObj.skillCertificate = reqObj.skillCertificate;
-        } else if (isCloudinaryConfigured && reqObj.skillCertificate.trim()) {
-          // Cloudinary is configured but stored as just the public_id
-          // Assume it's a PDF since we handle PDFs differently
-          const publicId = reqObj.skillCertificate.trim();
-          reqObj.skillCertificate = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/raw/upload/oibre/${publicId}.pdf`;
         } else if (!isCloudinaryConfigured) {
-          // Local storage
+          // Local storage fallback
           reqObj.skillCertificate = `${baseURL}/uploads/${reqObj.skillCertificate}`;
         }
+        // If Cloudinary is configured but it's just a publicId, still store as-is
+        // The upload middleware now always returns full URLs
       }
       
       return reqObj;
