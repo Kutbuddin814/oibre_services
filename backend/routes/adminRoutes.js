@@ -22,6 +22,7 @@ const {
   sendBlockEmail,
   sendUnblockEmail,
   sendRemovalApprovedEmail,
+  sendRemovalRejectedEmail,
   sendPasswordResetEmail,
   sendContactReplyEmail
 } = require("../utils/sendEmail");
@@ -456,12 +457,26 @@ router.patch("/removal-requests/:id/reject", async (req, res) => {
       return res.status(400).json({ message: "Removal request already processed" });
     }
 
+    const adminNote = (req.body?.adminNote || "").trim();
+    
+    // Get provider details for email
+    const provider = await ServiceProvider.findById(request.providerId);
+    const notificationEmail = request.email || provider?.email;
+    
+    if (notificationEmail) {
+      queueEmail(
+        sendRemovalRejectedEmail(notificationEmail, request.name || provider?.name, adminNote),
+        "PROVIDER REMOVAL REJECTION"
+      );
+    }
+
     request.status = "rejected";
-    request.adminNote = (req.body?.adminNote || "").trim();
+    request.adminNote = adminNote;
     await request.save();
 
-    res.json({ message: "Removal request rejected" });
-  } catch {
+    res.json({ message: "Removal request rejected and email sent" });
+  } catch (err) {
+    console.error("REMOVAL REJECTION ERROR:", err);
     res.status(500).json({ message: "Failed to reject removal request" });
   }
 });

@@ -270,10 +270,17 @@ const ProviderDashboard = () => {
         );
         setProvider(res.data);
 
+        // Only show location modal if provider hasn't set a location yet
+        const hasLocationInDb =
+          res.data?.location?.coordinates && res.data.location.coordinates.length === 2;
         const alreadyChosen =
           localStorage.getItem(getLocationSetupKey(res.data?._id)) === "true";
-        if (!alreadyChosen) {
+        
+        if (!hasLocationInDb && !alreadyChosen) {
           setShowLocationModal(true);
+        } else if (hasLocationInDb) {
+          // If they already have a location, mark it as chosen so modal doesn't show
+          localStorage.setItem(getLocationSetupKey(res.data?._id), "true");
         }
       } catch {
         logout();

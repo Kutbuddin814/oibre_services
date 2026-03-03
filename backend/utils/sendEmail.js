@@ -350,6 +350,61 @@ const sendRemovalApprovedEmail = async (to, name, adminNote) => {
 };
 
 /* ===============================
+   PROVIDER REMOVAL REJECTED EMAIL
+================================ */
+const sendRemovalRejectedEmail = async (to, name, adminNote) => {
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <style>${emailHeaderStyles}</style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <div class="logo">Oibre</div>
+            <div class="badge badge-rejection">Removal Rejected</div>
+          </div>
+          <div class="content">
+            <p class="greeting">Hello ${name || "Provider"},</p>
+            <p class="description">
+              Your request to remove your service provider account has been reviewed and rejected by our admin team.
+              Your provider account remains active on the platform.
+            </p>
+
+            <div class="purpose-box">
+              <div class="purpose-label" style="color: #dc2626;">Request Status</div>
+              <div class="purpose-text" style="color: #7f1d1d;">Your account removal request has been rejected</div>
+            </div>
+
+            ${
+              adminNote
+                ? `<div class="info-box"><div class="info-item"><span class="info-label">Admin note:</span> ${adminNote}</div></div>`
+                : ""
+            }
+
+            <p style="margin-top: 16px; font-size: 14px; color: #6b7280;">
+              If you have questions about this decision or would like to resubmit your removal request, please contact our support team at support@oibre.com.
+            </p>
+
+            <div class="footer">
+              <p style="margin: 0 0 8px 0;"><strong>Oibre</strong> | Local Services Platform</p>
+              <p style="margin: 0; font-size: 11px;">This is an automated email. Please do not reply to this address.</p>
+            </div>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+
+  return sendBrevoEmail({
+    to,
+    subject: "Your Oibre Provider Account Removal Request Was Rejected",
+    html
+  });
+};
+
+/* ===============================
    PROVIDER PASSWORD RESET EMAIL
 ================================ */
 const sendPasswordResetEmail = async (to, name, password) => {
@@ -569,6 +624,7 @@ module.exports = {
   sendBlockEmail,
   sendUnblockEmail,
   sendRemovalApprovedEmail,
+  sendRemovalRejectedEmail,
   sendPasswordResetEmail,
   sendContactReplyEmail,
   sendCompletionOtpEmail,
