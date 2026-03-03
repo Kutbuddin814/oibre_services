@@ -94,22 +94,28 @@ if (isCloudinaryConfigured) {
 }
 
 // Wrapper to handle upload and get Cloudinary URLs
-const uploadWithCloudinary = async (req, res, next) => {
-  upload.any()(req, res, async (err) => {
+const uploadWithCloudinary = (req, res, next) => {
+  upload.fields([
+    { name: "profilePhoto", maxCount: 1 },
+    { name: "skillCertificate", maxCount: 1 }
+  ])(req, res, (err) => {
     if (err) {
       return res.status(400).json({ message: err.message });
     }
 
-    // If Cloudinary is configured, the file URLs are in req.files[].path
+    // If Cloudinary is configured, the file URLs are in req.files
     if (isCloudinaryConfigured && req.files) {
       req.fileCloudinaryUrls = {};
-      for (const file of req.files) {
-        // Cloudinary stores the URL in file.path
-        if (file.path) {
-          req.fileCloudinaryUrls[file.fieldname] = file.path;
-        }
+
+      if (req.files.profilePhoto && req.files.profilePhoto[0]) {
+        req.fileCloudinaryUrls.profilePhoto = req.files.profilePhoto[0].path;
+      }
+
+      if (req.files.skillCertificate && req.files.skillCertificate[0]) {
+        req.fileCloudinaryUrls.skillCertificate = req.files.skillCertificate[0].path;
       }
     }
+
     next();
   });
 };
