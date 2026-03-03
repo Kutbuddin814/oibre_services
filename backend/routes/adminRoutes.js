@@ -132,15 +132,21 @@ router.get("/provider-requests", async (req, res) => {
       // Handle skillCertificate - check if it's already a Cloudinary URL
       if (reqObj.skillCertificate) {
         if (reqObj.skillCertificate.startsWith('http')) {
-          // Already a Cloudinary URL - use as is
-          reqObj.skillCertificate = reqObj.skillCertificate;
+          // Already a Cloudinary URL - add inline flag for PDFs
+          if (reqObj.skillCertificate.includes('/raw/upload/')) {
+            // PDF stored as raw - add fl_attachment flag to display inline
+            reqObj.skillCertificate = reqObj.skillCertificate.replace(
+              '/raw/upload/',
+              '/raw/upload/fl_attachment:false/'
+            );
+          }
         } else if (isCloudinaryConfigured) {
           // Cloudinary is configured but stored as filename
           // Check if it's a PDF - PDFs are stored as raw files
           const ext = String(reqObj.skillCertificate).split('.').pop().toLowerCase();
           if (ext === 'pdf') {
-            // PDF stored as raw - use /raw/upload/
-            reqObj.skillCertificate = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/raw/upload/oibre/${reqObj.skillCertificate}`;
+            // PDF stored as raw - use /raw/upload/ with inline display flag
+            reqObj.skillCertificate = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/raw/upload/fl_attachment:false/oibre/${reqObj.skillCertificate}`;
           } else {
             // Image - use /image/upload/
             reqObj.skillCertificate = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/oibre/${reqObj.skillCertificate}`;
