@@ -10,7 +10,7 @@ import Services from "./pages/Services";
 import About from "./pages/About";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-// test auto deploy
+
 export default function App() {
   return (
     <>
