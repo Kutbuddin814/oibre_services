@@ -3,9 +3,9 @@ const router = express.Router();
 const multer = require("multer");
 const axios = require("axios");
 const dns = require("dns").promises;
-const nodemailer = require("nodemailer");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
+const { sendBrevoEmail } = require("../utils/sendEmail");
 
 const ProviderRequest = require("../models/ProviderRequest");
 const ServiceProvider = require("../models/ServiceProvider");
@@ -31,47 +31,14 @@ const hasMxRecord = async (domain) => {
 };
 
 const createMailer = () => {
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT || 0);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-
-  // If SMTP is not configured, return null so caller can fallback to dev logging.
-  if (!host || !port || !user || !pass) {
-    console.warn("❌ SMTP credentials are not configured. Email sending will be disabled (dev fallback).");
-    return null;
-  }
-
-  console.log(`📧 Creating SMTP transporter for ${host}:${port}`);
-
-  const isSecure = port === 465;
-  const requireTLS = port === 587;
-
-  return nodemailer.createTransport({
-    host,
-    port,
-    secure: isSecure,
-    requireTLS: requireTLS,
-    auth: { 
-      user: String(user).trim(), 
-      pass: String(pass).trim() 
-    },
-    connectionTimeout: 10000,
-    socketTimeout: 10000,
-    tls: {
-      rejectUnauthorized: false
-    }
-  });
+  // Brevo API is now used via sendBrevoEmail - no SMTP transporter needed
+  return null;
 };
 
 const sendOtpEmail = async ({ to, otp }) => {
-  const transporter = createMailer();
-  const from = process.env.SMTP_FROM || process.env.SMTP_USER;
-
-  if (!transporter) {
-    // Development fallback: log OTP to console. Do NOT enable this behaviour in production.
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
     console.warn(`⚠️ DEV OTP for ${to}: ${otp}`);
-    console.warn(`⚠️ Email sending disabled! Configure SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS in .env`);
+    console.warn(`⚠️ Email sending disabled! Configure SMTP_USER, SMTP_PASS in .env`);
     return { sentByEmail: false, warning: "Email credentials not configured" };
   }
 
@@ -148,14 +115,14 @@ const sendOtpEmail = async ({ to, otp }) => {
   `;
 
   try {
-    await transporter.sendMail({
-      from,
-      to,
-      subject,
-      html
-    });
-    console.log(`✅ OTP email sent successfully to ${to}`);
-    return { sentByEmail: true };
+    const result = await sendBrevoEmail({ to, subject, html });
+    if (result.sent) {
+      console.log(`✅ OTP email sent successfully to ${to}`);
+      return { sentByEmail: true };
+    } else {
+      console.error("❌ PROVIDER OTP EMAIL ERROR:", result.reason);
+      return { sentByEmail: false, error: result.reason };
+    }
   } catch (err) {
     console.error("❌ PROVIDER OTP EMAIL ERROR:", err?.message || err);
     return { sentByEmail: false, error: err?.message };

@@ -2,7 +2,7 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const axios = require("axios");
-const nodemailer = require("nodemailer");
+const { sendBrevoEmail } = require("../utils/sendEmail");
 const crypto = require("crypto");
 const Customer = require("../models/Customer");
 const EmailOtp = require("../models/EmailOtp");
@@ -17,116 +17,103 @@ const isGmail = (email) =>
   /@googlemail\.com$/i.test(String(email || ""));
 
 const createMailer = () => {
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT || 0);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-
-  if (!host || !port || !user || !pass) {
-    throw new Error("SMTP credentials are not configured");
-  }
-
-  return nodemailer.createTransport({
-    host,
-    port,
-    secure: port === 465,
-    auth: { user, pass }
-  });
+  // Brevo API is used via sendBrevoEmail - no SMTP transporter needed
+  return null;
 };
 
 const sendOtpEmail = async ({ to, otp }) => {
-  const transporter = createMailer();
-  const from = process.env.SMTP_FROM || process.env.SMTP_USER;
-
-  transporter.sendMail({
-    from,
-    to,
-    subject: "Oibre - Customer Signup Verification Code",
-    html: `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f9fafb; margin: 0; padding: 0; }
-            .container { max-width: 500px; margin: 20px auto; padding: 0; }
-            .header { background: #1f2937; color: white; text-align: center; padding: 24px; border-radius: 8px 8px 0 0; }
-            .logo { font-size: 28px; font-weight: 700; margin: 0; }
-            .badge { display: inline-block; background: #10b981; color: white; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-top: 8px; letter-spacing: 0.5px; }
-            .content { background: white; padding: 32px 24px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
-            .greeting { color: #374151; font-size: 16px; margin: 0 0 16px 0; font-weight: 500; }
-            .description { color: #6b7280; font-size: 14px; margin: 0 0 16px 0; line-height: 1.6; }
-            .purpose-box { background: #eff6ff; border-left: 4px solid #2563eb; padding: 12px 16px; border-radius: 0 4px 4px 0; margin: 20px 0; }
-            .purpose-label { color: #1e40af; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 4px 0; }
-            .purpose-text { color: #3730a3; font-size: 14px; font-weight: 600; margin: 0; }
-            .code-section { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 24px; border-radius: 8px; border: 2px dashed #10b981; text-align: center; margin: 24px 0; }
-            .code-label { color: #166534; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 12px 0; font-weight: 700; }
-            .code { font-size: 40px; font-weight: 700; letter-spacing: 8px; color: #059669; font-family: 'Courier New', monospace; margin: 0; }
-            .instructions { background: #f3f4f6; padding: 16px; border-radius: 6px; margin: 20px 0; }
-            .step { color: #374151; font-size: 13px; margin: 8px 0; padding-left: 20px; position: relative; }
-            .step:before { content: "→"; position: absolute; left: 0; color: #2563eb; font-weight: 700; }
-            .expiry-info { background: #fef3c7; border-left: 3px solid #f59e0b; padding: 12px 16px; border-radius: 0 4px 4px 0; color: #92400e; font-size: 13px; margin: 20px 0; }
-            .warning { background: #fee2e2; border-left: 3px solid #dc2626; padding: 12px 16px; border-radius: 0 4px 4px 0; color: #991b1b; font-size: 13px; margin: 20px 0; }
-            .footer { color: #9ca3af; font-size: 12px; text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb; line-height: 1.6; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <div class="logo">Oibre</div>
-              <div class="badge">✓ Customer Signup</div>
+  const subject = "Oibre - Customer Signup Verification Code";
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <style>
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f9fafb; margin: 0; padding: 0; }
+          .container { max-width: 500px; margin: 20px auto; padding: 0; }
+          .header { background: #1f2937; color: white; text-align: center; padding: 24px; border-radius: 8px 8px 0 0; }
+          .logo { font-size: 28px; font-weight: 700; margin: 0; }
+          .badge { display: inline-block; background: #10b981; color: white; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-top: 8px; letter-spacing: 0.5px; }
+          .content { background: white; padding: 32px 24px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+          .greeting { color: #374151; font-size: 16px; margin: 0 0 16px 0; font-weight: 500; }
+          .description { color: #6b7280; font-size: 14px; margin: 0 0 16px 0; line-height: 1.6; }
+          .purpose-box { background: #eff6ff; border-left: 4px solid #2563eb; padding: 12px 16px; border-radius: 0 4px 4px 0; margin: 20px 0; }
+          .purpose-label { color: #1e40af; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 4px 0; }
+          .purpose-text { color: #3730a3; font-size: 14px; font-weight: 600; margin: 0; }
+          .code-section { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 24px; border-radius: 8px; border: 2px dashed #10b981; text-align: center; margin: 24px 0; }
+          .code-label { color: #166534; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 12px 0; font-weight: 700; }
+          .code { font-size: 40px; font-weight: 700; letter-spacing: 8px; color: #059669; font-family: 'Courier New', monospace; margin: 0; }
+          .instructions { background: #f3f4f6; padding: 16px; border-radius: 6px; margin: 20px 0; }
+          .step { color: #374151; font-size: 13px; margin: 8px 0; padding-left: 20px; position: relative; }
+          .step:before { content: "→"; position: absolute; left: 0; color: #2563eb; font-weight: 700; }
+          .expiry-info { background: #fef3c7; border-left: 3px solid #f59e0b; padding: 12px 16px; border-radius: 0 4px 4px 0; color: #92400e; font-size: 13px; margin: 20px 0; }
+          .warning { background: #fee2e2; border-left: 3px solid #dc2626; padding: 12px 16px; border-radius: 0 4px 4px 0; color: #991b1b; font-size: 13px; margin: 20px 0; }
+          .footer { color: #9ca3af; font-size: 12px; text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb; line-height: 1.6; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <div class="logo">Oibre</div>
+            <div class="badge">✓ Customer Signup</div>
+          </div>
+          <div class="content">
+            <p class="greeting">Welcome to Oibre! 👋</p>
+            
+            <div class="purpose-box">
+              <div class="purpose-label">📋 What is this?</div>
+              <div class="purpose-text">Your One-Time Password (OTP) for Customer Signup</div>
             </div>
-            <div class="content">
-              <p class="greeting">Welcome to Oibre! 👋</p>
-              
-              <div class="purpose-box">
-                <div class="purpose-label">📋 What is this?</div>
-                <div class="purpose-text">Your One-Time Password (OTP) for Customer Signup</div>
-              </div>
 
-              <p class="description">
-                Thank you for signing up! Please use the verification code below to complete your customer account registration.
-              </p>
-              
-              <div class="code-section">
-                <div class="code-label">Your Customer Signup OTP:</div>
-                <div class="code">${otp}</div>
-              </div>
+            <p class="description">
+              Thank you for signing up! Please use the verification code below to complete your customer account registration.
+            </p>
+            
+            <div class="code-section">
+              <div class="code-label">Your Customer Signup OTP:</div>
+              <div class="code">${otp}</div>
+            </div>
 
-              <div class="instructions">
-                <div style="color: #6b7280; font-size: 12px; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">How to Use:</div>
-                <div class="step">Go back to the signup form</div>
-                <div class="step">Paste or enter this 6-digit code</div>
-                <div class="step">Click "Verify OTP" to complete signup</div>
-              </div>
+            <div class="instructions">
+              <div style="color: #6b7280; font-size: 12px; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">How to Use:</div>
+              <div class="step">Go back to the signup form</div>
+              <div class="step">Paste or enter this 6-digit code</div>
+              <div class="step">Click "Verify OTP" to complete signup</div>
+            </div>
 
-              <div class="expiry-info">
-                ⏱️ <strong>Valid for 10 minutes only</strong> - This code will expire on first use after verification
-              </div>
+            <div class="expiry-info">
+              ⏱️ <strong>Valid for 10 minutes only</strong> - This code will expire on first use after verification
+            </div>
 
-              <div class="warning">
-                🔐 <strong>Never share this code!</strong> Oibre support will never ask for your OTP. This is only for your account verification.
-              </div>
+            <div class="warning">
+              🔐 <strong>Never share this code!</strong> Oibre support will never ask for your OTP. This is only for your account verification.
+            </div>
 
-              <p style="color: #6b7280; font-size: 13px; margin: 20px 0 0 0;">
-                <strong>After verification, you'll be able to:</strong><br>
-                ✓ Browse verified local service providers<br>
-                ✓ Post service requests and connect with professionals<br>
-                ✓ Track service requests in real-time<br>
-                ✓ Rate and review service providers<br>
-              </p>
+            <p style="color: #6b7280; font-size: 13px; margin: 20px 0 0 0;">
+              <strong>After verification, you'll be able to:</strong><br>
+              ✓ Browse verified local service providers<br>
+              ✓ Post service requests and connect with professionals<br>
+              ✓ Track service requests in real-time<br>
+              ✓ Rate and review service providers<br>
+            </p>
 
-              <div class="footer">
-                <p style="margin: 0 0 8px 0;"><strong>Oibre</strong> | Local Services Platform</p>
-                <p style="margin: 0; font-size: 11px;">This is an automated email. Please do not reply to this address.</p>
-              </div>
+            <div class="footer">
+              <p style="margin: 0 0 8px 0;"><strong>Oibre</strong> | Local Services Platform</p>
+              <p style="margin: 0; font-size: 11px;">This is an automated email. Please do not reply to this address.</p>
             </div>
           </div>
-        </body>
-      </html>
-    `
-  }).catch((err) => {
+        </div>
+      </body>
+    </html>
+  `;
+
+  try {
+    const result = await sendBrevoEmail({ to, subject, html });
+    if (!result.sent) {
+      console.error("CUSTOMER OTP EMAIL ERROR:", result.reason);
+    }
+  } catch (err) {
     console.error("CUSTOMER OTP EMAIL ERROR:", err?.message || err);
-  });
+  }
 };
 
 const generateOtp = () => String(crypto.randomInt(100000, 999999));

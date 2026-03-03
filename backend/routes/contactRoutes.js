@@ -1,5 +1,5 @@
 const express = require("express");
-const nodemailer = require("nodemailer");
+const { sendBrevoEmail } = require("../utils/sendEmail");
 const ContactMessage = require("../models/ContactMessage");
 
 const router = express.Router();
@@ -16,29 +16,11 @@ const escapeHtml = (value = "") =>
     .replace(/'/g, "&#39;");
 
 const createMailer = () => {
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT || 0);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-
-  if (!host || !port || !user || !pass) return null;
-
-  return nodemailer.createTransport({
-    host,
-    port,
-    secure: port === 465,
-    auth: { user, pass },
-    connectionTimeout: 7000,
-    greetingTimeout: 7000,
-    socketTimeout: 10000
-  });
+  // Brevo API is used via sendBrevoEmail - no SMTP transporter needed
+  return null;
 };
 
 const sendContactEmails = async (payload) => {
-  const transporter = createMailer();
-  if (!transporter) return;
-
-  const from = process.env.SMTP_FROM || process.env.SMTP_USER;
   const notifyTo = process.env.CONTACT_NOTIFY_EMAIL || "oibre38@gmail.com";
   const safeName = escapeHtml(payload.name);
   const safeEmail = escapeHtml(payload.email);
@@ -46,8 +28,8 @@ const sendContactEmails = async (payload) => {
   const safeSubject = escapeHtml(payload.subject);
   const safeMessage = escapeHtml(payload.message).replace(/\n/g, "<br/>");
 
-  await transporter.sendMail({
-    from,
+  // Send email to admin/support team
+  await sendBrevoEmail({
     to: notifyTo,
     subject: `[Contact] ${payload.subject}`,
     html: `
@@ -71,10 +53,12 @@ const sendContactEmails = async (payload) => {
         </div>
       </div>
     `
+  }).catch((err) => {
+    console.error("Failed to send admin contact email:", err?.message || err);
   });
 
-  await transporter.sendMail({
-    from,
+  // Send confirmation email to customer
+  await sendBrevoEmail({
     to: payload.email,
     subject: "We received your message - Oibre",
     html: `
@@ -99,6 +83,8 @@ const sendContactEmails = async (payload) => {
         </div>
       </div>
     `
+  }).catch((err) => {
+    console.error("Failed to send customer contact confirmation email:", err?.message || err);
   });
 };
 
