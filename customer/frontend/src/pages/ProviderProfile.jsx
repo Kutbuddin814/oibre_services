@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../config/axios";
+import { BACKEND_BASE_URL } from "../config/api";
 import "../styles/providerProfile.css";
 
 export default function ProviderProfile() {
@@ -160,8 +161,8 @@ export default function ProviderProfile() {
         formData.append("image", editingImage);
       }
 
-      await axios.patch(
-        `http://localhost:5000/api/reviews/${reviewId}`,
+      await api.patch(
+        `/reviews/${reviewId}`,
         formData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -183,7 +184,7 @@ export default function ProviderProfile() {
         )
       );
 
-      const refresh = await axios.get(`http://localhost:5000/api/providers/${id}`);
+      const refresh = await api.get(`/providers/${id}`);
       setReviews(refresh.data.reviews || []);
       setProvider(refresh.data.provider);
       cancelEditReview();
@@ -201,8 +202,8 @@ export default function ProviderProfile() {
   useEffect(() => {
     const fetchProfileWithLocation = async (lat, lng) => {
       try {
-        const res = await axios.get(
-          `http://localhost:5000/api/providers/${id}`,
+        const res = await api.get(
+          `/providers/${id}`,
           {
             params: {
               lat,
@@ -224,8 +225,8 @@ export default function ProviderProfile() {
 
     const fetchProfileWithoutLocation = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:5000/api/providers/${id}`
+        const res = await api.get(
+          `/providers/${id}`
         );
 
         setProvider(res.data.provider);
@@ -255,7 +256,7 @@ export default function ProviderProfile() {
       // 2) If logged in, use customer profile location from DB
       if (token) {
         try {
-          const profile = await axios.get("http://localhost:5000/api/customers/profile", {
+          const profile = await api.get("/customers/profile", {
             headers: { Authorization: `Bearer ${token}` }
           });
           const coords = profile.data?.location?.coordinates || [];
@@ -355,8 +356,8 @@ export default function ProviderProfile() {
         try { location = JSON.parse(storedLocation); } catch(e) { location = null; }
       }
 
-      await axios.post(
-        "http://localhost:5000/api/customer/requests/create",
+      await api.post(
+        "/customer/requests/create",
         {
           providerId: provider._id,
           serviceCategory: provider.serviceCategory,
@@ -421,7 +422,7 @@ export default function ProviderProfile() {
         <div className="profile-photo-wrapper">
           {provider.profilePhoto ? (
             <img
-              src={`http://localhost:5000/uploads/${provider.profilePhoto}`}
+              src={`${BACKEND_BASE_URL}/uploads/${provider.profilePhoto}`}
               alt="Profile"
               className="profile-photo large"
             />
@@ -498,7 +499,7 @@ export default function ProviderProfile() {
           ) : // Local storage URL
           provider.skillCertificate.endsWith(".pdf") ? (
             <a
-              href={`http://localhost:5000/uploads/${provider.skillCertificate}`}
+              href={`${BACKEND_BASE_URL}/uploads/${provider.skillCertificate}`}
               target="_blank"
               rel="noreferrer"
             >
@@ -506,7 +507,7 @@ export default function ProviderProfile() {
             </a>
           ) : (
             <img
-              src={`http://localhost:5000/uploads/${provider.skillCertificate}`}
+              src={`${BACKEND_BASE_URL}/uploads/${provider.skillCertificate}`}
               alt="Certificate"
               className="certificate-image"
             />
@@ -608,7 +609,7 @@ export default function ProviderProfile() {
                 <p>{r.comment}</p>
                 {r.image && (
                   <img
-                    src={`http://localhost:5000/uploads/${r.image}`}
+                    src={`${BACKEND_BASE_URL}/uploads/${r.image}`}
                     alt="Review attachment"
                     className="review-image"
                   />
