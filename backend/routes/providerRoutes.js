@@ -140,34 +140,43 @@ router.get("/", async (req, res) => {
 
     let filter = { status: "approved" };
 
-    // Filter by service category if provided
     if (serviceCategory && serviceCategory.trim()) {
-      const category = serviceCategory.trim().toLowerCase();
+      const category = serviceCategory.trim();
       filter.$or = [
         { serviceCategory: { $regex: category, $options: "i" } },
         { otherService: { $regex: category, $options: "i" } }
       ];
     }
 
-    let query = ServiceProvider.find(filter);
+    const latitude = parseFloat(lat);
+    const longitude = parseFloat(lng);
 
-    // If location is provided, sort by distance
-    const latitude = lat ? parseFloat(lat) : null;
-    const longitude = lng ? parseFloat(lng) : null;
+    let providers;
 
-    if (latitude && longitude && isFinite(latitude) && isFinite(longitude)) {
-      // Location provided - use geospatial search
-      query = query.where("location").near({
-        type: "Point",
-        coordinates: [longitude, latitude]
-      });
+    // ✅ STRICT numeric validation
+    if (!isNaN(latitude) && !isNaN(longitude)) {
+      providers = await ServiceProvider.find({
+        ...filter,
+        location: {
+          $near: {
+            $geometry: {
+              type: "Point",
+              coordinates: [longitude, latitude]
+            },
+            $maxDistance: 20000
+          }
+        }
+      })
+        .select("-password")
+        .limit(50)
+        .lean();
+    } else {
+      providers = await ServiceProvider.find(filter)
+        .sort({ averageRating: -1 })
+        .select("-password")
+        .limit(50)
+        .lean();
     }
-    // If no location, just return providers matching category (sorted by best rating)
-    else {
-      query = query.sort({ averageRating: -1 });
-    }
-
-    const providers = await query.select("-password").limit(50).lean();
 
     res.json(providers);
   } catch (err) {
