@@ -198,9 +198,13 @@ router.get("/", async (req, res) => {
       }
 
       const basePrice = provider.basePrice || 200;
-      const distanceCharge = distanceKm
-        ? Math.max(50, Math.round(distanceKm * 5))
-        : 0;
+      let distanceCharge = 0;
+
+      if (distanceKm) {
+        // ₹15 per km - realistic pricing
+        distanceCharge = Math.round(distanceKm * 15);
+      }
+
       const finalPrice = basePrice + distanceCharge;
 
       return {
@@ -263,7 +267,13 @@ router.get("/:id", async (req, res) => {
 
     // Calculate final price based on distance
     const basePrice = provider.basePrice || 200;
-    const distanceCharge = distanceKm ? Math.max(50, Math.round(distanceKm * 5)) : 0;
+    let distanceCharge = 0;
+
+    if (distanceKm) {
+      // ₹15 per km - realistic pricing
+      distanceCharge = Math.round(distanceKm * 15);
+    }
+
     const finalPrice = basePrice + distanceCharge;
 
     res.json({
