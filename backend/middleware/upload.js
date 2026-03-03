@@ -16,14 +16,20 @@ const createCloudinaryStorage = () => {
   return new CloudinaryStorage({
     cloudinary: cloudinary,
     params: async (req, file) => {
-      // Determine resource type based on file extension
-      const ext = file.originalname.split('.').pop().toLowerCase();
-      const resourceType = ext === 'pdf' ? 'raw' : 'auto';
+      // Use MIME type to determine resource type (more reliable than extension)
+      if (file.mimetype === "application/pdf") {
+        return {
+          folder: "oibre",
+          resource_type: "raw",
+          format: "pdf"
+        };
+      }
       
+      // Images (jpg, png, jpeg)
       return {
         folder: "oibre",
-        allowed_formats: ["jpg", "jpeg", "png", "pdf"],
-        resource_type: resourceType
+        resource_type: "image",
+        allowed_formats: ["jpg", "jpeg", "png"]
       };
     }
   });
