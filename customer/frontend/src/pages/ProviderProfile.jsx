@@ -479,8 +479,8 @@ export default function ProviderProfile() {
         {provider.skillCertificate ? (
           // Check if it's a Cloudinary URL
           provider.skillCertificate.startsWith('http') ? (
-            // Cloudinary URL - check if it's a PDF (raw or image)
-            provider.skillCertificate.includes('/raw/upload/') ? (
+            // Cloudinary URL - check if it's a PDF by looking for .pdf in URL
+            provider.skillCertificate.includes('.pdf') ? (
               <a
                 href={provider.skillCertificate}
                 target="_blank"

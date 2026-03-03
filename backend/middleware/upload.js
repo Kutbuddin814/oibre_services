@@ -31,7 +31,8 @@ const createCloudinaryStorage = () => {
       if (file.mimetype === "application/pdf") {
         return {
           folder: "oibre",
-          resource_type: "raw",
+          resource_type: "image",
+          format: "pdf",
           public_id: publicId
         };
       }
