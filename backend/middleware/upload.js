@@ -17,9 +17,15 @@ const createCloudinaryStorage = () => {
     cloudinary: cloudinary,
     params: async (req, file) => {
       // Generate proper filename without extension (Cloudinary will add it)
+      // Sanitize to only allow alphanumeric, hyphens, and underscores
       const originalName = path.parse(file.originalname).name;
+      const sanitizedName = originalName
+        .replace(/[^a-zA-Z0-9-_]/g, '_') // Replace special chars with underscore
+        .replace(/_+/g, '_') // Collapse multiple underscores
+        .substring(0, 50); // Limit length
+      
       const timestamp = Date.now();
-      const publicId = `${originalName}_${timestamp}`;
+      const publicId = `${sanitizedName}_${timestamp}`;
       
       // Use MIME type to determine resource type (more reliable than extension)
       if (file.mimetype === "application/pdf") {
