@@ -269,10 +269,9 @@ router.put("/update/:id", authMiddleware, async (req, res) => {
             to: request.customerEmail,
             customerName: request.customerName,
             providerName: provider?.name || request.providerName,
-            providerMobile: provider?.mobile || "",
+            serviceName: request.serviceCategory,
             visitDate: request.visitDate,
-            visitTime: convertTo12HourFormat(request.visitTime),
-            serviceCategory: request.serviceCategory
+            visitTime: convertTo12HourFormat(request.visitTime)
           }),
           "BOOKING ACCEPTED"
         );
