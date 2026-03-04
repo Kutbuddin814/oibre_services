@@ -405,6 +405,38 @@ export default function ProviderProfile() {
       })
     : timeSlots;
 
+  const resolveMediaUrl = (fileValue) => {
+    if (!fileValue || typeof fileValue !== "string") return "";
+
+    const normalized = fileValue.trim().replace(/\\/g, "/");
+    if (!normalized) return "";
+
+    if (/^https?:\/\//i.test(normalized)) {
+      return normalized;
+    }
+
+    const cleanBase = BACKEND_BASE_URL.replace(/\/$/, "");
+
+    if (normalized.startsWith("/uploads/")) {
+      return `${cleanBase}${normalized}`;
+    }
+
+    if (normalized.startsWith("uploads/")) {
+      return `${cleanBase}/${normalized}`;
+    }
+
+    return `${cleanBase}/uploads/${normalized}`;
+  };
+
+  const isPdfFile = (fileUrl) => {
+    if (!fileUrl) return false;
+    const clean = fileUrl.split("?")[0].split("#")[0].toLowerCase();
+    return clean.endsWith(".pdf");
+  };
+
+  const profilePhotoUrl = resolveMediaUrl(provider?.profilePhoto);
+  const certificateUrl = resolveMediaUrl(provider?.skillCertificate);
+
   return (
     <div className="provider-profile-page">
 
@@ -420,9 +452,9 @@ export default function ProviderProfile() {
       {/* ================= HEADER ================= */}
       <div className="profile-header card">
         <div className="profile-photo-wrapper">
-          {provider.profilePhoto ? (
+          {profilePhotoUrl ? (
             <img
-              src={`${BACKEND_BASE_URL}/uploads/${provider.profilePhoto}`}
+              src={profilePhotoUrl}
               alt="Profile"
               className="profile-photo large"
             />
@@ -477,29 +509,10 @@ export default function ProviderProfile() {
       <div className="card certificate-card">
         <h3>Certification</h3>
 
-        {provider.skillCertificate ? (
-          // Check if it's a Cloudinary URL
-          provider.skillCertificate.startsWith('http') ? (
-            // Cloudinary URL - check if it's a PDF by looking for .pdf in URL
-            provider.skillCertificate.includes('.pdf') ? (
-              <a
-                href={provider.skillCertificate}
-                target="_blank"
-                rel="noreferrer"
-              >
-                📄 View Certificate (PDF)
-              </a>
-            ) : (
-              <img
-                src={provider.skillCertificate}
-                alt="Certificate"
-                className="certificate-image"
-              />
-            )
-          ) : // Local storage URL
-          provider.skillCertificate.endsWith(".pdf") ? (
+        {certificateUrl ? (
+          isPdfFile(certificateUrl) ? (
             <a
-              href={`${BACKEND_BASE_URL}/uploads/${provider.skillCertificate}`}
+              href={certificateUrl}
               target="_blank"
               rel="noreferrer"
             >
@@ -507,7 +520,7 @@ export default function ProviderProfile() {
             </a>
           ) : (
             <img
-              src={`${BACKEND_BASE_URL}/uploads/${provider.skillCertificate}`}
+              src={certificateUrl}
               alt="Certificate"
               className="certificate-image"
             />
