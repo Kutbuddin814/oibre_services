@@ -64,7 +64,7 @@ const createMailer = () => {
 const sendProviderBookingEmail = async ({ provider, customer, request }) => {
   if (!provider?.email) return;
 
-  const providerPortalUrl = process.env.PROVIDER_PORTAL_URL || "http://localhost:3000";
+  const providerPortalUrl = process.env.REACT_APP_PROVIDER_WEB_API_URL || "http://localhost:3000";
 
   const prettyDate = (() => {
     try {
