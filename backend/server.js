@@ -149,4 +149,6 @@ app.get("/api/admin/services", async (req, res) => {
 app.get("/", (req, res) => {
   res.send("Oibre Backend Running - Combined");
 });
-
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "Server is running" });
+});

@@ -16,6 +16,14 @@ export default function CustomerProfile() {
     address: ""
   });
 
+  // Email change states
+  const [showEmailChangeModal, setShowEmailChangeModal] = useState(false);
+  const [emailChangeStep, setEmailChangeStep] = useState("email"); // "email" or "otp"
+  const [newEmailInput, setNewEmailInput] = useState("");
+  const [emailOtp, setEmailOtp] = useState("");
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [emailError, setEmailError] = useState("");
+
   useEffect(() => {
     const token = localStorage.getItem("customerToken");
     if (!token) {
@@ -52,6 +60,81 @@ export default function CustomerProfile() {
     });
     setEditError("");
     setShowEditModal(true);
+  };
+
+  const startEmailChange = () => {
+    setNewEmailInput("");
+    setEmailOtp("");
+    setEmailChangeStep("email");
+    setEmailError("");
+    setEmailLoading(false);
+    setShowEmailChangeModal(true);
+  };
+
+  const sendEmailOtp = async () => {
+    const cleanEmail = String(newEmailInput || "").trim().toLowerCase();
+    
+    if (!cleanEmail) {
+      setEmailError("Please enter a new email");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      setEmailError("Please enter a valid email address");
+      return;
+    }
+
+    if (cleanEmail === customer.email) {
+      setEmailError("New email must be different from current email");
+      return;
+    }
+
+    setEmailError("");
+    setEmailLoading(true);
+
+    try {
+      const token = localStorage.getItem("customerToken");
+      await api.post(
+        "/customers/change-email/send-otp",
+        { newEmail: cleanEmail },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setEmailChangeStep("otp");
+    } catch (err) {
+      setEmailError(err.response?.data?.message || "Failed to send OTP");
+    } finally {
+      setEmailLoading(false);
+    }
+  };
+
+  const verifyEmailOtp = async () => {
+    const cleanOtp = String(emailOtp || "").trim();
+    
+    if (!cleanOtp) {
+      setEmailError("Please enter OTP");
+      return;
+    }
+
+    setEmailError("");
+    setEmailLoading(true);
+
+    try {
+      const token = localStorage.getItem("customerToken");
+      const res = await api.post(
+        "/customers/change-email/verify-otp",
+        { newEmail: newEmailInput.trim().toLowerCase(), otp: cleanOtp },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setCustomer(res.data.customer);
+      localStorage.setItem("customerData", JSON.stringify(res.data.customer));
+      setShowEmailChangeModal(false);
+      alert("✅ Email changed successfully!");
+    } catch (err) {
+      setEmailError(err.response?.data?.message || "Failed to verify OTP");
+    } finally {
+      setEmailLoading(false);
+    }
   };
 
   const saveProfile = async () => {
@@ -141,6 +224,9 @@ export default function CustomerProfile() {
           <button className="profile-btn edit-btn" onClick={openEditModal}>
             Edit Profile
           </button>
+          <button className="profile-btn edit-btn" onClick={startEmailChange}>
+            Change Email
+          </button>
           <button onClick={handleLogout} className="profile-btn logout-btn">
             Logout
           </button>
@@ -171,6 +257,9 @@ export default function CustomerProfile() {
                 onChange={(e) => setEditForm((prev) => ({ ...prev, email: e.target.value }))}
                 disabled={saving}
               />
+              <small style={{ color: "#6b7280", marginTop: "4px", display: "block" }}>
+                Use "Change Email" button to change email with verification
+              </small>
             </div>
 
             <div className="profile-modal-field">
@@ -209,6 +298,65 @@ export default function CustomerProfile() {
                 {saving ? "Saving..." : "Save Changes"}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showEmailChangeModal && (
+        <div className="profile-modal-overlay" onClick={() => !emailLoading && setShowEmailChangeModal(false)}>
+          <div className="profile-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Change Email</h3>
+            <p>Verify your new email address with OTP</p>
+
+            {emailChangeStep === "email" ? (
+              <>
+                <div className="profile-modal-field">
+                  <label>New Email Address</label>
+                  <input
+                    type="email"
+                    value={newEmailInput}
+                    onChange={(e) => setNewEmailInput(e.target.value)}
+                    placeholder="Enter new email"
+                    disabled={emailLoading}
+                  />
+                </div>
+                {emailError ? <div className="profile-modal-error">{emailError}</div> : null}
+                <div className="profile-modal-actions">
+                  <button onClick={() => setShowEmailChangeModal(false)} disabled={emailLoading}>
+                    Cancel
+                  </button>
+                  <button onClick={sendEmailOtp} disabled={emailLoading}>
+                    {emailLoading ? "Sending OTP..." : "Send OTP"}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="profile-modal-field">
+                  <label>Verification Code</label>
+                  <input
+                    type="text"
+                    value={emailOtp}
+                    onChange={(e) => setEmailOtp(e.target.value.replace(/[^0-9]/g, "").slice(0, 6))}
+                    placeholder="6-digit OTP"
+                    maxLength={6}
+                    disabled={emailLoading}
+                  />
+                  <small style={{ color: "#6b7280", marginTop: "4px", display: "block" }}>
+                    Sent to {newEmailInput}
+                  </small>
+                </div>
+                {emailError ? <div className="profile-modal-error">{emailError}</div> : null}
+                <div className="profile-modal-actions">
+                  <button onClick={() => setEmailChangeStep("email")} disabled={emailLoading}>
+                    Back
+                  </button>
+                  <button onClick={verifyEmailOtp} disabled={emailLoading}>
+                    {emailLoading ? "Verifying..." : "Verify & Change"}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

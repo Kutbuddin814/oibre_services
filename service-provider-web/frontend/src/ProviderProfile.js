@@ -30,6 +30,12 @@ const ProviderProfile = () => {
   });
   const [serviceOptions, setServiceOptions] = useState([]);
   const [loadingServices, setLoadingServices] = useState(false);
+  const [showEmailChangeModal, setShowEmailChangeModal] = useState(false);
+  const [emailChangeStep, setEmailChangeStep] = useState("email");
+  const [newEmailInput, setNewEmailInput] = useState("");
+  const [emailOtp, setEmailOtp] = useState("");
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [emailError, setEmailError] = useState("");
   const token = localStorage.getItem("providerToken");
   const navigate = useNavigate();
   const isCoordinateString = (value) =>
@@ -116,6 +122,78 @@ const ProviderProfile = () => {
     });
     setEditError("");
     setShowEditModal(true);
+  };
+
+  const startEmailChange = () => {
+    setNewEmailInput("");
+    setEmailOtp("");
+    setEmailChangeStep("email");
+    setEmailError("");
+    setEmailLoading(false);
+    setShowEmailChangeModal(true);
+  };
+
+  const sendEmailOtp = async () => {
+    const cleanEmail = String(newEmailInput || "").trim().toLowerCase();
+    
+    if (!cleanEmail) {
+      setEmailError("Please enter a new email");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      setEmailError("Please enter a valid email address");
+      return;
+    }
+
+    if (cleanEmail === provider.email) {
+      setEmailError("New email must be different from current email");
+      return;
+    }
+
+    setEmailError("");
+    setEmailLoading(true);
+
+    try {
+      await api.post(
+        "/provider/change-email/send-otp",
+        { newEmail: cleanEmail },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setEmailChangeStep("otp");
+    } catch (err) {
+      setEmailError(err.response?.data?.message || "Failed to send OTP");
+    } finally {
+      setEmailLoading(false);
+    }
+  };
+
+  const verifyEmailOtp = async () => {
+    const cleanOtp = String(emailOtp || "").trim();
+    
+    if (!cleanOtp) {
+      setEmailError("Please enter OTP");
+      return;
+    }
+
+    setEmailError("");
+    setEmailLoading(true);
+
+    try {
+      const res = await api.post(
+        "/provider/change-email/verify-otp",
+        { newEmail: newEmailInput.trim().toLowerCase(), otp: cleanOtp },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setProvider(res.data.provider);
+      setShowEmailChangeModal(false);
+      alert("✅ Email changed successfully!");
+    } catch (err) {
+      setEmailError(err.response?.data?.message || "Failed to verify OTP");
+    } finally {
+      setEmailLoading(false);
+    }
   };
 
   const handleEditProfileSave = async () => {
@@ -524,6 +602,9 @@ const ProviderProfile = () => {
           <button className="edit-btn" onClick={openEditModal}>
             ✏️ Edit Profile
           </button>
+          <button className="edit-btn" onClick={startEmailChange}>
+            ✉️ Change Email
+          </button>
         </div>
       </div>
 
@@ -549,6 +630,9 @@ const ProviderProfile = () => {
               disabled
               style={{ background: "#f3f4f6", color: "#6b7280", cursor: "not-allowed" }}
             />
+            <small style={{ fontSize: "11px", color: "#6b7280", marginTop: "4px", display: "block" }}>
+              Use "Change Email" button to change with verification
+            </small>
 
             <label className="provider-location-hint" style={{ display: "block", marginTop: 8 }}>
               Service Category (not editable)
@@ -663,6 +747,89 @@ const ProviderProfile = () => {
                 {editSaving ? "Saving..." : "Save Changes"}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showEmailChangeModal && (
+        <div
+          className="provider-location-backdrop"
+          onClick={() => !emailLoading && setShowEmailChangeModal(false)}
+        >
+          <div
+            className="provider-location-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3>Change Email</h3>
+            <p>Verify your new email address with OTP</p>
+
+            {emailChangeStep === "email" ? (
+              <>
+                <label className="provider-location-hint" style={{ display: "block", marginTop: 8 }}>
+                  New Email Address
+                </label>
+                <input
+                  type="email"
+                  className="provider-location-search"
+                  value={newEmailInput}
+                  onChange={(e) => setNewEmailInput(e.target.value)}
+                  placeholder="Enter new email"
+                  disabled={emailLoading}
+                />
+                {emailError && <div className="error-message">{emailError}</div>}
+                <div className="provider-location-actions">
+                  <button
+                    className="action-btn secondary"
+                    onClick={() => setShowEmailChangeModal(false)}
+                    disabled={emailLoading}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="action-btn primary"
+                    onClick={sendEmailOtp}
+                    disabled={emailLoading}
+                  >
+                    {emailLoading ? "Sending OTP..." : "Send OTP"}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <label className="provider-location-hint" style={{ display: "block", marginTop: 8 }}>
+                  Verification Code
+                </label>
+                <input
+                  type="text"
+                  className="provider-location-search"
+                  value={emailOtp}
+                  onChange={(e) => setEmailOtp(e.target.value.replace(/[^0-9]/g, "").slice(0, 6))}
+                  placeholder="6-digit OTP"
+                  maxLength={6}
+                  disabled={emailLoading}
+                />
+                <small style={{ fontSize: "11px", color: "#6b7280", marginTop: "4px", display: "block" }}>
+                  Sent to {newEmailInput}
+                </small>
+                {emailError && <div className="error-message">{emailError}</div>}
+                <div className="provider-location-actions">
+                  <button
+                    className="action-btn secondary"
+                    onClick={() => setEmailChangeStep("email")}
+                    disabled={emailLoading}
+                  >
+                    Back
+                  </button>
+                  <button
+                    className="action-btn primary"
+                    onClick={verifyEmailOtp}
+                    disabled={emailLoading}
+                  >
+                    {emailLoading ? "Verifying..." : "Verify & Change"}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
