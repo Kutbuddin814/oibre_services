@@ -541,100 +541,122 @@ export default function Navbar() {
       </nav>
 
       {showChangePasswordModal && (
-        <div className="cp-modal-overlay" onClick={handleCloseChangePassword}>
-          <div className="cp-modal-card" onClick={(e) => e.stopPropagation()}>
-            <h3>Change Password</h3>
-            <p className="cp-modal-subtitle">Update your account password securely.</p>
-            <form onSubmit={handlePasswordChangeSubmit} className="cp-form">
-              <label htmlFor="currentPassword">Current Password</label>
-              <div className="password-input-wrap">
-                <input
-                  id="currentPassword"
-                  type={showPassword.current ? "text" : "password"}
-                  value={passwordForm.currentPassword}
-                  onChange={(e) =>
-                    setPasswordForm((prev) => ({ ...prev, currentPassword: e.target.value }))
-                  }
-                  autoComplete="current-password"
-                  required
-                />
-                <button
-                  type="button"
-                  className="password-toggle-btn"
-                  onClick={() =>
-                    setShowPassword((prev) => ({ ...prev, current: !prev.current }))
-                  }
-                  aria-label={showPassword.current ? "Hide password" : "Show password"}
-                >
-                  &#128065;
-                </button>
+        <div className="modal-backdrop" onClick={handleCloseChangePassword}>
+          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="modal-header-content">
+                <h2 className="modal-title">Change Password</h2>
+                <p className="modal-subtitle">Update your account password securely.</p>
               </div>
+              <button className="modal-close-button" onClick={handleCloseChangePassword}>
+                ✕
+              </button>
+            </div>
+            <div className="modal-body">
+              <form onSubmit={handlePasswordChangeSubmit} className="form">
+                <div className="modal-field">
+                  <label htmlFor="currentPassword" className="modal-field-label">Current Password</label>
+                  <div className="modal-password-group">
+                    <input
+                      id="currentPassword"
+                      type={showPassword.current ? "text" : "password"}
+                      className="modal-field-input"
+                      value={passwordForm.currentPassword}
+                      onChange={(e) =>
+                        setPasswordForm((prev) => ({ ...prev, currentPassword: e.target.value }))
+                      }
+                      autoComplete="current-password"
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="modal-password-toggle"
+                      onClick={() =>
+                        setShowPassword((prev) => ({ ...prev, current: !prev.current }))
+                      }
+                      aria-label={showPassword.current ? "Hide password" : "Show password"}
+                    >
+                      {showPassword.current ? '🙈' : '👁️'}
+                    </button>
+                  </div>
+                </div>
 
-              <label htmlFor="newPassword">New Password</label>
-              <div className="password-input-wrap">
-                <input
-                  id="newPassword"
-                  type={showPassword.next ? "text" : "password"}
-                  value={passwordForm.newPassword}
-                  onChange={(e) =>
-                    setPasswordForm((prev) => ({ ...prev, newPassword: e.target.value }))
-                  }
-                  autoComplete="new-password"
-                  required
-                />
-                <button
-                  type="button"
-                  className="password-toggle-btn"
-                  onClick={() =>
-                    setShowPassword((prev) => ({ ...prev, next: !prev.next }))
-                  }
-                  aria-label={showPassword.next ? "Hide password" : "Show password"}
-                >
-                  &#128065;
-                </button>
-              </div>
+                <div className="modal-field">
+                  <label htmlFor="newPassword" className="modal-field-label">New Password</label>
+                  <div className="modal-password-group">
+                    <input
+                      id="newPassword"
+                      type={showPassword.next ? "text" : "password"}
+                      className="modal-field-input"
+                      value={passwordForm.newPassword}
+                      onChange={(e) =>
+                        setPasswordForm((prev) => ({ ...prev, newPassword: e.target.value }))
+                      }
+                      autoComplete="new-password"
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="modal-password-toggle"
+                      onClick={() =>
+                        setShowPassword((prev) => ({ ...prev, next: !prev.next }))
+                      }
+                      aria-label={showPassword.next ? "Hide password" : "Show password"}
+                    >
+                      {showPassword.next ? '🙈' : '👁️'}
+                    </button>
+                  </div>
+                </div>
 
-              <label htmlFor="confirmPassword">Confirm New Password</label>
-              <div className="password-input-wrap">
-                <input
-                  id="confirmPassword"
-                  type={showPassword.confirm ? "text" : "password"}
-                  value={passwordForm.confirmPassword}
-                  onChange={(e) =>
-                    setPasswordForm((prev) => ({ ...prev, confirmPassword: e.target.value }))
-                  }
-                  autoComplete="new-password"
-                  required
-                />
-                <button
-                  type="button"
-                  className="password-toggle-btn"
-                  onClick={() =>
-                    setShowPassword((prev) => ({ ...prev, confirm: !prev.confirm }))
-                  }
-                  aria-label={showPassword.confirm ? "Hide password" : "Show password"}
-                >
-                  &#128065;
-                </button>
-              </div>
+                <div className="modal-field">
+                  <label htmlFor="confirmPassword" className="modal-field-label">Confirm New Password</label>
+                  <div className="modal-password-group">
+                    <input
+                      id="confirmPassword"
+                      type={showPassword.confirm ? "text" : "password"}
+                      className="modal-field-input"
+                      value={passwordForm.confirmPassword}
+                      onChange={(e) =>
+                        setPasswordForm((prev) => ({ ...prev, confirmPassword: e.target.value }))
+                      }
+                      autoComplete="new-password"
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="modal-password-toggle"
+                      onClick={() =>
+                        setShowPassword((prev) => ({ ...prev, confirm: !prev.confirm }))
+                      }
+                      aria-label={showPassword.confirm ? "Hide password" : "Show password"}
+                    >
+                      {showPassword.confirm ? '🙈' : '👁️'}
+                    </button>
+                  </div>
+                </div>
 
-              {changePasswordError && <p className="cp-error">{changePasswordError}</p>}
-              {changePasswordSuccess && <p className="cp-success">{changePasswordSuccess}</p>}
-
-              <div className="cp-actions">
-                <button
-                  type="button"
-                  className="cp-btn-cancel"
-                  onClick={handleCloseChangePassword}
-                  disabled={changePasswordLoading}
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="cp-btn-save" disabled={changePasswordLoading}>
-                  {changePasswordLoading ? "Updating..." : "Update Password"}
-                </button>
-              </div>
-            </form>
+                {changePasswordError && <div className="modal-message error"><span>⚠️</span><span>{changePasswordError}</span></div>}
+                {changePasswordSuccess && <div className="modal-message success"><span>✓</span><span>{changePasswordSuccess}</span></div>}
+              </form>
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={handleCloseChangePassword}
+                disabled={changePasswordLoading}
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit" 
+                className="btn btn-primary" 
+                onClick={handlePasswordChangeSubmit}
+                disabled={changePasswordLoading}
+              >
+                {changePasswordLoading ? "Updating..." : "Update Password"}
+              </button>
+            </div>
           </div>
         </div>
       )}

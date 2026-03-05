@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import api from "../config/axios";
 import { useNavigate } from "react-router-dom";
 import "../styles/CustomerProfile.css";
+import "../styles/unified-modal.css";
+import "../styles/unified-forms.css";
+import "../styles/unified-buttons.css";
 
 export default function CustomerProfile() {
   const navigate = useNavigate();
@@ -237,67 +240,80 @@ export default function CustomerProfile() {
       </div>
 
       {showEditModal && (
-        <div className="profile-modal-overlay" onClick={() => !saving && setShowEditModal(false)}>
-          <div className="profile-modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Edit Profile</h3>
-            <p>Update your account details.</p>
-
-            <div className="profile-modal-field">
-              <label>Full Name</label>
-              <input
-                type="text"
-                value={editForm.name}
-                onChange={(e) => setEditForm((prev) => ({ ...prev, name: e.target.value }))}
-                disabled={saving}
-              />
+        <div className="modal-backdrop" onClick={() => !saving && setShowEditModal(false)}>
+          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="modal-header-content">
+                <h2 className="modal-title">Edit Profile</h2>
+                <p className="modal-subtitle">Update your account details.</p>
+              </div>
+              <button className="modal-close-button" onClick={() => setShowEditModal(false)} disabled={saving}>
+                ✕
+              </button>
             </div>
 
-            <div className="profile-modal-field">
-              <label>Email</label>
-              <input
-                type="email"
-                value={editForm.email}
-                onChange={(e) => setEditForm((prev) => ({ ...prev, email: e.target.value }))}
-                disabled={saving}
-              />
-              <small style={{ color: "#6b7280", marginTop: "4px", display: "block" }}>
-                Use "Change Email" button to change email with verification
-              </small>
+            <div className="modal-body">
+              <div className="modal-field">
+                <label className="modal-field-label">Full Name</label>
+                <input
+                  type="text"
+                  className="modal-field-input"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm((prev) => ({ ...prev, name: e.target.value }))}
+                  disabled={saving}
+                />
+              </div>
+
+              <div className="modal-field">
+                <label className="modal-field-label">Email</label>
+                <input
+                  type="email"
+                  className="modal-field-input"
+                  value={editForm.email}
+                  onChange={(e) => setEditForm((prev) => ({ ...prev, email: e.target.value }))}
+                  disabled={saving}
+                />
+                <div className="modal-field-hint">
+                  Use "Change Email" button to change email with verification
+                </div>
+              </div>
+
+              <div className="modal-field">
+                <label className="modal-field-label">Mobile</label>
+                <input
+                  type="text"
+                  className="modal-field-input"
+                  value={editForm.mobile}
+                  maxLength={10}
+                  onChange={(e) =>
+                    setEditForm((prev) => ({
+                      ...prev,
+                      mobile: e.target.value.replace(/[^0-9]/g, "")
+                    }))
+                  }
+                  disabled={saving}
+                />
+              </div>
+
+              <div className="modal-field">
+                <label className="modal-field-label">Address</label>
+                <textarea
+                  rows={3}
+                  className="modal-field-textarea"
+                  value={editForm.address}
+                  onChange={(e) => setEditForm((prev) => ({ ...prev, address: e.target.value }))}
+                  disabled={saving}
+                />
+              </div>
+
+              {editError && <div className="modal-message error"><span>⚠️</span><span>{editError}</span></div>}
             </div>
 
-            <div className="profile-modal-field">
-              <label>Mobile</label>
-              <input
-                type="text"
-                value={editForm.mobile}
-                maxLength={10}
-                onChange={(e) =>
-                  setEditForm((prev) => ({
-                    ...prev,
-                    mobile: e.target.value.replace(/[^0-9]/g, "")
-                  }))
-                }
-                disabled={saving}
-              />
-            </div>
-
-            <div className="profile-modal-field">
-              <label>Address</label>
-              <textarea
-                rows={3}
-                value={editForm.address}
-                onChange={(e) => setEditForm((prev) => ({ ...prev, address: e.target.value }))}
-                disabled={saving}
-              />
-            </div>
-
-            {editError ? <div className="profile-modal-error">{editError}</div> : null}
-
-            <div className="profile-modal-actions">
-              <button type="button" onClick={() => setShowEditModal(false)} disabled={saving}>
+            <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={() => setShowEditModal(false)} disabled={saving}>
                 Cancel
               </button>
-              <button type="button" onClick={saveProfile} disabled={saving}>
+              <button className="btn btn-primary" onClick={saveProfile} disabled={saving}>
                 {saving ? "Saving..." : "Save Changes"}
               </button>
             </div>
@@ -306,60 +322,75 @@ export default function CustomerProfile() {
       )}
 
       {showEmailChangeModal && (
-        <div className="profile-modal-overlay" onClick={() => !emailLoading && setShowEmailChangeModal(false)}>
-          <div className="profile-modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Change Email</h3>
-            <p>Verify your new email address with OTP</p>
+        <div className="modal-backdrop" onClick={() => !emailLoading && setShowEmailChangeModal(false)}>
+          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="modal-header-content">
+                <h2 className="modal-title">Change Email</h2>
+                <p className="modal-subtitle">Verify your new email address with OTP</p>
+              </div>
+              <button className="modal-close-button" onClick={() => setShowEmailChangeModal(false)} disabled={emailLoading}>
+                ✕
+              </button>
+            </div>
 
-            {emailChangeStep === "email" ? (
-              <>
-                <div className="profile-modal-field">
-                  <label>New Email Address</label>
-                  <input
-                    type="email"
-                    value={newEmailInput}
-                    onChange={(e) => setNewEmailInput(e.target.value)}
-                    placeholder="Enter new email"
-                    disabled={emailLoading}
-                  />
-                </div>
-                {emailError ? <div className="profile-modal-error">{emailError}</div> : null}
-                <div className="profile-modal-actions">
-                  <button onClick={() => setShowEmailChangeModal(false)} disabled={emailLoading}>
+            <div className="modal-body">
+              {emailChangeStep === "email" ? (
+                <>
+                  <div className="modal-field">
+                    <label className="modal-field-label">New Email Address</label>
+                    <input
+                      type="email"
+                      className="modal-field-input"
+                      value={newEmailInput}
+                      onChange={(e) => setNewEmailInput(e.target.value)}
+                      placeholder="Enter new email"
+                      disabled={emailLoading}
+                    />
+                  </div>
+                  {emailError && <div className="modal-message error"><span>⚠️</span><span>{emailError}</span></div>}
+                </>
+              ) : (
+                <>
+                  <div className="modal-field">
+                    <label className="modal-field-label">Verification Code</label>
+                    <input
+                      type="text"
+                      className="modal-field-input"
+                      value={emailOtp}
+                      onChange={(e) => setEmailOtp(e.target.value.replace(/[^0-9]/g, "").slice(0, 6))}
+                      placeholder="6-digit OTP"
+                      maxLength={6}
+                      disabled={emailLoading}
+                    />
+                    <div className="modal-field-hint">Sent to {newEmailInput}</div>
+                  </div>
+                  {emailError && <div className="modal-message error"><span>⚠️</span><span>{emailError}</span></div>}
+                </>
+              )}
+            </div>
+
+            <div className="modal-footer">
+              {emailChangeStep === "email" ? (
+                <>
+                  <button className="btn btn-secondary" onClick={() => setShowEmailChangeModal(false)} disabled={emailLoading}>
                     Cancel
                   </button>
-                  <button onClick={sendEmailOtp} disabled={emailLoading}>
+                  <button className="btn btn-primary" onClick={sendEmailOtp} disabled={emailLoading}>
                     {emailLoading ? "Sending OTP..." : "Send OTP"}
                   </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="profile-modal-field">
-                  <label>Verification Code</label>
-                  <input
-                    type="text"
-                    value={emailOtp}
-                    onChange={(e) => setEmailOtp(e.target.value.replace(/[^0-9]/g, "").slice(0, 6))}
-                    placeholder="6-digit OTP"
-                    maxLength={6}
-                    disabled={emailLoading}
-                  />
-                  <small style={{ color: "#6b7280", marginTop: "4px", display: "block" }}>
-                    Sent to {newEmailInput}
-                  </small>
-                </div>
-                {emailError ? <div className="profile-modal-error">{emailError}</div> : null}
-                <div className="profile-modal-actions">
-                  <button onClick={() => setEmailChangeStep("email")} disabled={emailLoading}>
+                </>
+              ) : (
+                <>
+                  <button className="btn btn-secondary" onClick={() => setEmailChangeStep("email")} disabled={emailLoading}>
                     Back
                   </button>
-                  <button onClick={verifyEmailOtp} disabled={emailLoading}>
+                  <button className="btn btn-primary" onClick={verifyEmailOtp} disabled={emailLoading}>
                     {emailLoading ? "Verifying..." : "Verify & Change"}
                   </button>
-                </div>
-              </>
-            )}
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}

@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import api from "../api";
 import "../styles/AdminNavbar.css";
 
 const AdminNavbar = ({ sidebarOpen, setSidebarOpen, admin, onLogout }) => {
   const initial = admin?.name?.charAt(0)?.toUpperCase() || "A";
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const mobileMenuRef = useRef(null);
   const [form, setForm] = useState({
     currentPassword: "",
     newPassword: "",
@@ -18,6 +20,19 @@ const AdminNavbar = ({ sidebarOpen, setSidebarOpen, admin, onLogout }) => {
     next: false,
     confirm: false
   });
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
+        setShowMobileMenu(false);
+      }
+    }
+    if (showMobileMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [showMobileMenu]);
 
   const openPasswordModal = () => {
     setShowPasswordModal(true);
@@ -83,12 +98,26 @@ const AdminNavbar = ({ sidebarOpen, setSidebarOpen, admin, onLogout }) => {
           <h1 className="navbar-logo">Oibre Admin</h1>
         </div>
         <div className="navbar-right">
-          <div className="admin-profile">
+          <div 
+            className="admin-profile" 
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            ref={mobileMenuRef}
+          >
             <div className="profile-avatar">{initial}</div>
             <div className="profile-info">
               <p className="profile-name">{admin?.name || "Admin"}</p>
               <p className="profile-role">Administrator</p>
             </div>
+            {showMobileMenu && (
+              <div className="admin-profile-mobile-menu" onClick={(e) => e.stopPropagation()}>
+                <button onClick={() => { setShowMobileMenu(false); openPasswordModal(); }}>
+                  Change Password
+                </button>
+                <button onClick={() => { setShowMobileMenu(false); onLogout(); }}>
+                  Logout
+                </button>
+              </div>
+            )}
           </div>
           <button className="change-password-btn" onClick={openPasswordModal}>
             Change Password

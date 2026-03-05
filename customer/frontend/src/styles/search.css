@@ -14,8 +14,8 @@
   cursor: pointer;
   font-weight: 600;
   font-size: 14px;
-  transition: all 0.2s ease;
-  z-index: 999;
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  z-index: 900;
   min-height: 44px;
   min-width: 44px;
   display: flex;

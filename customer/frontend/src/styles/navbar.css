@@ -731,6 +731,8 @@
     background: #111111;
     border: 1px solid #1f2937;
     border-radius: 12px;
+    z-index: 1050;
+    position: relative;
   }
 
   .nav-links.mobile-open {
@@ -771,6 +773,10 @@
     right: 0;
     width: min(94vw, 340px);
     min-width: 0;
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 65px;
   }
 }
 

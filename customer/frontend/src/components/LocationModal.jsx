@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import "../styles/locationModal.css";
+import "../styles/unified-modal.css";
+import "../styles/unified-forms.css";
+import "../styles/unified-buttons.css";
 
 export default function LocationModal({ 
   onLocationSelect, 
@@ -40,78 +43,189 @@ export default function LocationModal({
   };
 
   return (
-    <div className="blinkit-location-backdrop" onClick={onClose}>
-      <div className="blinkit-location-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="blinkit-location-close" onClick={onClose}>
-          ✕
-        </button>
-
-        <h1 className="blinkit-location-title">
-          {isDetecting ? "Welcome to Oibre" : "Change Location"}
-        </h1>
-        {!isDetecting && (
-          <p className="blinkit-location-subtitle">
-            Choose your service area to see providers near you.
-          </p>
-        )}
-
-        {isDetecting ? (
-          <div className="blinkit-detecting-container">
-            <div className="blinkit-loading-dots">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-            <p className="blinkit-detecting-text">Detecting your location...</p>
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal-container modal-lg" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <div className="modal-header-content">
+            <h2 className="modal-title">
+              {isDetecting ? "Welcome to Oibre" : "Change Location"}
+            </h2>
+            {!isDetecting && (
+              <p className="modal-subtitle">
+                Choose your service area to see providers near you.
+              </p>
+            )}
           </div>
-        ) : (
-          <>
-            <div className="blinkit-location-actions">
+          <button className="modal-close-button" onClick={onClose}>
+            ✕
+          </button>
+        </div>
+
+        <div className="modal-body">
+          {isDetecting ? (
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '40px 20px',
+              gap: '16px'
+            }}>
+              <div style={{
+                display: 'flex',
+                gap: '8px'
+              }}>
+                <span style={{
+                  width: '12px',
+                  height: '12px',
+                  borderRadius: '50%',
+                  background: '#2563eb',
+                  animation: 'pulse 1.4s ease-in-out infinite'
+                }}></span>
+                <span style={{
+                  width: '12px',
+                  height: '12px',
+                  borderRadius: '50%',
+                  background: '#2563eb',
+                  animation: 'pulse 1.4s ease-in-out infinite 0.2s'
+                }}></span>
+                <span style={{
+                  width: '12px',
+                  height: '12px',
+                  borderRadius: '50%',
+                  background: '#2563eb',
+                  animation: 'pulse 1.4s ease-in-out infinite 0.4s'
+                }}></span>
+              </div>
+              <p style={{
+                fontSize: '14px',
+                color: '#64748b',
+                fontWeight: '500'
+              }}>Detecting your location...</p>
+            </div>
+          ) : (
+            <div className="form">
               <button 
-                className="blinkit-detect-btn"
+                className="btn btn-primary" 
+                style={{ width: '100%' }}
                 onClick={handleDetectLocation}
               >
-                Detect my location
+                📍 Detect my location
               </button>
 
-              <span className="blinkit-or-divider">OR</span>
-
-              <input
-                type="text"
-                className="blinkit-location-search"
-                placeholder="search delivery location"
-                value={searchQuery}
-                onChange={handleSearchChange}
-              />
-            </div>
-
-            {searchResults && searchResults.length > 0 && (
-              <div className="blinkit-search-results">
-                {searchResults.map((location, idx) => (
-                  <div
-                    key={idx}
-                    className="blinkit-result-item"
-                    onClick={() => handleLocationSelect(location)}
-                  >
-                    <span className="blinkit-result-icon">📍</span>
-                    <div className="blinkit-result-content">
-                      <p className="blinkit-result-name">{location.title || location.locality}</p>
-                      {location.subtitle && (
-                        <p className="blinkit-result-address">{location.subtitle}</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                margin: '12px 0'
+              }}>
+                <div style={{
+                  flex: 1,
+                  height: '1px',
+                  background: '#e5e7eb'
+                }}></div>
+                <span style={{
+                  fontSize: '13px',
+                  color: '#9ca3b8',
+                  fontWeight: '500'
+                }}>OR</span>
+                <div style={{
+                  flex: 1,
+                  height: '1px',
+                  background: '#e5e7eb'
+                }}></div>
               </div>
-            )}
 
-            {isSearching && searchQuery.trim().length > 0 && (
-              <p className="blinkit-searching-status">Searching locations...</p>
-            )}
+              <div className="modal-field">
+                <label className="modal-field-label">Search Location</label>
+                <input
+                  type="text"
+                  className="modal-field-input"
+                  placeholder="Enter location or address"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                />
+              </div>
 
-          </>
-        )}
+              {isSearching && searchQuery.trim().length > 0 && (
+                <div style={{
+                  padding: '12px',
+                  textAlign: 'center',
+                  color: '#64748b',
+                  fontSize: '13px'
+                }}>
+                  Searching locations...
+                </div>
+              )}
+
+              {searchResults && searchResults.length > 0 && (
+                <div style={{
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '10px',
+                  overflow: 'hidden',
+                  maxHeight: '300px',
+                  overflowY: 'auto'
+                }}>
+                  {searchResults.map((location, idx) => (
+                    <div
+                      key={idx}
+                      onClick={() => handleLocationSelect(location)}
+                      style={{
+                        padding: '12px',
+                        borderBottom: idx < searchResults.length - 1 ? '1px solid #e5e7eb' : 'none',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        gap: '12px',
+                        alignItems: 'flex-start',
+                        transition: 'background 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = '#f8fafc'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                    >
+                      <span style={{ fontSize: '16px', lineHeight: '1' }}>📍</span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{
+                          margin: '0 0 4px',
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          color: '#0f172a',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          {location.title || location.locality}
+                        </p>
+                        {location.subtitle && (
+                          <p style={{
+                            margin: '0',
+                            fontSize: '12px',
+                            color: '#64748b',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                          }}>
+                            {location.subtitle}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
+      <style>{`
+        @keyframes pulse {
+          0%, 100% {
+            opacity: 0.6;
+          }
+          50% {
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   );
 }

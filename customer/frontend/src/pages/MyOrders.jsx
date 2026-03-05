@@ -3,6 +3,9 @@ import api from "../config/axios";
 import { useNavigate } from "react-router-dom";
 import { convertTo12HourFormat } from "../utils/timeUtils";
 import "../styles/MyOrders.css";
+import "../styles/unified-modal.css";
+import "../styles/unified-forms.css";
+import "../styles/unified-buttons.css";
 
 export default function MyOrders() {
   const navigate = useNavigate();
@@ -188,28 +191,36 @@ export default function MyOrders() {
       ))}
 
       {activeOrder && !showReview && (
-        <Modal onClose={() => setActiveOrder(null)}>
-          <h2>Booking Status</h2>
+        <Modal onClose={() => setActiveOrder(null)} title="Booking Status">
           <Timeline status={activeOrder.status} />
 
-          <p>
-            <b>Problem:</b> {activeOrder.problemDescription}
-          </p>
+          <div style={{ marginTop: "16px" }}>
+            <div style={{ marginBottom: "12px" }}>
+              <strong>Problem:</strong>
+              <p style={{ margin: "4px 0 0" }}>{activeOrder.problemDescription}</p>
+            </div>
 
-          <p>
-            <b>Scheduled:</b>{" "}
-            {getScheduledVisitLabel(activeOrder)}
-          </p>
+            <div style={{ marginBottom: "12px" }}>
+              <strong>Scheduled:</strong>
+              <p style={{ margin: "4px 0 0" }}>
+                {getScheduledVisitLabel(activeOrder)}
+              </p>
+            </div>
 
-          {activeOrder.providerNote && (
-            <p>
-              <b>Provider Note:</b> {activeOrder.providerNote}
-            </p>
-          )}
+            {activeOrder.providerNote && (
+              <div style={{ marginBottom: "12px" }}>
+                <strong>Provider Note:</strong>
+                <p style={{ margin: "4px 0 0" }}>{activeOrder.providerNote}</p>
+              </div>
+            )}
 
-          {activeOrder.status === "cancelled" && (
-            <div className="cancelled-banner">Booking cancelled by provider.</div>
-          )}
+            {activeOrder.status === "cancelled" && (
+              <div className="modal-message warning">
+                <span>⚠️</span>
+                <span>Booking cancelled by provider.</span>
+              </div>
+            )}
+          </div>
         </Modal>
       )}
 
@@ -220,59 +231,80 @@ export default function MyOrders() {
             setRating(5);
             setComment("");
           }}
+          title="Share Feedback"
+          footer={
+            <button className="btn btn-primary" style={{ width: "100%" }} onClick={submitReview}>
+              Submit Feedback
+            </button>
+          }
         >
-          <h2>Share Feedback</h2>
-
-          <label>Rating</label>
-          <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
-            {[5, 4, 3, 2, 1].map((r) => (
-              <option key={r} value={r}>
-                {r} Star
-              </option>
-            ))}
-          </select>
-
-          <label>Comment</label>
-          <textarea
-            placeholder="Share your experience..."
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-          />
-
-          <label>Optional Image</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              const file = e.target.files?.[0] || null;
-              setFeedbackImage(file);
-              if (file) {
-                setFeedbackPreview(URL.createObjectURL(file));
-              } else {
-                setFeedbackPreview("");
-              }
-            }}
-          />
-
-          {feedbackPreview && (
-            <div className="feedback-image-preview">
-              <img src={feedbackPreview} alt="Feedback attachment preview" />
-              <button
-                type="button"
-                className="close-btn"
-                onClick={() => {
-                  setFeedbackImage(null);
-                  setFeedbackPreview("");
-                }}
-              >
-                Remove Image
-              </button>
+          <div className="form">
+            <div className="modal-field">
+              <label className="modal-field-label">Rating</label>
+              <select className="modal-field-select" value={rating} onChange={(e) => setRating(Number(e.target.value))}>
+                {[5, 4, 3, 2, 1].map((r) => (
+                  <option key={r} value={r}>
+                    {r} Star{r !== 1 ? 's' : ''}
+                  </option>
+                ))}
+              </select>
             </div>
-          )}
 
-          <button className="confirm-btn" onClick={submitReview}>
-            Submit Feedback
-          </button>
+            <div className="modal-field">
+              <label className="modal-field-label">Comment</label>
+              <textarea
+                className="modal-field-textarea"
+                placeholder="Share your experience..."
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+              />
+            </div>
+
+            <div className="modal-field">
+              <label className="modal-field-label">Optional Image</label>
+              <input
+                type="file"
+                className="modal-field-input"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || null;
+                  setFeedbackImage(file);
+                  if (file) {
+                    setFeedbackPreview(URL.createObjectURL(file));
+                  } else {
+                    setFeedbackPreview("");
+                  }
+                }}
+              />
+            </div>
+
+            {feedbackPreview && (
+              <div style={{
+                marginBottom: "16px",
+                padding: "12px",
+                border: "1px solid #e5e7eb",
+                borderRadius: "10px",
+                position: "relative"
+              }}>
+                <img src={feedbackPreview} alt="Feedback preview" style={{
+                  maxWidth: "100%",
+                  borderRadius: "8px",
+                  maxHeight: "200px"
+                }} />
+                <button
+                  type="button"
+                  className="btn btn-sm btn-danger"
+                  onClick={() => {
+                    setFeedbackImage(null);
+                    setFeedbackPreview("");
+                  }}
+                  style={{ marginTop: "8px", width: "100%" }}
+                >
+                  Remove Image
+                </button>
+              </div>
+            )}
+          </div>
         </Modal>
       )}
     </div>
@@ -297,14 +329,29 @@ function Timeline({ status }) {
   );
 }
 
-function Modal({ children, onClose }) {
+function Modal({ children, onClose, title, subtitle, footer }) {
   return (
-    <div className="modal-overlay">
-      <div className="modal-box">
-        {children}
-        <button className="close-btn" onClick={onClose}>
-          Close
-        </button>
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+        {title && (
+          <div className="modal-header">
+            <div className="modal-header-content">
+              <h2 className="modal-title">{title}</h2>
+              {subtitle && <p className="modal-subtitle">{subtitle}</p>}
+            </div>
+            <button className="modal-close-button" onClick={onClose}>
+              ✕
+            </button>
+          </div>
+        )}
+        <div className="modal-body">
+          {children}
+        </div>
+        {footer && (
+          <div className="modal-footer">
+            {typeof footer === 'function' ? footer() : footer}
+          </div>
+        )}
       </div>
     </div>
   );

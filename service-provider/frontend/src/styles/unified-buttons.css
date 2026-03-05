@@ -1,0 +1,293 @@
+/* =======================
+   UNIFIED BUTTON SYSTEM
+   Consistent buttons across all modals
+   Replaces: profile-btn, cp-btn*, confirm-btn, etc.
+======================= */
+
+/* ========================
+   BUTTON BASE STYLES
+======================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  user-select: none;
+  text-decoration: none;
+  line-height: 1;
+  font-family: inherit;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ========================
+   BUTTON VARIANTS
+======================== */
+
+/* PRIMARY BUTTON - Action buttons */
+.btn-primary {
+  background: #111827;
+  color: #ffffff;
+  border-color: #111827;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #1f2937;
+  border-color: #1f2937;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* SECONDARY BUTTON - Alternative action */
+.btn-secondary {
+  background: #f3f4f6;
+  color: #111827;
+  border-color: #d1d5db;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+  transform: translateY(-2px);
+}
+
+.btn-secondary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* DANGER BUTTON - Destructive actions */
+.btn-danger {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #fca5a5;
+  border-color: #f87171;
+  color: #7f1d1d;
+  transform: translateY(-2px);
+}
+
+.btn-danger:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* OUTLINE BUTTON - Secondary/tertiary action */
+.btn-outline {
+  background: transparent;
+  color: #111827;
+  border-color: #cbd5e1;
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  transform: translateY(-2px);
+}
+
+.btn-outline:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* GHOST BUTTON - Minimal style */
+.btn-ghost {
+  background: transparent;
+  color: #111827;
+  border-color: transparent;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: #f3f4f6;
+  color: #0f172a;
+}
+
+.btn-ghost:active:not(:disabled) {
+  background: #e5e7eb;
+}
+
+/* SUCCESS BUTTON - Confirmation actions */
+.btn-success {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #bbf7d0;
+  border-color: #86efac;
+  transform: translateY(-2px);
+}
+
+.btn-success:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* ========================
+   BUTTON SIZES
+======================== */
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 8px;
+}
+
+.btn-lg {
+  padding: 12px 20px;
+  font-size: 15px;
+  border-radius: 12px;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-icon {
+  padding: 8px;
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+}
+
+.btn-icon-sm {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+}
+
+/* ========================
+   BUTTON GROUPS
+======================== */
+
+.btn-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-group.stretch {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+}
+
+.btn-group.vertical {
+  flex-direction: column;
+}
+
+.btn-group.centered {
+  justify-content: center;
+}
+
+.btn-group.right {
+  justify-content: flex-end;
+}
+
+/* ========================
+   BUTTON STATES
+======================== */
+
+.btn.loading {
+  position: relative;
+  color: transparent;
+}
+
+.btn.loading::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* ========================
+   ICON + TEXT BUTTON
+======================== */
+
+.btn-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-icon-left::before {
+  content: attr(data-icon);
+  margin-right: 4px;
+}
+
+.btn-icon-right::after {
+  content: attr(data-icon);
+  margin-left: 4px;
+}
+
+/* ========================
+   RESPONSIVE
+======================== */
+
+@media (max-width: 480px) {
+  .btn {
+    padding: 10px 14px;
+    font-size: 13px;
+    border-radius: 8px;
+  }
+
+  .btn-lg {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  .btn-group {
+    gap: 8px;
+  }
+
+  .btn-group.stretch {
+    grid-auto-flow: row;
+  }
+}
+
+/* ========================
+   BUTTONS IN MODALS
+======================== */
+
+.modal-footer .btn {
+  min-height: 38px;
+  padding: 8px 16px;
+}
+
+.modal-footer .btn-primary {
+  flex: 0 1 auto;
+}
+
+.modal-footer .btn-secondary,
+.modal-footer .btn-outline {
+  flex: 0 1 auto;
+}
+
+@media (max-width: 480px) {
+  .modal-footer .btn {
+    width: 100%;
+    min-height: 42px;
+  }
+}
