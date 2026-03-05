@@ -38,6 +38,24 @@
   font-weight: 600;
 }
 
+.footer-brand-link {
+  text-decoration: none;
+  color: inherit;
+  display: inline-block;
+  transition: opacity 0.2s ease;
+}
+
+.footer-brand-link:hover {
+  opacity: 0.8;
+}
+
+.footer-brand-link h2 {
+  color: white;
+  font-size: 20px;
+  margin: 0 0 var(--space-md) 0;
+  font-weight: 600;
+}
+
 .footer-address {
   margin-bottom: var(--space-lg);
 }

@@ -8,7 +8,9 @@ export default function Footer() {
         <div className="footer-content">
           {/* LEFT: Brand, Address, Contact */}
           <div className="footer-left">
-            <h2 className="footer-brand">Oibre</h2>
+            <Link to="/" className="footer-brand-link">
+              <h2 className="footer-brand">Oibre</h2>
+            </Link>
             <div className="footer-address">
               <p>Trusted local professionals at your doorstep</p>
               <p>Goa, India</p>
@@ -33,7 +35,7 @@ export default function Footer() {
                 <li><Link to="/">Home</Link></li>
                 <li><Link to="/search">Services</Link></li>
                 <li><Link to="/about">About us</Link></li>
-                <li><a href="#">FAQ</a></li>
+                <li><Link to="/faq">FAQ</Link></li>
                 <li><Link to="/contact">Contact us</Link></li>
               </ul>
             </div>
@@ -41,20 +43,20 @@ export default function Footer() {
             <div className="footer-column">
               <h4>Social</h4>
               <ul>
-                <li><a href="#">Facebook</a></li>
-                <li><a href="#">Instagram</a></li>
-                <li><a href="#">LinkedIn</a></li>
-                <li><a href="#">Twitter</a></li>
-                <li><a href="#">Youtube</a></li>
+                <li><a href="https://facebook.com/oibre" target="_blank" rel="noopener noreferrer">Facebook</a></li>
+                <li><a href="https://instagram.com/oibre" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+                <li><a href="https://linkedin.com/company/oibre" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+                <li><a href="https://twitter.com/oibre" target="_blank" rel="noopener noreferrer">Twitter</a></li>
+                <li><a href="https://youtube.com/@oibre" target="_blank" rel="noopener noreferrer">Youtube</a></li>
               </ul>
             </div>
 
             <div className="footer-column">
               <h4>Legal</h4>
               <ul>
-                <li><a href="#">Terms of service</a></li>
-                <li><a href="#">Privacy policy</a></li>
-                <li><a href="#">Cookie policy</a></li>
+                <li><Link to="/terms">Terms of service</Link></li>
+                <li><Link to="/privacy">Privacy policy</Link></li>
+                <li><Link to="/cookies">Cookie policy</Link></li>
               </ul>
             </div>
           </div>

@@ -10,7 +10,7 @@
   cursor: pointer;
   font-weight: 600;
   font-size: 14px;
-  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   z-index: 900;
   min-height: 44px;
   min-width: 44px;
@@ -18,25 +18,26 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 0;
+  white-space: nowrap;
 }
 
 .back-button:hover {
   background: #f9fafb;
   border-color: #d1d5db;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
 }
 
 .back-button:active {
-  transform: translateY(0);
+  background: #e5e7eb;
 }
 
 @media (max-width: 768px) {
   .back-button {
-    top: 68px;
-    left: 12px;
-    padding: 6px 12px;
-    font-size: 13px;
+    top: 72px;
+    left: 16px;
+    padding: 8px 16px;
+    font-size: 14px;
   }
 }
 
@@ -336,8 +337,10 @@
   }
 
   .back-button {
-    position: static;
-    margin-bottom: 10px;
+    top: 72px;
+    left: 12px;
+    padding: 8px 14px;
+    font-size: 13px;
   }
 
   .orders-title {

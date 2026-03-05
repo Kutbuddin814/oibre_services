@@ -134,6 +134,8 @@ body {
 .dashboard-wrapper {
   max-width: 1200px;
   margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .dashboard-header {
@@ -142,9 +144,12 @@ body {
   align-items: center;
   margin-bottom: 30px;
   background: white;
-  padding: 20px;
+  padding: 16px 20px;
   border-radius: 12px;
   box-shadow: var(--shadow-sm);
+  width: 100%;
+  box-sizing: border-box;
+  gap: 16px;
 }
 
 .dashboard-header h1 {
@@ -152,6 +157,8 @@ body {
   font-weight: 700;
   color: var(--gray-700);
   flex: 1;
+  min-width: 0;
+  word-break: break-word;
 }
 
 .user-menu {
@@ -159,6 +166,8 @@ body {
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  flex-shrink: 0;
+  min-width: 44px;
 }
 
 .avatar {
@@ -174,6 +183,7 @@ body {
   cursor: pointer;
   font-size: 16px;
   transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .avatar:hover {
@@ -782,16 +792,50 @@ body {
   background: var(--primary-dark);
 }
 
+@media (max-width: 480px) {
+  .dashboard-container {
+    padding: 12px;
+  }
+
+  .dashboard-header {
+    padding: 12px;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .dashboard-header h1 {
+    font-size: 18px;
+  }
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 15px;
+  }
+
+  .dashboard-welcome h2 {
+    font-size: 18px;
+  }
+}
+}
+
+/* ==================== RESPONSIVE ==================== */
 /* ==================== RESPONSIVE ==================== */
 @media (max-width: 768px) {
   .dashboard-header {
-    flex-direction: column;
-    gap: 15px;
-    text-align: center;
+    flex-direction: row;
+    gap: 12px;
+    padding: 14px 16px;
   }
 
   .dashboard-header h1 {
     font-size: 22px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .user-menu {
+    min-width: auto;
   }
 
   .request-actions {
