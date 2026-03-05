@@ -1,0 +1,117 @@
+/* =======================
+   ADMIN NAVBAR - MOBILE FIRST
+   Professional, responsive
+======================= */
+
+.admin-navbar {
+  background: var(--secondary);
+  color: white;
+  padding: var(--space-lg) var(--space-lg);
+  min-height: 56px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-md);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  gap: var(--space-lg);
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  flex: 1;
+}
+
+.menu-toggle-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--radius-lg);
+  transition: background var(--transition-fast);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.navbar-logo {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+  color: white;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 10px 16px;
+  border-radius: var(--radius-lg);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+.admin-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.logout-btn,
+.change-password-btn {
+  display: none;
+}
+
+/* Show buttons on tablet+ */
+@media (min-width: 548px) {
+  .logout-btn,
+  .change-password-btn {
+    display: inline-flex;
+  }
+}
+
+/* =======================
+   RESPONSIVE
+======================= */
+
+@media (min-width: 548px) {
+  .admin-navbar {
+    padding: var(--space-lg) var(--space-xl);
+  }
+
+  .navbar-logo {
+    font-size: 20px;
+  }
+}
+
+@media (min-width: 768px) {
+  .admin-navbar {
+    padding: var(--space-md) var(--space-2xl);
+    min-height: 64px;
+  }
+
+  .menu-toggle-btn {
+    display: none;
+  }
+}

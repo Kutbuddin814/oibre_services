@@ -1,12 +1,37 @@
+/* IMPORT ORDER (mobile-first) */
+
+/* 1. Design System Variables & Foundations */
+@import './styles/designSystem.css';
+
+/* 2. Tailwind CSS */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* 3. Layout Components */
+@import './styles/AdminNavbar-improved.css';
+@import './styles/Sidebar-improved.css';
+@import './styles/AdminDashboard-improved.css';
+
+/* 4. Page-specific Styles */
+@import './styles/Dashboard.css';
+@import './styles/Users.css';
+@import './styles/Providers.css';
+@import './styles/Services.css';
+@import './styles/ProviderRequests.css';
+@import './styles/RemovalRequests.css';
+@import './styles/ContactMessages.css';
+@import './styles/AdminAuth.css';
+@import './styles/toast.css';
+
+/* 5. Base Responsive Fixes */
 
 html,
 body,
 #root {
   max-width: 100%;
   overflow-x: hidden;
+  scroll-behavior: smooth;
 }
 
 img,
@@ -17,18 +42,3 @@ svg {
   height: auto;
 }
 
-table {
-  width: 100%;
-}
-
-@media (max-width: 768px) {
-  .admin-content {
-    overflow-x: auto;
-  }
-
-  table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-  }
-}

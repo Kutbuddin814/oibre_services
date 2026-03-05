@@ -1,47 +1,81 @@
-* {
-  margin: 0;
+/* =======================
+   BASE STYLES
+   Built on design system
+======================= */
+
+/* Remove duplicate resets - design system handles this */
+
+/* Ensure text rendering is crisp */
+html,
+body,
+#root {
+  max-width: 100%;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Links */
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+/* Lists */
+ul,
+ol {
+  margin-left: var(--space-lg);
+  margin-bottom: var(--space-md);
+}
+
+li {
+  margin-bottom: var(--space-sm);
+}
+
+/* Code blocks */
+code {
+  background-color: var(--bg-tertiary);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--danger);
+}
+
+pre {
+  background-color: var(--secondary);
+  color: #e5e7eb;
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  overflow-x: auto;
+  margin-bottom: var(--space-lg);
+}
+
+pre code {
+  background-color: transparent;
   padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: Inter, system-ui, sans-serif;
-  background: #F7F7F8;
-  color: #111827;
-  line-height: 1.6;
-}
-
-button {
-  font-family: inherit;
-}
-
-section {
-  width: 100%;
+  color: inherit;
 }
 
 /* =======================
-   GLOBAL ANIMATIONS
+   ANIMATIONS
 ======================= */
 
-/* Fade-in on load */
-section {
-  animation: fadeInUp 0.6s ease both;
-}
-
-/* Cards hover */
-.card,
-.category,
-.why-card {
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-.card:hover,
-.category:hover,
-.why-card:hover {
-  transform: translateY(-4px);
-}
-
-/* Keyframes */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -53,9 +87,129 @@ section {
   }
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease both;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.5s ease;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.5s ease;
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 /* =======================
-   SECTION SPACING RESET
+   SCROLLBAR STYLING
 ======================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-light);
+}
+
+/* =======================
+   FOCUS STYLES
+======================= */
+
+*:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline-offset: 2px;
+}
+
+/* =======================
+   SECTION SPACING
+======================= */
+
 section {
   margin-bottom: 0;
+  padding: var(--space-xl) var(--space-lg);
+}
+
+@media (min-width: 768px) {
+  section {
+    padding: var(--space-2xl) var(--space-2xl);
+  }
+}
+
+@media (min-width: 1024px) {
+  section {
+    padding: var(--space-3xl) var(--space-2xl);
+  }
 }

@@ -4,23 +4,44 @@
 
 .back-button {
   position: fixed;
-  top: 80px;
-  left: 20px;
+  top: 72px;
+  left: 16px;
   background: #FFFFFF;
   color: #000000;
   border: 1px solid #E5E7EB;
-  padding: 10px 16px;
+  padding: 8px 16px;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
   font-size: 14px;
-  transition: background 0.2s, border-color 0.2s;
+  transition: all 0.2s ease;
   z-index: 999;
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .back-button:hover {
   background: #F3F4F6;
   border-color: #D1D5DB;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.back-button:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .back-button {
+    top: 68px;
+    left: 12px;
+    padding: 6px 12px;
+    font-size: 13px;
+  }
 }
 
 .search-page {

@@ -48,7 +48,10 @@ export default function CustomerProfile() {
 
   const handleLogout = () => {
     localStorage.removeItem("customerToken");
-    navigate("/");
+    localStorage.removeItem("customerData");
+    localStorage.removeItem("userLocation");
+    // Reload page so navbar updates immediately
+    window.location.href = "/";
   };
 
   const openEditModal = () => {

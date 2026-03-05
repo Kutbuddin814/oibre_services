@@ -1,3 +1,37 @@
+/* IMPORT ORDER (mobile-first, bottom-up cascade) */
+
+/* 1. Design System Variables & Foundations */
+@import './styles/designSystem.css';
+
+/* 2. Tailwind CSS */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* 3. Base Styles */
+@import './styles/base.css';
+
+/* 4. Responsive Design */
+@import './styles/responsive.css';
+
+/* 5. Component Library */
+@import './styles/components.css';
+
+/* 6. Layout Components */
+@import './styles/navbar-improved.css';
+@import './styles/footer.css';
+@import './styles/home-improved.css';
+
+/* 7. Page-specific Styles */
+@import './styles/carousel.css';
+@import './styles/search.css';
+@import './styles/Contact.css';
+@import './styles/CustomerAuth.css';
+@import './styles/CustomerProfile.css';
+@import './styles/MyOrders.css';
+@import './styles/providerProfile.css';
+@import './styles/Services.css';
+@import './styles/About.css';
+@import './styles/locationModal.css';
+@import './styles/employees.css';
+@import './styles/toast.css';
