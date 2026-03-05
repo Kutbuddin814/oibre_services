@@ -73,7 +73,6 @@ button:hover:not(.password-toggle-btn) {
     grid-template-columns: repeat(3, 1fr);
   }
 }
-}
 
 input:focus,
 textarea:focus,

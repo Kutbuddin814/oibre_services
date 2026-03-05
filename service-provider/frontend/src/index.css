@@ -74,8 +74,6 @@ code {
     grid-template-columns: repeat(3, 1fr);
   }
 }
-  transform: translateY(-2px);
-}
 
 input:focus,
 textarea:focus,

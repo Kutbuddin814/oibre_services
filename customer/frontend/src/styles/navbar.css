@@ -346,33 +346,37 @@
 }
 
 .profile-header {
-  padding: 14px 16px;
+  padding: 16px;
   display: flex;
   gap: 12px;
   align-items: center;
+  background: #F9FAFB;
+  border-bottom: 1px solid #E5E7EB;
 }
 
 .profile-avatar {
   width: 48px;
   height: 48px;
-  background: #000000;
+  background: linear-gradient(135deg, #111827 0%, #374151 100%);
   color: #FFFFFF;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 18px;
+  flex-shrink: 0;
 }
 
 .profile-name {
   font-weight: 600;
   margin: 0;
-  font-size: 14px;
+  font-size: 15px;
+  color: #111827;
 }
 
 .profile-mobile {
-  font-size: 12px;
+  font-size: 13px;
   color: #6B7280;
   margin: 2px 0 0 0;
 }
@@ -385,48 +389,61 @@
 
 .profile-link {
   display: block;
-  padding: 12px 16px;
-  color: #000000;
+  padding: 14px 16px;
+  color: #111827;
   text-decoration: none;
   font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .profile-link:hover {
   background: #F3F4F6;
+  padding-left: 20px;
 }
 
 .profile-action-btn {
   width: 100%;
-  padding: 12px 16px;
+  padding: 14px 16px;
   background: #FFFFFF;
-  color: #000000;
+  color: #111827;
   border: none;
   cursor: pointer;
   font-weight: 500;
   font-size: 14px;
   text-align: left;
+  transition: all 0.2s ease;
 }
 
 .profile-action-btn:hover {
   background: #F3F4F6;
+  padding-left: 20px;
 }
 
 .logout-btn {
   width: 100%;
-  padding: 12px 16px;
+  padding: 14px 16px;
   background: #FEE2E2;
   color: #991B1B;
   border: none;
+  border-top: 1px solid #E5E7EB;
   cursor: pointer;
   font-weight: 600;
   font-size: 14px;
   text-align: left;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: #FEE2E2;
+  padding-left: 20px;
 }
 
 .logout-btn:hover {
   background: #FCA5A5;
   color: #7F1D1D;
+  padding-left: 20px;
 }
 
 /* MAP PICKER MODAL */
