@@ -11,7 +11,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  min-height: 56px;
+  min-height: 64px;
   box-sizing: border-box;
   gap: 16px;
 }
@@ -28,6 +28,17 @@
   font-size: 20px;
   font-weight: 700;
   line-height: 1;
+}
+
+.logo-link {
+  color: #FFFFFF;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.logo-link:hover {
+  color: #FFFFFF;
 }
 
 /* NAV LINKS */
@@ -109,7 +120,7 @@
 
 .notifications-dropdown {
   position: absolute;
-  top: 48px;
+  top: 56px;
   right: 0;
   background: #FFFFFF;
   color: #000000;
@@ -191,7 +202,7 @@
 /* PROFILE DROPDOWN - NEW */
 .profile-dropdown-new {
   position: absolute;
-  top: 48px;
+  top: 56px;
   right: 0;
   background: #FFFFFF;
   color: #000000;
@@ -261,7 +272,7 @@
 /* DROPDOWN */
 .location-dropdown {
   position: absolute;
-  top: 46px;
+  top: 54px;
   right: 0;
   background: #FFFFFF;
   color: #000000;
@@ -336,7 +347,7 @@
 /* PROFILE DROPDOWN */
 .profile-dropdown {
   position: absolute;
-  top: 46px;
+  top: 54px;
   right: 0;
   background: #FFFFFF;
   color: #000000;
@@ -850,5 +861,20 @@
   .map-actions {
     flex-direction: column;
     align-items: stretch;
+  }
+}
+
+@media (min-width: 1025px) {
+  .profile-dropdown-new .profile-link,
+  .profile-dropdown-new .profile-action-btn,
+  .profile-dropdown-new .logout-btn {
+    text-align: left !important;
+  }
+
+  .profile-dropdown-new .profile-action-btn,
+  .profile-dropdown-new .logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
   }
 }

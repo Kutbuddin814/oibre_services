@@ -371,7 +371,9 @@ export default function Navbar() {
       <nav className="navbar">
         {/* LEFT */}
         <div className="nav-left">
-          <h1 className="logo">Oibre</h1>
+          <Link to="/" className="logo-link" onClick={() => setMobileMenuOpen(false)}>
+            <h1 className="logo">Oibre</h1>
+          </Link>
 
           <button
             className="mobile-menu-toggle"
