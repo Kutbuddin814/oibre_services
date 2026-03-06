@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import api from "../api";
-import "../styles/RemovalRequests.css";
 
 const RemovalRequests = () => {
   const [requests, setRequests] = useState([]);

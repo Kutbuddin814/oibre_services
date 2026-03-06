@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import api from "../api";
-import "../styles/ContactMessages.css";
 
 const statusOptions = ["new", "in_progress", "closed"];
 

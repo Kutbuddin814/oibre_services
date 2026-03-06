@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import api from "../api";
-import "../styles/AdminNavbar.css";
 
 const AdminNavbar = ({ sidebarOpen, setSidebarOpen, admin, onLogout }) => {
   const initial = admin?.name?.charAt(0)?.toUpperCase() || "A";

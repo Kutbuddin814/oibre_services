@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import api from "../api";
-import "../styles/Users.css";
 
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState("");

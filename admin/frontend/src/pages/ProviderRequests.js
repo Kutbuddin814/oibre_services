@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import api from "../api";
-import "../styles/ProviderRequests.css";
 
 const ProviderRequests = () => {
   const [requests, setRequests] = useState([]);

@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import api from "../api";
-import "../styles/Providers.css";
 
 const Providers = () => {
   const AUTO_REFRESH_MS = 15000;

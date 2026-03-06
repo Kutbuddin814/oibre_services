@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import api from "../api";
-import "../styles/Dashboard.css";
 
 const Dashboard = ({ setCurrentPage }) => {
   const [stats, setStats] = useState({

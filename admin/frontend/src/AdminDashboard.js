@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "./styles/AdminDashboard.css";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/AdminNavbar";
 import Dashboard from "./pages/Dashboard";

@@ -1,5 +1,4 @@
 import React from "react";
-import "../styles/Sidebar.css";
 
 const Sidebar = ({ currentPage, setCurrentPage, isOpen, setSidebarOpen }) => {
   const menuItems = [

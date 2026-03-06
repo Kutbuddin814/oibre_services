@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import api from "../api";
-import "../styles/AdminAuth.css";
 
 const AdminAuth = ({ onLogin }) => {
   const [isSignup, setIsSignup] = useState(false);
