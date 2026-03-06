@@ -37,19 +37,21 @@
   gap: 16px;
   margin-bottom: 32px;
   width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
-@media (min-width: 1100px) {
+@media (min-width: 1400px) {
   .stats-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 20px;
   }
 }
 
-@media (min-width: 1700px) {
+@media (min-width: 1900px) {
   .stats-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 20px;
   }
 }
