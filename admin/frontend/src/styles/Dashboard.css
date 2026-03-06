@@ -47,7 +47,7 @@
   }
 }
 
-@media (min-width: 1500px) {
+@media (min-width: 1700px) {
   .stats-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 20px;
@@ -78,6 +78,7 @@
   font-family: inherit;
   overflow: hidden;
   box-sizing: border-box;
+  min-width: 0;
 }
 
 .stat-card:hover {
@@ -103,6 +104,7 @@
 
 .stat-content {
   flex: 1;
+  min-width: 0;
 }
 
 .stat-content h3 {
@@ -112,6 +114,7 @@
   margin: 0 0 8px 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  overflow-wrap: anywhere;
 }
 
 .stat-number {
@@ -138,6 +141,7 @@
   border: 1px solid #E5E7EB;
   overflow: hidden;
   box-sizing: border-box;
+  min-width: 0;
 }
 
 .section h3 {
@@ -206,6 +210,8 @@
   transition: all 0.2s ease;
   width: 100%;
   text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .action-btn.primary {

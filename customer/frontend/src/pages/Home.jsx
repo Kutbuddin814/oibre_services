@@ -437,60 +437,65 @@ export default function Home() {
         </div>
 
         <div className="quick-services">
-          <div
-            className="service-chip"
-            onClick={() =>
-              navigate("/search?query=plumber")
-            }
+          <button
+            type="button"
+            className="service-item"
+            onClick={() => navigate("/search?query=plumber")}
             title="Plumber"
           >
-            🔧
-          </div>
-          <div
-            className="service-chip"
-            onClick={() =>
-              navigate("/search?query=electrician")
-            }
+            <span className="service-chip" aria-hidden="true">🔧</span>
+            <span className="service-label">Plumber</span>
+          </button>
+
+          <button
+            type="button"
+            className="service-item"
+            onClick={() => navigate("/search?query=electrician")}
             title="Electrician"
           >
-            ⚡
-          </div>
-          <div
-            className="service-chip"
-            onClick={() =>
-              navigate("/search?query=carpenter")
-            }
+            <span className="service-chip" aria-hidden="true">⚡</span>
+            <span className="service-label">Electrician</span>
+          </button>
+
+          <button
+            type="button"
+            className="service-item"
+            onClick={() => navigate("/search?query=carpenter")}
             title="Carpenter"
           >
-            🪚
-          </div>
-          <div
-            className="service-chip"
-            onClick={() =>
-              navigate("/search?query=taxi")
-            }
+            <span className="service-chip" aria-hidden="true">🪚</span>
+            <span className="service-label">Carpenter</span>
+          </button>
+
+          <button
+            type="button"
+            className="service-item"
+            onClick={() => navigate("/search?query=taxi")}
             title="Taxi"
           >
-            🚕
-          </div>
-          <div
-            className="service-chip"
-            onClick={() =>
-              navigate("/search?query=pickup%20and%20drop")
-            }
-            title="Pickup & Drop"
+            <span className="service-chip" aria-hidden="true">🚕</span>
+            <span className="service-label">Taxi</span>
+          </button>
+
+          <button
+            type="button"
+            className="service-item"
+            onClick={() => navigate("/search?query=pickup%20and%20drop")}
+            title="Pickup and Drop"
           >
-            📦
-          </div>
-          <div
-            className="service-chip"
-            onClick={() =>
-              navigate("/search?query=mechanic")
-            }
+            <span className="service-chip" aria-hidden="true">📦</span>
+            <span className="service-label">Pickup & Drop</span>
+          </button>
+
+          <button
+            type="button"
+            className="service-item"
+            onClick={() => navigate("/search?query=mechanic")}
             title="Mechanic"
           >
-            🔩
-          </div>
+            <span className="service-chip" aria-hidden="true">🔩</span>
+            <span className="service-label">Mechanic</span>
+          </button>
         </div>
       </section>
 
