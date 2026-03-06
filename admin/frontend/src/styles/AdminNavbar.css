@@ -285,51 +285,13 @@
 
   .change-password-btn,
   .logout-btn {
-    display: none;
+    padding: 6px 8px;
+    font-size: 11px;
   }
 
   .profile-avatar {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     font-size: 13px;
-  }
-
-  .admin-profile {
-    position: relative;
-  }
-
-  .admin-profile-mobile-menu {
-    position: absolute;
-    top: 48px;
-    right: 0;
-    background: #FFFFFF;
-    border-radius: 12px;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
-    min-width: 200px;
-    overflow: hidden;
-    z-index: 9999;
-  }
-
-  .admin-profile-mobile-menu button {
-    display: block;
-    width: 100%;
-    text-align: left;
-    padding: 14px 16px;
-    border: none;
-    background: transparent;
-    color: #334155;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-
-  .admin-profile-mobile-menu button:hover {
-    background: #F3F4F6;
-  }
-
-  .admin-profile-mobile-menu button:last-child {
-    color: #EF4444;
-    border-top: 1px solid #E5E7EB;
   }
 }

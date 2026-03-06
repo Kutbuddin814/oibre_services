@@ -3,17 +3,12 @@
 ======================= */
 
 .dashboard {
-  width: 100%;
-  max-width: 100%;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0;
-  box-sizing: border-box;
 }
 
 .page-header {
-  margin-bottom: 24px;
-  width: 100%;
-  box-sizing: border-box;
+  margin-bottom: 32px;
 }
 
 .page-header h2 {
@@ -21,7 +16,6 @@
   font-weight: 700;
   color: #111827;
   margin: 0 0 8px 0;
-  word-break: break-word;
 }
 
 .page-header p {
@@ -33,34 +27,9 @@
 /* STATS GRID */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  margin-bottom: 32px;
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  overflow: hidden;
-}
-
-@media (min-width: 1400px) {
-  .stats-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 20px;
-  }
-}
-
-@media (min-width: 1900px) {
-  .stats-grid {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 20px;
-  }
-}
-
-@media (max-width: 640px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
 }
 
 .stat-card {
@@ -74,13 +43,10 @@
   gap: 16px;
   transition: all 0.2s ease;
   width: 100%;
-  max-width: 100%;
   text-align: left;
+  border: 1px solid #E5E7EB;
   cursor: pointer;
   font-family: inherit;
-  overflow: hidden;
-  box-sizing: border-box;
-  min-width: 0;
 }
 
 .stat-card:hover {
@@ -106,7 +72,6 @@
 
 .stat-content {
   flex: 1;
-  min-width: 0;
 }
 
 .stat-content h3 {
@@ -116,7 +81,6 @@
   margin: 0 0 8px 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  overflow-wrap: anywhere;
 }
 
 .stat-number {
@@ -131,8 +95,6 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  width: 100%;
-  box-sizing: border-box;
 }
 
 .section {
@@ -141,9 +103,6 @@
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   border: 1px solid #E5E7EB;
-  overflow: hidden;
-  box-sizing: border-box;
-  min-width: 0;
 }
 
 .section h3 {
@@ -212,8 +171,6 @@
   transition: all 0.2s ease;
   width: 100%;
   text-align: left;
-  white-space: normal;
-  overflow-wrap: anywhere;
 }
 
 .action-btn.primary {
@@ -238,14 +195,9 @@
 }
 
 @media (max-width: 768px) {
-  .dashboard {
-    width: 100%;
-    max-width: 100%;
-  }
-
   .stats-grid {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 16px;
   }
 
   .dashboard-sections {
@@ -255,45 +207,9 @@
 
   .stat-card {
     gap: 12px;
-    padding: 16px;
   }
 
-  .stat-icon {
-    width: 50px;
-    height: 50px;
+  .stat-number {
     font-size: 24px;
-  }
-
-  .stat-number {
-    font-size: 20px;
-  }
-
-  .page-header h2 {
-    font-size: 22px;
-  }
-}
-
-@media (max-width: 560px) {
-  .page-header h2 {
-    font-size: 20px;
-  }
-  
-  .stat-card {
-    gap: 10px;
-    padding: 12px;
-  }
-
-  .stat-icon {
-    width: 44px;
-    height: 44px;
-    font-size: 20px;
-  }
-  
-  .stat-content h3 {
-    font-size: 11px;
-  }
-  
-  .stat-number {
-    font-size: 18px;
   }
 }
