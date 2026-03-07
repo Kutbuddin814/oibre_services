@@ -30,10 +30,12 @@
 .password-input-wrap {
   position: relative;
   width: 100%;
+  margin-bottom: 12px;
 }
 
 .password-input-wrap .customer-email-input {
   padding-right: 42px;
+  margin-bottom: 0;
 }
 
 .password-toggle-btn {

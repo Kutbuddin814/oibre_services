@@ -57,12 +57,14 @@
 .password-input-wrap {
   position: relative;
   width: 100%;
+  margin-bottom: 12px;
 }
 
 .password-input-wrap input {
   width: 100%;
   padding-right: 42px;
   box-sizing: border-box;
+  margin-bottom: 0;
 }
 
 .admin-auth-card .password-toggle-btn {

@@ -100,8 +100,8 @@ const AdminAuth = ({ onLogin }) => {
           required
         />
 
+        <label className="form-field-label" htmlFor="admin-password">Password</label>
         <div className="password-input-wrap">
-          <label className="form-field-label" htmlFor="admin-password">Password</label>
           <input
             id="admin-password"
             type={showPassword ? "text" : "password"}

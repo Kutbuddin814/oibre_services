@@ -402,27 +402,29 @@ export default function CustomerAuth() {
           />
 
           {!googleUser && (
-            <div className="password-input-wrap">
+            <>
               <label htmlFor="customerPassword" className="form-field-label">Password</label>
-              <input
-                id="customerPassword"
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="Password"
-                value={form.password}
-                onChange={handleChange}
-                required
-                className="customer-email-input"
-              />
-              <button
-                type="button"
-                className="password-toggle-btn"
-                onClick={() => setShowPassword((prev) => !prev)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                &#128065;
-              </button>
-            </div>
+              <div className="password-input-wrap">
+                <input
+                  id="customerPassword"
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Password"
+                  value={form.password}
+                  onChange={handleChange}
+                  required
+                  className="customer-email-input"
+                />
+                <button
+                  type="button"
+                  className="password-toggle-btn"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  &#128065;
+                </button>
+              </div>
+            </>
           )}
 
           <button className="customer-signup-btn">
