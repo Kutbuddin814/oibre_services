@@ -128,29 +128,27 @@ const Dashboard = ({ setCurrentPage }) => {
           </div>
         </button>
 
-        <button
-          type="button"
+        <div
           className="stat-card"
-          onClick={() => setCurrentPage("provider-requests")}
-          title="Open Provider Requests"
+          title="Total service booking requests from customers"
         >
           <div className="stat-icon" style={{ background: "#FFF3E0" }}>Req</div>
           <div className="stat-content">
-            <h3>Total Requests</h3>
+            <h3>Service Bookings</h3>
             <p className="stat-number">{stats.totalRequests}</p>
           </div>
-        </button>
+        </div>
 
         <button
           type="button"
           className="stat-card"
           onClick={() => setCurrentPage("provider-requests")}
-          title="Open Pending Approvals"
+          title="Open Provider Registration Requests"
         >
           <div className="stat-icon" style={{ background: "#FCE4EC" }}>Pend</div>
           <div className="stat-content">
-            <h3>Pending Approvals</h3>
-            <p className="stat-number">{stats.pendingRequests}</p>
+            <h3>Provider Registrations</h3>
+            <p className="stat-number">{stats.pendingRequests} pending</p>
           </div>
         </button>
 
@@ -175,7 +173,7 @@ const Dashboard = ({ setCurrentPage }) => {
             <div className="activity-item">
               <span className="activity-icon">1</span>
               <div className="activity-details">
-                <p><b>Pending Provider Requests</b></p>
+                <p><b>Pending Provider Registrations</b></p>
                 <p className="activity-time">{stats.pendingRequests} awaiting review</p>
               </div>
             </div>
@@ -196,8 +194,8 @@ const Dashboard = ({ setCurrentPage }) => {
             <div className="activity-item">
               <span className="activity-icon">4</span>
               <div className="activity-details">
-                <p><b>Total Service Requests</b></p>
-                <p className="activity-time">{stats.totalRequests} requests</p>
+                <p><b>Service Booking Requests</b></p>
+                <p className="activity-time">{stats.totalRequests} bookings</p>
               </div>
             </div>
             <div className="activity-item">
