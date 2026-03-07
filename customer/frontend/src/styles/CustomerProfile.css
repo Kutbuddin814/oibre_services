@@ -125,6 +125,12 @@
   word-break: break-word;
 }
 
+/* Email specific styling */
+.profile-item:nth-child(2) .profile-item-value {
+  color: #2563eb;
+  font-weight: 500;
+}
+
 /* BUTTONS */
 .profile-actions {
   display: flex;
@@ -148,12 +154,14 @@
 }
 
 .edit-btn {
-  background: #111827;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .edit-btn:hover {
-  background: #000000;
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
 }
 
 .logout-btn {
