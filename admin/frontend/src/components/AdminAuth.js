@@ -75,17 +75,23 @@ const AdminAuth = ({ onLogin }) => {
         <p>{isSignup ? "Create a new admin account" : "Login to continue"}</p>
 
         {isSignup && (
-          <input
-            type="text"
-            name="name"
-            placeholder="Full name"
-            value={form.name}
-            onChange={onChange}
-            required
-          />
+          <>
+            <label className="form-field-label" htmlFor="admin-name">Full Name</label>
+            <input
+              id="admin-name"
+              type="text"
+              name="name"
+              placeholder="Full name"
+              value={form.name}
+              onChange={onChange}
+              required
+            />
+          </>
         )}
 
+        <label className="form-field-label" htmlFor="admin-email">Email Address</label>
         <input
+          id="admin-email"
           type="email"
           name="email"
           placeholder="Email"
@@ -95,7 +101,9 @@ const AdminAuth = ({ onLogin }) => {
         />
 
         <div className="password-input-wrap">
+          <label className="form-field-label" htmlFor="admin-password">Password</label>
           <input
+            id="admin-password"
             type={showPassword ? "text" : "password"}
             name="password"
             placeholder="Password"
@@ -115,14 +123,18 @@ const AdminAuth = ({ onLogin }) => {
         </div>
 
         {isSignup && (
-          <input
-            type="text"
-            name="adminKey"
-            placeholder="Admin signup key"
-            value={form.adminKey}
-            onChange={onChange}
-            required
-          />
+          <>
+            <label className="form-field-label" htmlFor="admin-signup-key">Admin Signup Key</label>
+            <input
+              id="admin-signup-key"
+              type="text"
+              name="adminKey"
+              placeholder="Admin signup key"
+              value={form.adminKey}
+              onChange={onChange}
+              required
+            />
+          </>
         )}
 
         {error && <p className="auth-error">{error}</p>}

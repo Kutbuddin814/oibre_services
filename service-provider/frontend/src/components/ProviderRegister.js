@@ -487,7 +487,9 @@ const ProviderRegister = ({ onSuccess }) => {
 
         <div className="form-section">
           <h3>Personal Information</h3>
+          <label className="form-field-label" htmlFor="provider-name">Full Name</label>
           <input
+            id="provider-name"
             name="name"
             placeholder="Full Name"
             value={formData.name}
@@ -495,7 +497,9 @@ const ProviderRegister = ({ onSuccess }) => {
             required
           />
 
+          <label className="form-field-label" htmlFor="provider-email">Email Address</label>
           <input
+            id="provider-email"
             type="email"
             name="email"
             placeholder="Enter a valid email (e.g. name@gmail.com)"
@@ -597,8 +601,10 @@ const ProviderRegister = ({ onSuccess }) => {
 
           {emailOtp.sent && !emailOtp.verified && (
             <div>
+              <label className="form-field-label" htmlFor="provider-email-otp">Email OTP</label>
               <div className="otp-row">
                 <input
+                  id="provider-email-otp"
                   name="emailOtp"
                   className={`otp-input ${emailOtp.error ? "otp-input-error" : ""}`}
                   placeholder="Enter 6-digit code"
@@ -674,7 +680,9 @@ const ProviderRegister = ({ onSuccess }) => {
             </>
           )}
 
+          <label className="form-field-label" htmlFor="provider-mobile">Mobile Number</label>
           <input
+            id="provider-mobile"
             name="mobile"
             placeholder="Mobile Number (10 digits)"
             value={formData.mobile}
@@ -682,7 +690,9 @@ const ProviderRegister = ({ onSuccess }) => {
             required
           />
 
+          <label className="form-field-label" htmlFor="provider-qualification">Qualification</label>
           <input
+            id="provider-qualification"
             name="qualification"
             placeholder="Qualification"
             value={formData.qualification}
@@ -697,7 +707,9 @@ const ProviderRegister = ({ onSuccess }) => {
             <p style={{ color: "#999", textAlign: "center" }}>Loading services...</p>
           ) : (
             <>
+              <label className="form-field-label" htmlFor="provider-service-category">Service Category</label>
               <select
+                id="provider-service-category"
                 name="serviceCategory"
                 value={formData.serviceCategory}
                 onChange={handleChange}
@@ -713,22 +725,27 @@ const ProviderRegister = ({ onSuccess }) => {
               </select>
 
               {formData.serviceCategory === "Other" && (
+                <>
+                <label className="form-field-label" htmlFor="provider-other-service">Other Service Name</label>
                 <input
+                  id="provider-other-service"
                   name="otherService"
                   placeholder="Specify Service"
                   value={formData.otherService}
                   onChange={handleChange}
                   required
                 />
+                </>
               )}
             </>
           )}
 
           <div style={{ marginTop: "12px" }}>
-            <label style={{ fontSize: "14px", fontWeight: "600", color: "#1e293b", display: "block", marginBottom: "8px" }}>
+            <label className="form-field-label" htmlFor="provider-base-price" style={{ fontSize: "14px", fontWeight: "600", color: "#1e293b", display: "block", marginBottom: "8px" }}>
               Hourly Charge (₹)
             </label>
             <input
+              id="provider-base-price"
               type="number"
               name="basePrice"
               placeholder="Enter hourly charge"
@@ -750,7 +767,9 @@ const ProviderRegister = ({ onSuccess }) => {
             </small>
           </div>
 
+          <label className="form-field-label" htmlFor="provider-address">Address</label>
           <input
+            id="provider-address"
             name="address"
             placeholder="House No, Street, Area, City (e.g. Vasco, Goa)"
             value={formData.address}
@@ -796,7 +815,9 @@ const ProviderRegister = ({ onSuccess }) => {
             <div className="location-searching">Searching locations...</div>
           )}
 
+          <label className="form-field-label" htmlFor="provider-start-time">Start Time</label>
           <select
+            id="provider-start-time"
             name="startTime"
             value={startTime}
             onChange={handleStartTimeChange}
@@ -810,7 +831,9 @@ const ProviderRegister = ({ onSuccess }) => {
             ))}
           </select>
 
+          <label className="form-field-label" htmlFor="provider-end-time">End Time</label>
           <select
+            id="provider-end-time"
             name="endTime"
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
@@ -825,14 +848,18 @@ const ProviderRegister = ({ onSuccess }) => {
             ))}
           </select>
 
+          <label className="form-field-label" htmlFor="provider-experience">Experience</label>
           <input
+            id="provider-experience"
             name="experience"
             placeholder="Experience (e.g. 5 years)"
             value={formData.experience}
             onChange={handleChange}
           />
 
+          <label className="form-field-label" htmlFor="provider-description">Service Description</label>
           <textarea
+            id="provider-description"
             name="description"
             placeholder="Brief description of your services"
             value={formData.description}
@@ -843,10 +870,11 @@ const ProviderRegister = ({ onSuccess }) => {
 
         <div className="form-section">
           <h3>Documents</h3>
-          <label style={{ fontSize: "12px", fontWeight: "600" }}>
+          <label className="form-field-label" htmlFor="provider-profile-photo" style={{ fontSize: "12px", fontWeight: "600" }}>
             Profile Photo (Image)
           </label>
           <input
+            id="provider-profile-photo"
             type="file"
             name="profilePhoto"
             onChange={handleFileChange}
@@ -854,10 +882,11 @@ const ProviderRegister = ({ onSuccess }) => {
             required
           />
 
-          <label style={{ fontSize: "12px", fontWeight: "600" }}>
+          <label className="form-field-label" htmlFor="provider-skill-certificate" style={{ fontSize: "12px", fontWeight: "600" }}>
             Skill Certificate (PDF or Image)
           </label>
           <input
+            id="provider-skill-certificate"
             type="file"
             name="skillCertificate"
             onChange={handleFileChange}

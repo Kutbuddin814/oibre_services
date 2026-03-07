@@ -209,7 +209,9 @@ export default function CustomerAuth() {
         <form onSubmit={handleSubmit} className="customer-auth-form">
           {!isLogin && (
             <>
+              <label htmlFor="customerName" className="form-field-label">Full Name</label>
               <input
+                id="customerName"
                 name="name"
                 placeholder="Full Name"
                 value={form.name}
@@ -218,7 +220,9 @@ export default function CustomerAuth() {
                 className="customer-email-input"
               />
 
+              <label htmlFor="customerEmail" className="form-field-label">Email Address</label>
               <input
+                id="customerEmail"
                 name="email"
                 placeholder="Email Address"
                 value={form.email}
@@ -286,8 +290,10 @@ export default function CustomerAuth() {
 
                   {emailOtp.sent && !emailOtp.verified && (
                     <div>
+                      <label htmlFor="customerEmailOtp" className="form-field-label">Email OTP</label>
                       <div className="customer-otp-row">
                         <input
+                          id="customerEmailOtp"
                           name="customerEmailOtp"
                           className={`customer-otp-input ${emailOtp.error ? "customer-otp-input-error" : ""}`}
                           placeholder="Enter 6-digit code"
@@ -360,7 +366,9 @@ export default function CustomerAuth() {
                 </>
               )}
 
+              <label htmlFor="customerAddress" className="form-field-label">Address</label>
               <input
+                id="customerAddress"
                 name="address"
                 placeholder="House No, Street, Landmark"
                 value={form.address}
@@ -369,7 +377,9 @@ export default function CustomerAuth() {
                 className="customer-email-input"
               />
 
+              <label htmlFor="customerLocality" className="form-field-label">Locality</label>
               <input
+                id="customerLocality"
                 name="locality"
                 placeholder="Locality (e.g. Vasco, Panaji)"
                 value={form.locality}
@@ -380,7 +390,9 @@ export default function CustomerAuth() {
             </>
           )}
 
+          <label htmlFor="customerMobile" className="form-field-label">Mobile Number</label>
           <input
+            id="customerMobile"
             name="mobile"
             placeholder="Mobile Number"
             value={form.mobile}
@@ -391,7 +403,9 @@ export default function CustomerAuth() {
 
           {!googleUser && (
             <div className="password-input-wrap">
+              <label htmlFor="customerPassword" className="form-field-label">Password</label>
               <input
+                id="customerPassword"
                 type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="Password"

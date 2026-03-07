@@ -10,7 +10,8 @@ export default function LocationModal({
   isDetecting = false,
   searchResults = [],
   isSearching = false,
-  onSearch
+  onSearch,
+  locationError = ""
 }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isDetectingLocal, setIsDetectingLocal] = useState(isDetecting);
@@ -155,6 +156,22 @@ export default function LocationModal({
                   fontSize: '13px'
                 }}>
                   Searching locations...
+                </div>
+              )}
+
+              {locationError && (
+                <div style={{
+                  marginTop: '8px',
+                  marginBottom: '8px',
+                  padding: '10px 12px',
+                  borderRadius: '8px',
+                  background: '#fff7ed',
+                  border: '1px solid #fed7aa',
+                  color: '#9a3412',
+                  fontSize: '13px',
+                  fontWeight: '500'
+                }}>
+                  {locationError}
                 </div>
               )}
 

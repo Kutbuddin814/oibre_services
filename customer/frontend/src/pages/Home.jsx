@@ -4,6 +4,7 @@ import api from "../config/axios";
 import "../styles/home.css";
 import EmployeesOfMonth from "../components/EmployeesOfMonth";
 import LocationModal from "../components/LocationModal";
+import { detectUserLocation } from "../utils/locationDetection";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -164,63 +165,30 @@ export default function Home() {
     window.dispatchEvent(new Event("userLocationChanged"));
   };
 
-  const getReadableLocation = async (lat, lng) => {
-    try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&addressdetails=1`
-      );
-      if (!res.ok) return null;
-      const data = await res.json();
-      const a = data?.address || {};
-      const locality =
-        a.suburb ||
-        a.neighbourhood ||
-        a.village ||
-        a.town ||
-        a.city ||
-        a.county ||
-        "";
-
-      return {
-        address: data?.display_name || `${lat.toFixed(6)}, ${lng.toFixed(6)}`,
-        locality
-      };
-    } catch {
-      return null;
-    }
-  };
-
-  const handleUseCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      setLocationError("Geolocation is not supported in this browser.");
-      return;
-    }
-
+  const handleUseCurrentLocation = async () => {
     setLocationError("");
     setDetectingLocation(true);
 
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        const readable = await getReadableLocation(lat, lng);
+    try {
+      const detected = await detectUserLocation();
+      await saveUserLocation({
+        lat: detected.lat,
+        lng: detected.lng,
+        address: detected.address,
+        locality: detected.locality,
+        label: detected.label,
+        type: detected.type
+      });
 
-        await saveUserLocation({
-          lat,
-          lng,
-          address: readable?.address || `${lat.toFixed(6)}, ${lng.toFixed(6)}`,
-          locality: readable?.locality || "",
-          type: "current"
-        });
-        setDetectingLocation(false);
-      },
-      (err) => {
-        console.error("Geolocation error:", err);
-        setDetectingLocation(false);
-        setLocationError("Could not detect your location. Please allow location permission.");
-      },
-      { enableHighAccuracy: true, timeout: 12000 }
-    );
+      if (detected.source === "ip") {
+        setLocationError("Using approximate IP location. You can refine it using search/map.");
+      }
+    } catch (err) {
+      console.error("Location detection error:", err);
+      setLocationError("Could not detect location automatically. Please search and select manually.");
+    } finally {
+      setDetectingLocation(false);
+    }
   };
 
   const handleUseRegisteredLocation = () => {
@@ -578,6 +546,7 @@ export default function Home() {
           isDetecting={detectingLocation}
           searchResults={locationResults}
           isSearching={searchingLocations}
+          locationError={locationError}
           registeredLocation={customerData?.locality}
         />
       )}

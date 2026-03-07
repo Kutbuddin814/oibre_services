@@ -31,6 +31,14 @@
   font-size: 14px;
 }
 
+.admin-auth-card .form-field-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: -4px;
+}
+
 .admin-auth-card input {
   border: 1px solid #d1d5db;
   border-radius: 8px;

@@ -47,6 +47,14 @@
   border-bottom: 2px solid #e5e7eb;
 }
 
+.form-field-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 6px;
+}
+
 .register-form input,
 .register-form select,
 .register-form textarea {

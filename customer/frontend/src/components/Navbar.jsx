@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../config/axios";
 import MapPicker from "./MapPicker";
+import { detectUserLocation } from "../utils/locationDetection";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -179,43 +180,46 @@ export default function Navbar() {
     if (userLocationSet) return; // Skip if user already set location
     if (localStorage.getItem("userLocation")) return;
 
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          const { latitude, longitude } = pos.coords;
-          // Use Nominatim for readable label
-          let label = "Pinned location";
-          try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`);
-            if (res.ok) {
-              const data = await res.json();
-              if (data && data.address) {
-                const a = data.address;
-                const prefer = ["hamlet", "village", "suburb", "neighbourhood", "town", "city_district", "city", "county", "state"];
-                for (const key of prefer) {
-                  if (a[key]) {
-                    const extra = a.county || a.state || a.country;
-                    label = extra ? `${a[key]}, ${extra}` : a[key];
-                    break;
-                  }
-                }
-              }
-              if (!label && data.display_name) label = data.display_name;
-            }
-          } catch {}
-          setLocation({ label, lat: latitude, lng: longitude });
-          setDetectedLabel(label);
-          setIsConfirmed(false);
-        },
-        (err) => {
-          console.warn("Geolocation permission denied or unavailable", err);
-          setLocation((s) => ({ ...s, label: "Select location" }));
-        },
-        { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
-      );
-    } else {
-      setLocation((s) => ({ ...s, label: "Geolocation not supported" }));
-    }
+    let cancelled = false;
+
+    const autoDetect = async () => {
+      try {
+        const detected = await detectUserLocation();
+        if (cancelled) return;
+
+        const loc = {
+          label: detected.label || "Selected location",
+          lat: detected.lat,
+          lng: detected.lng,
+          address: detected.address,
+          locality: detected.locality,
+          type: detected.type
+        };
+
+        setLocation({ label: loc.label, lat: loc.lat, lng: loc.lng });
+        setDetectedLabel(loc.label);
+        setIsConfirmed(false);
+
+        try {
+          localStorage.setItem("userLocation", JSON.stringify(loc));
+        } catch (e) {
+          console.warn("Could not save auto-detected location", e);
+        }
+
+        persistLocationToServer(loc);
+        window.dispatchEvent(new Event("userLocationChanged"));
+      } catch (err) {
+        if (cancelled) return;
+        console.warn("Auto location detection failed", err);
+        setLocation((s) => ({ ...s, label: "Select location" }));
+      }
+    };
+
+    autoDetect();
+
+    return () => {
+      cancelled = true;
+    };
   }, [userLocationSet]);
 
   // Fetch notifications
