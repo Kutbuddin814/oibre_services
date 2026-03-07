@@ -56,6 +56,36 @@ const Dashboard = ({ setCurrentPage }) => {
     }
   };
 
+  const handleUpdateServicePrices = async () => {
+    if (!window.confirm("This will update all service provider prices based on their service category. Continue?")) {
+      return;
+    }
+    
+    try {
+      const res = await api.post("/admin/migrate/update-service-prices");
+      const { updated, skipped, total, updates } = res.data;
+      
+      let message = `Price Migration Complete!\n\n`;
+      message += `Updated: ${updated} providers\n`;
+      message += `Skipped: ${skipped} providers\n`;
+      message += `Total: ${total} providers\n\n`;
+      
+      if (updates && updates.length > 0) {
+        message += `Updated Providers:\n`;
+        updates.slice(0, 10).forEach(u => {
+          message += `- ${u.name} (${u.service}): ₹${u.oldPrice} → ₹${u.newPrice}\n`;
+        });
+        if (updates.length > 10) {
+          message += `...and ${updates.length - 10} more\n`;
+        }
+      }
+      
+      alert(message);
+    } catch (err) {
+      alert("Failed to update service prices: " + (err.response?.data?.message || err.message));
+    }
+  };
+
   if (loading) {
     return (
       <div className="dashboard">
@@ -185,6 +215,9 @@ const Dashboard = ({ setCurrentPage }) => {
           <div className="action-buttons">
             <button className="action-btn primary" onClick={handleGenerateReport}>Generate Report</button>
             <button className="action-btn secondary" onClick={handleExportData}>Export Data</button>
+            <button className="action-btn secondary" onClick={handleUpdateServicePrices} style={{ background: "#059669", color: "#fff" }}>
+              Update Service Prices
+            </button>
             <button className="action-btn secondary" onClick={() => setCurrentPage("provider-requests")}>View Logs</button>
             <button className="action-btn secondary" onClick={() => setCurrentPage("users")}>Settings</button>
             <button className="action-btn secondary" onClick={() => setCurrentPage("contact-messages")}>

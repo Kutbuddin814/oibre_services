@@ -717,4 +717,71 @@ router.post("/contact-messages/:id/reply", async (req, res) => {
   }
 });
 
+/* ===============================
+   MIGRATION: UPDATE SERVICE PRICES
+================================ */
+router.post("/migrate/update-service-prices", async (req, res) => {
+  try {
+    // Service-based pricing
+    const SERVICE_HOURLY_CHARGES = {
+      // Basic services
+      "Cleaning": 250,
+      "Laundry": 250,
+      "Taxi": 250,
+      "Babysitter": 250,
+      "Mover & Packer": 300,
+      
+      // Skilled services
+      "Electrician": 400,
+      "Plumber": 350,
+      "Mechanic": 400,
+      "Carpenter": 400,
+      "Painter": 350,
+      "Pest Control": 350,
+      
+      // Professional services
+      "AC Service": 500,
+      "Appliance Repair": 500,
+      "Salon at Home": 600,
+      "Tutor": 500
+    };
+
+    const providers = await ServiceProvider.find({});
+    let updatedCount = 0;
+    let skippedCount = 0;
+    const updates = [];
+
+    for (const provider of providers) {
+      const serviceCategory = provider.serviceCategory;
+      const newBasePrice = SERVICE_HOURLY_CHARGES[serviceCategory] || 300;
+      const currentPrice = provider.basePrice || 200;
+
+      if (currentPrice !== newBasePrice) {
+        provider.basePrice = newBasePrice;
+        await provider.save();
+        updates.push({
+          name: provider.name,
+          service: serviceCategory,
+          oldPrice: currentPrice,
+          newPrice: newBasePrice
+        });
+        updatedCount++;
+      } else {
+        skippedCount++;
+      }
+    }
+
+    res.json({
+      message: "Service prices updated successfully",
+      updated: updatedCount,
+      skipped: skippedCount,
+      total: providers.length,
+      updates
+    });
+  } catch (err) {
+    console.error("PRICE MIGRATION ERROR:", err);
+    res.status(500).json({ message: "Failed to update service prices" });
+  }
+});
+
 module.exports = router;
