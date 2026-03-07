@@ -1,0 +1,151 @@
+.legal-page {
+  min-height: calc(100vh - 140px);
+  padding: 40px 20px 64px;
+  background: linear-gradient(180deg, #f4f7fb 0%, #eef2f8 100%);
+}
+
+.legal-shell {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.legal-hero {
+  background: linear-gradient(135deg, #0f1a2e 0%, #1a2a45 65%, #243b63 100%);
+  color: #f8fafc;
+  border-radius: 20px;
+  padding: 28px;
+  margin-bottom: 20px;
+  box-shadow: 0 14px 40px rgba(10, 18, 34, 0.25);
+}
+
+.legal-eyebrow {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #bfdbfe;
+  margin-bottom: 10px;
+}
+
+.legal-hero h1 {
+  margin: 0;
+  font-size: clamp(30px, 4vw, 44px);
+  line-height: 1.15;
+}
+
+.legal-hero p {
+  margin: 12px 0 0;
+  color: #dbe7ff;
+  font-size: 17px;
+  line-height: 1.65;
+  max-width: 70ch;
+}
+
+.legal-meta {
+  margin-top: 16px;
+  font-size: 13px;
+  color: #c7d7f6;
+}
+
+.legal-content {
+  background: #ffffff;
+  border: 1px solid #dbe4f0;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
+}
+
+.legal-section + .legal-section {
+  margin-top: 26px;
+  padding-top: 24px;
+  border-top: 1px solid #e6edf7;
+}
+
+.legal-section h2 {
+  margin: 0 0 10px;
+  font-size: 24px;
+  color: #0f172a;
+}
+
+.legal-section p {
+  margin: 0;
+  color: #334155;
+  line-height: 1.75;
+}
+
+.legal-section ul {
+  margin: 12px 0 0;
+  padding-left: 20px;
+  color: #334155;
+  line-height: 1.75;
+}
+
+.legal-section li + li {
+  margin-top: 8px;
+}
+
+.faq-list {
+  display: grid;
+  gap: 12px;
+}
+
+.faq-item {
+  border: 1px solid #dbe4f0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f8fbff;
+}
+
+.faq-question {
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  padding: 16px 18px;
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.faq-question span:last-child {
+  font-size: 22px;
+  line-height: 1;
+  color: #1d4ed8;
+}
+
+.faq-answer {
+  padding: 0 18px 16px;
+  color: #334155;
+  line-height: 1.7;
+}
+
+.legal-note {
+  margin-top: 20px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 14px;
+  color: #1e3a8a;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .legal-page {
+    padding: 24px 14px 42px;
+  }
+
+  .legal-hero,
+  .legal-content {
+    padding: 20px;
+    border-radius: 14px;
+  }
+
+  .legal-section h2 {
+    font-size: 21px;
+  }
+}

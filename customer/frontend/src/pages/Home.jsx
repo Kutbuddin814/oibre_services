@@ -480,16 +480,6 @@ export default function Home() {
           <button
             type="button"
             className="service-item"
-            onClick={() => navigate("/search?query=pickup%20and%20drop")}
-            title="Pickup and Drop"
-          >
-            <span className="service-chip" aria-hidden="true">📦</span>
-            <span className="service-label">Pickup & Drop</span>
-          </button>
-
-          <button
-            type="button"
-            className="service-item"
             onClick={() => navigate("/search?query=mechanic")}
             title="Mechanic"
           >
