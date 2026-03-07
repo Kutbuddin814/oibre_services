@@ -16,6 +16,16 @@ const isGmail = (email) =>
   /@gmail\.com$/i.test(String(email || "")) ||
   /@googlemail\.com$/i.test(String(email || ""));
 
+const normalizeEmail = (email) => String(email || "").trim().toLowerCase();
+
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const findCustomerByEmail = async (email) => {
+  const cleanEmail = normalizeEmail(email);
+  if (!cleanEmail) return null;
+  return Customer.findOne({ email: { $regex: `^\\s*${escapeRegex(cleanEmail)}\\s*$`, $options: "i" } });
+};
+
 const createMailer = () => {
   // Brevo API is used via sendBrevoEmail - no SMTP transporter needed
   return null;
@@ -165,18 +175,19 @@ const getLatLng = async (address, locality) => {
 router.post("/email-otp/send", async (req, res) => {
   try {
     const { email } = req.body;
+    const cleanEmail = normalizeEmail(email);
 
-    if (!email) {
+    if (!cleanEmail) {
       return res.status(400).json({ message: "Email is required" });
     }
 
     // Check if email already exists in registered customers
-    const existingCustomer = await Customer.findOne({ email });
+    const existingCustomer = await findCustomerByEmail(cleanEmail);
     if (existingCustomer) {
       return res.status(409).json({ message: "Email already registered. Please login or use another email." });
     }
 
-    const lastOtp = await EmailOtp.findOne({ email }).sort({ createdAt: -1 });
+    const lastOtp = await EmailOtp.findOne({ email: cleanEmail }).sort({ createdAt: -1 });
     if (lastOtp && Date.now() - lastOtp.createdAt.getTime() < OTP_RESEND_COOLDOWN_MS) {
       return res.status(429).json({
         message: "Please wait before requesting another OTP."
@@ -188,12 +199,12 @@ router.post("/email-otp/send", async (req, res) => {
     const expiresAt = new Date(Date.now() + OTP_TTL_MS);
 
     await EmailOtp.create({
-      email,
+      email: cleanEmail,
       otpHash,
       expiresAt
     });
 
-    sendOtpEmail({ to: email, otp }).catch((err) => {
+    sendOtpEmail({ to: cleanEmail, otp }).catch((err) => {
       console.error("EMAIL OTP BACKGROUND SEND ERROR:", err?.message || err);
     });
 
@@ -207,12 +218,13 @@ router.post("/email-otp/send", async (req, res) => {
 router.post("/email-otp/verify", async (req, res) => {
   try {
     const { email, otp } = req.body;
+    const cleanEmail = normalizeEmail(email);
 
-    if (!email || !otp) {
+    if (!cleanEmail || !otp) {
       return res.status(400).json({ message: "email and otp are required" });
     }
 
-    const record = await EmailOtp.findOne({ email }).sort({ createdAt: -1 });
+    const record = await EmailOtp.findOne({ email: cleanEmail }).sort({ createdAt: -1 });
     if (!record) {
       return res.status(400).json({ message: "OTP not found. Please request a new one." });
     }
@@ -244,16 +256,22 @@ router.post("/email-otp/verify", async (req, res) => {
 router.post("/register", async (req, res) => {
   try {
     const { name, email, mobile, password, locality, address, emailOtpId } = req.body;
+    const cleanEmail = normalizeEmail(email);
+    const cleanMobile = String(mobile || "").trim();
 
-    if (await Customer.findOne({ mobile })) {
+    if (!cleanMobile) {
+      return res.status(400).json({ message: "Mobile is required" });
+    }
+
+    if (await Customer.findOne({ mobile: cleanMobile })) {
       return res.status(400).json({ message: "Mobile already registered" });
     }
 
-    if (email && await Customer.findOne({ email })) {
+    if (cleanEmail && await findCustomerByEmail(cleanEmail)) {
       return res.status(400).json({ message: "Email already registered" });
     }
 
-    if (email && !isGmail(email)) {
+    if (cleanEmail && !isGmail(cleanEmail)) {
       if (!emailOtpId) {
         return res.status(400).json({
           message: "Please verify your email with OTP before signup."
@@ -263,7 +281,7 @@ router.post("/register", async (req, res) => {
       const otpRecord = await EmailOtp.findById(emailOtpId);
       if (
         !otpRecord ||
-        otpRecord.email !== email ||
+        otpRecord.email !== cleanEmail ||
         !otpRecord.verifiedAt ||
         otpRecord.consumedAt ||
         otpRecord.expiresAt.getTime() < Date.now()
@@ -286,8 +304,8 @@ router.post("/register", async (req, res) => {
 
     const customer = new Customer({
       name,
-      email: email || null,
-      mobile,
+      email: cleanEmail || null,
+      mobile: cleanMobile,
       password: hashedPassword,
       locality,
       address,
@@ -715,8 +733,13 @@ router.post("/change-email/verify-otp", customerAuth, async (req, res) => {
 router.post("/google-login", async (req, res) => {
   try {
     const { email } = req.body;
+    const cleanEmail = normalizeEmail(email);
 
-    const customer = await Customer.findOne({ email });
+    if (!cleanEmail) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const customer = await findCustomerByEmail(cleanEmail);
     if (!customer) {
       return res.status(404).json({ message: "Email not registered" });
     }

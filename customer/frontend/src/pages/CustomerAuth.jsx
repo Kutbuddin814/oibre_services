@@ -94,17 +94,21 @@ export default function CustomerAuth() {
           setIsLogin(true); // ✅ OK here (Google flow)
           setGoogleUser(null);
           return;
-        } catch {
-          // Email NOT registered → continue signup
-          setGoogleUser(user);
-          setForm({
-            name: user.displayName || "",
-            email: user.email,
-            address: "",
-            locality: "",
-            mobile: "",
-            password: ""
-          });
+        } catch (err) {
+          if (err.response?.status === 404) {
+            // Email NOT registered → continue signup
+            setGoogleUser(user);
+            setForm({
+              name: user.displayName || "",
+              email: user.email,
+              address: "",
+              locality: "",
+              mobile: "",
+              password: ""
+            });
+          } else {
+            alert(err.response?.data?.message || "Unable to verify Google account. Please try again.");
+          }
         }
       }
     } catch (err) {
@@ -115,8 +119,11 @@ export default function CustomerAuth() {
         alert("Sign-in popup was blocked. Please allow popups and try again.");
       } else if (err.code === "auth/unauthorized-domain") {
         alert("This domain is not authorized for Google Sign-In. Please contact support.");
+      } else if (err.response?.status === 404) {
+        alert("No account found for this Google email. Please use Google signup first.");
+        setIsLogin(false);
       } else {
-        alert("Google authentication failed: " + (err.message || "Unknown error"));
+        alert(err.response?.data?.message || ("Google authentication failed: " + (err.message || "Unknown error")));
       }
     }
   };
