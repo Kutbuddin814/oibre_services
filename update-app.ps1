@@ -1,3 +1,4 @@
+$content = @"
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import SearchResults from "./pages/SearchResults";
@@ -40,4 +41,7 @@ export default function App() {
     </>
   );
 }
+"@
 
+$content | Out-File -FilePath "c:\Users\user\Desktop\Oibre\Oibre\Oibre\customer\frontend\src\App.jsx" -Encoding UTF8 -NoNewline
+Write-Host "✓ App.jsx updated with ScrollToTop"

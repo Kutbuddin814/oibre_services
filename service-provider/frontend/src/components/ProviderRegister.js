@@ -28,6 +28,30 @@ const TIME_OPTIONS = [
   "10:00 PM"
 ];
 
+/* HOURLY CHARGE MAPPING BY SERVICE */
+const SERVICE_HOURLY_CHARGES = {
+  // Basic services (₹200 – ₹300 / hour)
+  "Cleaning": 250,
+  "Laundry": 250,
+  "Taxi": 250,
+  "Babysitter": 250,
+  "Mover & Packer": 300,
+  
+  // Skilled services (₹300 – ₹500 / hour)
+  "Electrician": 400,
+  "Plumber": 350,
+  "Mechanic": 400,
+  "Carpenter": 400,
+  "Painter": 350,
+  "Pest Control": 350,
+  
+  // Professional services (₹500 – ₹800 / hour)
+  "AC Service": 500,
+  "Appliance Repair": 500,
+  "Salon at Home": 600,
+  "Tutor": 500
+};
+
 const FALLBACK_SERVICES = [
   { name: "Electrician", icon: "\u26A1" },
   { name: "Plumber", icon: "\uD83D\uDD27" },
@@ -69,7 +93,8 @@ const ProviderRegister = ({ onSuccess }) => {
     otherService: "",
     address: "",
     experience: "",
-    description: ""
+    description: "",
+    basePrice: 300
   });
 
   const [startTime, setStartTime] = useState("");
@@ -128,11 +153,24 @@ const ProviderRegister = ({ onSuccess }) => {
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    if (e.target.name === "address") {
-      setLocationQuery(e.target.value);
+    const { name, value } = e.target;
+    
+    // Auto-set hourly charge when service category is selected
+    if (name === "serviceCategory" && value !== "Other") {
+      const suggestedCharge = SERVICE_HOURLY_CHARGES[value] || 300;
+      setFormData({ 
+        ...formData, 
+        [name]: value,
+        basePrice: suggestedCharge
+      });
+    } else {
+      setFormData({ ...formData, [name]: value });
     }
-    if (e.target.name === "email") {
+    
+    if (name === "address") {
+      setLocationQuery(value);
+    }
+    if (name === "email") {
       setEmailOtp({
         code: "",
         sending: false,
@@ -381,6 +419,11 @@ const ProviderRegister = ({ onSuccess }) => {
 
     if (!formData.address.trim()) {
       setError("Please enter your address");
+      return;
+    }
+
+    if (!formData.basePrice || formData.basePrice < 100 || formData.basePrice > 2000) {
+      setError("Please enter a valid hourly charge between ₹100 and ₹2000");
       return;
     }
 
@@ -680,6 +723,32 @@ const ProviderRegister = ({ onSuccess }) => {
               )}
             </>
           )}
+
+          <div style={{ marginTop: "12px" }}>
+            <label style={{ fontSize: "14px", fontWeight: "600", color: "#1e293b", display: "block", marginBottom: "8px" }}>
+              Hourly Charge (₹)
+            </label>
+            <input
+              type="number"
+              name="basePrice"
+              placeholder="Enter hourly charge"
+              value={formData.basePrice}
+              onChange={handleChange}
+              min="100"
+              max="2000"
+              required
+              style={{ 
+                fontSize: "16px", 
+                fontWeight: "500",
+                color: "#059669"
+              }}
+            />
+            <small style={{ display: "block", color: "#64748b", marginTop: "6px", fontSize: "12px" }}>
+              {formData.serviceCategory && formData.serviceCategory !== "Other" 
+                ? `Suggested: ₹${SERVICE_HOURLY_CHARGES[formData.serviceCategory] || 300}/hr` 
+                : "Set your hourly rate (₹100 - ₹2000)"}
+            </small>
+          </div>
 
           <input
             name="address"

@@ -49,13 +49,7 @@ export default function CustomerProfile() {
 
   if (!customer) return null;
 
-  const handleLogout = () => {
-    localStorage.removeItem("customerToken");
-    localStorage.removeItem("customerData");
-    localStorage.removeItem("userLocation");
-    // Reload page so navbar updates immediately
-    window.location.href = "/";
-  };
+
 
   const openEditModal = () => {
     setEditForm({
@@ -233,9 +227,6 @@ export default function CustomerProfile() {
           <button className="profile-btn edit-btn" onClick={startEmailChange}>
             Change Email
           </button>
-          <button onClick={handleLogout} className="profile-btn logout-btn">
-            Logout
-          </button>
         </div>
       </div>
 
@@ -397,3 +388,4 @@ export default function CustomerProfile() {
     </div>
   );
 }
+

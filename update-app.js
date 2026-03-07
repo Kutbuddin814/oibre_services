@@ -1,4 +1,6 @@
-import { Routes, Route } from "react-router-dom";
+const fs = require('fs');
+
+const content = `import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import SearchResults from "./pages/SearchResults";
 import CustomerAuth from "./pages/CustomerAuth";
@@ -40,4 +42,7 @@ export default function App() {
     </>
   );
 }
+`;
 
+fs.writeFileSync('c:\\Users\\user\\Desktop\\Oibre\\Oibre\\Oibre\\customer\\frontend\\src\\App.jsx', content, 'utf8');
+console.log('✓ App.jsx updated with ScrollToTop');
