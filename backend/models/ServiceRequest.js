@@ -31,6 +31,7 @@ const ServiceRequestSchema = new mongoose.Schema(
     },
 
     providerNote: String,
+    customerCancelReason: String,
 
     completionOtp: String,
     completionOtpSentAt: Date,

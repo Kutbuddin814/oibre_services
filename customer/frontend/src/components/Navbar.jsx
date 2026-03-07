@@ -400,8 +400,8 @@ export default function Navbar() {
         {/* RIGHT */}
         <div className="nav-actions" ref={dropdownRef}>
           <div className="location-wrapper">
-            <div className="location-pill" title={location.label || "Detecting..."}>
-              {location.label || "Detecting..."}
+            <div className="location-pill" title={location.address || location.label || "Detecting..."}>
+              📍 {location.label || "Detecting..."}
             </div>
             <button
               className="change-location-btn"
@@ -414,13 +414,13 @@ export default function Navbar() {
                 initialLat={location.lat}
                 initialLng={location.lng}
                 onClose={() => setIsConfirmed(false)}
-                onConfirm={(lat, lng, label) => {
+                onConfirm={(lat, lng, fullAddress, locality, displayLabel) => {
                   const loc = {
                     lat,
                     lng,
-                    label: label || "Pinned location",
-                    address: label || "Pinned location",
-                    locality: label || "Pinned location",
+                    label: displayLabel || locality || "Pinned location",
+                    address: fullAddress || "Pinned location",
+                    locality: locality || displayLabel || "Pinned location",
                     type: "manual"
                   };
                   setLocation(loc);

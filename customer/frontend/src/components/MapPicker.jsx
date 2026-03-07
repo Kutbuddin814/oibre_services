@@ -14,6 +14,7 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
+  const [detecting, setDetecting] = useState(false);
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
   // Load Google Maps if apiKey present, otherwise set loaded so fallback runs
@@ -39,62 +40,109 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
     document.head.appendChild(s);
   }, [apiKey]);
 
-  // Helper: get readable label preferring locality/village names
-  const getReadableLabel = useCallback(async (lat, lng) => {
+  // Helper: get detailed address information
+  const getAddressDetails = useCallback(async (lat, lng) => {
     // Try Google Geocoder first if available
     if (window.google && window.google.maps && window.google.maps.Geocoder) {
       try {
-        const label = await new Promise((resolve) => {
+        const result = await new Promise((resolve) => {
           new window.google.maps.Geocoder().geocode({ location: { lat, lng } }, (results, status) => {
             if (status === "OK" && results && results.length) {
-              const comp = results[0].address_components || [];
-              const prefer = ["locality", "sublocality", "neighborhood", "postal_town", "administrative_area_level_3", "administrative_area_level_2"];
-              for (const p of prefer) {
-                const found = comp.find((c) => c.types && c.types.includes(p));
-                if (found) return resolve(found.long_name);
-              }
-              return resolve(results[0].formatted_address);
+              const formatted = results[0].formatted_address;
+              const comp = results[0].address_components || {};
+              
+              // Extract components for better formatting
+              let route = "", locality = "", adminArea = "", state = "", country = "";
+              
+              results[0].address_components.forEach((c) => {
+                if (c.types.includes("route")) route = c.long_name;
+                if (c.types.includes("locality")) locality = c.long_name;
+                if (c.types.includes("sublocality")) locality = locality || c.long_name;
+                if (c.types.includes("administrative_area_level_2")) adminArea = c.long_name;
+                if (c.types.includes("administrative_area_level_1")) state = c.short_name;
+                if (c.types.includes("country")) country = c.long_name;
+              });
+              
+              // Build display label (medium length for UI)
+              const displayParts = [route, locality, state].filter(Boolean);
+              const displayLabel = displayParts.length > 0 ? displayParts.join(", ") : formatted;
+              
+              return resolve({
+                fullAddress: formatted,
+                locality: locality || adminArea || "",
+                displayLabel: displayLabel
+              });
             }
             resolve(null);
           });
         });
-        if (label) return label;
+        if (result) return result;
       } catch (e) {
+        console.error("Google Geocoding error:", e);
         // fallthrough to Nominatim
       }
     }
 
-    // Fallback: Nominatim reverse geocode and prefer address fields
+    // Fallback: Nominatim reverse geocode - return full display_name
     try {
       const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`);
       if (!res.ok) return null;
       const data = await res.json();
-      if (data && data.address) {
-        const a = data.address;
-        const prefer = ["hamlet", "village", "suburb", "neighbourhood", "town", "city_district", "city", "county", "state"];
+      if (data) {
+        const a = data.address || {};
+        
+        // Get locality for short display
+        const prefer = ["hamlet", "village", "suburb", "neighbourhood", "town", "city_district", "city"];
+        let locality = "";
         for (const key of prefer) {
           if (a[key]) {
-            // include nearby larger area for clarity
-            const extra = a.county || a.state || a.country;
-            return extra ? `${a[key]}, ${extra}` : a[key];
+            locality = a[key];
+            break;
           }
         }
+        
+        // Build detailed address
+        const addressParts = [];
+        if (a.road) addressParts.push(a.road);
+        if (a.suburb || a.neighbourhood) addressParts.push(a.suburb || a.neighbourhood);
+        if (a.village || a.town || a.city) addressParts.push(a.village || a.town || a.city);
+        if (a.state) addressParts.push(a.state);
+        if (a.postcode) addressParts.push(a.postcode);
+        if (a.country) addressParts.push(a.country);
+        
+        const fullAddress = addressParts.length > 0 ? addressParts.join(", ") : data.display_name;
+        
+        // Build display label (road + locality + state for medium length)
+        const displayParts = [
+          a.road,
+          locality,
+          a.state
+        ].filter(Boolean);
+        const displayLabel = displayParts.length > 0 ? displayParts.join(", ") : fullAddress;
+        
+        return {
+          fullAddress: fullAddress,
+          locality: locality || (a.city || a.town || a.village || ""),
+          displayLabel: displayLabel
+        };
       }
-      return data.display_name || null;
+      return null;
     } catch (e) {
+      console.error("Nominatim geocoding error:", e);
       return null;
     }
   }, []);
 
   const resolveAndSetLabel = useCallback(async (lat, lng) => {
-    const label = await getReadableLabel(lat, lng);
-    if (label) {
-      setLabelText(label);
-      return label;
+    const addressData = await getAddressDetails(lat, lng);
+    if (addressData) {
+      // Display the formatted label in the UI
+      setLabelText(addressData.displayLabel);
+      return addressData;
     }
     setLabelText("Selected location");
     return null;
-  }, [getReadableLabel]);
+  }, [getAddressDetails]);
 
   // Main initializer: Google Maps OR Leaflet fallback
   useEffect(() => {
@@ -272,9 +320,9 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
   }, [searchQuery]);
 
   const handleSelectSearchResult = (item) => {
-    const displayLabel = item.subtitle ? `${item.title}, ${item.subtitle}` : item.title;
     setMarkerPos({ lat: item.lat, lng: item.lng });
-    setLabelText(displayLabel || item.address || "Selected location");
+    // Use full address from search result
+    setLabelText(item.address || "Selected location");
     setSearchQuery("");
     setSearchResults([]);
 
@@ -295,6 +343,68 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
     }
   };
 
+  const handleAutoDetect = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
+
+    setDetecting(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        
+        setMarkerPos({ lat, lng });
+        await resolveAndSetLabel(lat, lng);
+        
+        // Update marker position
+        if (markerInstanceRef.current) {
+          if (markerInstanceRef.current.setPosition) {
+            markerInstanceRef.current.setPosition({ lat, lng });
+          } else if (markerInstanceRef.current.setLatLng) {
+            markerInstanceRef.current.setLatLng([lat, lng]);
+          }
+        }
+
+        // Center map on detected location
+        if (mapInstanceRef.current) {
+          if (mapInstanceRef.current.setCenter) {
+            mapInstanceRef.current.setCenter({ lat, lng });
+          } else if (mapInstanceRef.current.setView) {
+            mapInstanceRef.current.setView([lat, lng], 14);
+          }
+        }
+
+        setDetecting(false);
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+        let message = "Unable to detect location. ";
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            message += "Please allow location access in your browser.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            message += "Location information unavailable.";
+            break;
+          case error.TIMEOUT:
+            message += "Location request timed out.";
+            break;
+          default:
+            message += "An unknown error occurred.";
+        }
+        alert(message);
+        setDetecting(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
+  };
+
   return (
     <div className="map-modal">
       <div className="map-backdrop" onClick={onClose} />
@@ -302,10 +412,27 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
         <div className="map-header">
           <div>
             <h3>Pin your exact location</h3>
-            <p className="map-subtitle">Search manually or drop the pin on the map.</p>
+            <p className="map-subtitle">Auto-detect, search manually, or drop the pin on the map.</p>
           </div>
           <button className="map-close" onClick={onClose} aria-label="Close">
             ×
+          </button>
+        </div>
+
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+          <button 
+            onClick={handleAutoDetect}
+            disabled={detecting}
+            className="btn btn-ghost"
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '6px',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            <span style={{ fontSize: '16px' }}>📍</span>
+            {detecting ? "Detecting..." : "Auto Detect"}
           </button>
         </div>
 
@@ -362,13 +489,26 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
           <button
             onClick={() => {
               const confirm = async () => {
-                const labelElement = containerRef.current?.querySelector(".map-label");
-                let label = labelElement?.textContent || labelText;
-                if (!label || label === "Selected location") {
-                  const resolved = await getReadableLabel(markerPos.lat, markerPos.lng);
-                  label = resolved || label || `${markerPos.lat.toFixed(4)}, ${markerPos.lng.toFixed(4)}`;
+                let fullAddress = "";
+                let locality = "";
+                let displayLabel = labelText;
+                
+                // Fetch fresh address details
+                const addressData = await getAddressDetails(markerPos.lat, markerPos.lng);
+                if (addressData) {
+                  fullAddress = addressData.fullAddress;
+                  locality = addressData.locality;
+                  displayLabel = addressData.displayLabel;
+                } else {
+                  // Fallback to coordinates
+                  const coordStr = `${markerPos.lat.toFixed(4)}, ${markerPos.lng.toFixed(4)}`;
+                  fullAddress = coordStr;
+                  locality = coordStr;
+                  displayLabel = coordStr;
                 }
-                onConfirm(markerPos.lat, markerPos.lng, label);
+                
+                // Pass all address components to parent
+                onConfirm(markerPos.lat, markerPos.lng, fullAddress, locality, displayLabel);
               };
               confirm();
             }}

@@ -11,6 +11,9 @@ export default function MyOrders() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [activeOrder, setActiveOrder] = useState(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+  const [cancelLoading, setCancelLoading] = useState(false);
 
   // review modal
   const [showReview, setShowReview] = useState(false);
@@ -101,6 +104,61 @@ export default function MyOrders() {
     }
   };
 
+  const canCancelOrder = (order) => {
+    if (!order?.status) return false;
+    return !["completed", "cancelled"].includes(order.status);
+  };
+
+  const openCancelModal = (order) => {
+    setActiveOrder(order);
+    setCancelReason("");
+    setShowCancelModal(true);
+  };
+
+  const submitCancellation = async () => {
+    if (!activeOrder?._id) return;
+
+    const reason = cancelReason.trim();
+    if (!reason) {
+      alert("Please enter a cancellation reason.");
+      return;
+    }
+
+    try {
+      setCancelLoading(true);
+      const res = await api.put(
+        `/customer/requests/cancel/${activeOrder._id}`,
+        { reason },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const updated = res.data?.request;
+
+      setOrders((prev) =>
+        prev.map((order) =>
+          order._id === activeOrder._id
+            ? {
+                ...order,
+                status: "cancelled",
+                customerCancelReason: updated?.customerCancelReason || reason
+              }
+            : order
+        )
+      );
+
+      setActiveOrder((prev) =>
+        prev ? { ...prev, status: "cancelled", customerCancelReason: updated?.customerCancelReason || reason } : prev
+      );
+      setShowCancelModal(false);
+      setCancelReason("");
+      alert("Booking cancelled. Provider has been notified by email.");
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to cancel booking");
+    } finally {
+      setCancelLoading(false);
+    }
+  };
+
   return (
     <div className="orders-page">
       <button
@@ -147,13 +205,23 @@ export default function MyOrders() {
           )}
 
           {o.status === "cancelled" && (
-            <p className="cancelled-note">This booking was cancelled by provider.</p>
+            <p className="cancelled-note">
+              {o.customerCancelReason
+                ? "This booking was cancelled by you."
+                : "This booking was cancelled by provider."}
+            </p>
           )}
 
           <div className="order-actions">
             <button className="track-btn" onClick={() => setActiveOrder(o)}>
               Track Booking
             </button>
+
+            {canCancelOrder(o) && (
+              <button className="cancel-btn" onClick={() => openCancelModal(o)}>
+                Cancel Booking
+              </button>
+            )}
 
             {o.status === "completed" && !o.reviewed && (
               <button
@@ -217,9 +285,65 @@ export default function MyOrders() {
             {activeOrder.status === "cancelled" && (
               <div className="modal-message warning">
                 <span>⚠️</span>
-                <span>Booking cancelled by provider.</span>
+                <span>
+                  {activeOrder.customerCancelReason
+                    ? "Booking cancelled by you."
+                    : "Booking cancelled by provider."}
+                </span>
               </div>
             )}
+
+            {activeOrder.customerCancelReason && (
+              <div style={{ marginBottom: "12px" }}>
+                <strong>Cancellation Reason:</strong>
+                <p style={{ margin: "4px 0 0" }}>{activeOrder.customerCancelReason}</p>
+              </div>
+            )}
+
+            {canCancelOrder(activeOrder) && (
+              <button
+                className="btn btn-danger"
+                style={{ width: "100%", marginTop: "8px" }}
+                onClick={() => openCancelModal(activeOrder)}
+              >
+                Cancel Booking
+              </button>
+            )}
+          </div>
+        </Modal>
+      )}
+
+      {showCancelModal && activeOrder && (
+        <Modal
+          onClose={() => {
+            if (cancelLoading) return;
+            setShowCancelModal(false);
+            setCancelReason("");
+          }}
+          title="Cancel Booking"
+          subtitle="Tell us why you want to cancel. This will be emailed to the service provider."
+          footer={
+            <button
+              className="btn btn-danger"
+              style={{ width: "100%" }}
+              onClick={submitCancellation}
+              disabled={cancelLoading}
+            >
+              {cancelLoading ? "Cancelling..." : "Confirm Cancellation"}
+            </button>
+          }
+        >
+          <div className="form">
+            <div className="modal-field">
+              <label className="modal-field-label">Reason</label>
+              <textarea
+                className="modal-field-textarea"
+                placeholder="Please tell us why you are cancelling this service"
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                rows={4}
+              />
+            </div>
           </div>
         </Modal>
       )}

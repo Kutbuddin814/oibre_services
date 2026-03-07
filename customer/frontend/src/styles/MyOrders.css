@@ -163,7 +163,8 @@
 
 .track-btn,
 .review-btn,
-.feedback-btn {
+.feedback-btn,
+.cancel-btn {
   border: none;
   padding: 10px 16px;
   border-radius: 10px;
@@ -175,7 +176,8 @@
 
 .track-btn:hover,
 .review-btn:hover,
-.feedback-btn:hover {
+.feedback-btn:hover,
+.cancel-btn:hover {
   transform: translateY(-1px);
   filter: brightness(0.98);
 }
@@ -192,6 +194,11 @@
 
 .feedback-btn {
   background: #f59e0b;
+  color: #ffffff;
+}
+
+.cancel-btn {
+  background: #dc2626;
   color: #ffffff;
 }
 
