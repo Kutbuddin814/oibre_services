@@ -1,5 +1,10 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const path = require("path");
+const fs = require("fs");
+const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const { sendBrevoEmail } = require("../utils/sendEmail");
 const ServiceRequest = require("../models/ServiceRequest");
 const Customer = require("../models/Customer");
@@ -9,6 +14,50 @@ const Notification = require("../models/Notification");
 const customerAuth = require("../middleware/customerAuth");
 
 const router = express.Router();
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+const problemUploadDir = path.join(__dirname, "../uploads/service-problem-images");
+if (!fs.existsSync(problemUploadDir)) {
+  fs.mkdirSync(problemUploadDir, { recursive: true });
+}
+
+const isCloudinaryConfigured = Boolean(
+  process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET
+);
+
+const bookingImageStorage = isCloudinaryConfigured
+  ? new CloudinaryStorage({
+      cloudinary,
+      params: async (req, file) => ({
+        folder: "oibre/service-problem-images",
+        resource_type: "image",
+        allowed_formats: ["jpg", "jpeg", "png", "webp"],
+        public_id: `problem_${Date.now()}_${Math.round(Math.random() * 1e6)}`
+      })
+    })
+  : multer.diskStorage({
+      destination: (req, file, cb) => cb(null, problemUploadDir),
+      filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname || "").toLowerCase() || ".jpg";
+        cb(null, `problem_${Date.now()}_${Math.round(Math.random() * 1e6)}${ext}`);
+      }
+    });
+
+const bookingImageUpload = multer({
+  storage: bookingImageStorage,
+  limits: { fileSize: 8 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype || !file.mimetype.startsWith("image/")) {
+      return cb(new Error("Only image files are allowed"));
+    }
+    cb(null, true);
+  }
+});
 
 /**
  * Converts 24-hour time string (HH:MM) to 12-hour format with AM/PM
@@ -263,7 +312,7 @@ const sendProviderCancellationEmail = async ({ provider, request, reason }) => {
 /* =========================
    CREATE SERVICE REQUEST
 ========================= */
-router.post("/create", customerAuth, async (req, res) => {
+router.post("/create", customerAuth, bookingImageUpload.single("problemImage"), async (req, res) => {
   try {
     const {
       providerId,
@@ -318,6 +367,7 @@ router.post("/create", customerAuth, async (req, res) => {
 
       serviceCategory,
       problemDescription,
+      problemImage: req.file?.path || req.file?.filename || "",
 
       // Prefer explicit location sent in body (e.g., from user's chosen location),
       // otherwise fall back to registered customer address/locality.
@@ -352,6 +402,9 @@ router.post("/create", customerAuth, async (req, res) => {
 
   } catch (err) {
     console.error("BOOKING ERROR:", err);
+    if (err?.message === "Only image files are allowed") {
+      return res.status(400).json({ message: err.message });
+    }
     res.status(500).json({ message: "Booking failed" });
   }
 });

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "./config/axios";
+import API_BASE_URL from "./config/api";
 import { useNavigate } from "react-router-dom";
 import { convertTo12HourFormat } from "./utils/timeUtils";
 import "./ProviderStyles.css";
@@ -44,6 +45,20 @@ const ProviderDashboard = () => {
   const logout = () => {
     localStorage.removeItem("providerToken");
     navigate("/");
+  };
+
+  const resolveImageUrl = (value) => {
+    if (!value || typeof value !== "string") return "";
+    const normalized = value.trim().replace(/\\/g, "/");
+    if (!normalized) return "";
+    if (/^https?:\/\//i.test(normalized)) return normalized;
+
+    const apiBase = String(API_BASE_URL || "").replace(/\/$/, "");
+    const backendBase = apiBase.replace(/\/api$/, "");
+
+    if (normalized.startsWith("/uploads/")) return `${backendBase}${normalized}`;
+    if (normalized.startsWith("uploads/")) return `${backendBase}/${normalized}`;
+    return `${backendBase}/uploads/${normalized}`;
   };
 
   const formatRequests = (rows = []) =>
@@ -616,6 +631,18 @@ const ProviderDashboard = () => {
                   <p>
                     <strong>Problem:</strong> {req.problemDescription}
                   </p>
+                  {req.problemImage && (
+                    <div className="problem-image-box">
+                      <p>
+                        <strong>Problem Image:</strong>
+                      </p>
+                      <img
+                        src={resolveImageUrl(req.problemImage)}
+                        alt="Customer problem"
+                        className="request-problem-image"
+                      />
+                    </div>
+                  )}
                   {req.customerPhone && (
                     <p>
                       <strong>Customer Phone:</strong>{" "}

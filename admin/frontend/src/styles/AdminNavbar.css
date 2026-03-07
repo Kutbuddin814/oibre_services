@@ -87,10 +87,15 @@
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.2s ease;
+  position: relative;
 }
 
 .admin-profile:hover {
   background: rgba(255, 255, 255, 0.1);
+}
+
+.admin-profile-mobile-menu {
+  display: none;
 }
 
 .profile-avatar {
@@ -263,9 +268,44 @@
     display: none;
   }
 
-  .change-password-btn {
-    padding: 8px 10px;
-    font-size: 12px;
+  .change-password-btn,
+  .logout-btn {
+    display: none;
+  }
+
+  .admin-profile-mobile-menu {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    min-width: 180px;
+    overflow: hidden;
+    z-index: 150;
+  }
+
+  .admin-profile-mobile-menu button {
+    background: #ffffff;
+    border: none;
+    color: #1F2937;
+    padding: 14px 18px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    border-bottom: 1px solid #E5E7EB;
+  }
+
+  .admin-profile-mobile-menu button:last-child {
+    border-bottom: none;
+  }
+
+  .admin-profile-mobile-menu button:hover {
+    background: #F3F4F6;
   }
 }
 

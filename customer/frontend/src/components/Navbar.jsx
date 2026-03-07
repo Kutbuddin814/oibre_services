@@ -16,6 +16,7 @@ export default function Navbar() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [showAllNotifications, setShowAllNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const dropdownRef = useRef(null);
   const profileRef = useRef(null);
@@ -292,6 +293,23 @@ export default function Navbar() {
     }
   };
 
+  const clearNotifications = async () => {
+    const token = localStorage.getItem("customerToken");
+    if (!token) return;
+
+    try {
+      await api.delete("/notifications/clear", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setNotifications([]);
+      setUnreadCount(0);
+      setShowAllNotifications(false);
+    } catch (err) {
+      console.error("Failed to clear notifications", err);
+      alert("Failed to clear notifications");
+    }
+  };
+
   const resetChangePasswordForm = () => {
     setPasswordForm({
       currentPassword: "",
@@ -461,7 +479,18 @@ export default function Navbar() {
 
                 {notificationsOpen && (
                   <div className="notifications-dropdown">
-                    <div className="notifications-header">Notifications</div>
+                    <div className="notifications-header">
+                      <span>Notifications</span>
+                      {notifications.length > 0 && (
+                        <button
+                          type="button"
+                          className="clear-notifications-btn"
+                          onClick={clearNotifications}
+                        >
+                          Clear all
+                        </button>
+                      )}
+                    </div>
                     {notifications.length === 0 ? (
                       <p className="no-notifications">
                         No notifications yet.
@@ -469,22 +498,38 @@ export default function Navbar() {
                         Booking updates will appear here.
                       </p>
                     ) : (
-                      <div className="notifications-list">
-                        {notifications.map((n) => (
+                      <>
+                        <div className="notifications-list">
+                          {(showAllNotifications ? notifications : notifications.slice(0, 4)).map((n) => (
+                            <button
+                              key={n._id}
+                              className={`notification-item ${n.read ? "read" : "unread"}`}
+                              onClick={() => {
+                                if (!n.read) markNotificationRead(n._id);
+                                setNotificationsOpen(false);
+                                navigate("/orders");
+                              }}
+                              type="button"
+                            >
+                              {n.message}
+                            </button>
+                          ))}
+                        </div>
+
+                        {notifications.length > 4 && (
                           <button
-                            key={n._id}
-                            className={`notification-item ${n.read ? "read" : "unread"}`}
-                            onClick={() => {
-                              if (!n.read) markNotificationRead(n._id);
-                              setNotificationsOpen(false);
-                              navigate("/orders");
-                            }}
                             type="button"
+                            className="more-notifications-btn"
+                            onClick={() => {
+                              setShowAllNotifications((prev) => !prev);
+                            }}
                           >
-                            {n.message}
+                            {showAllNotifications
+                              ? "Show less"
+                              : `More notifications (${notifications.length - 4})`}
                           </button>
-                        ))}
-                      </div>
+                        )}
+                      </>
                     )}
                   </div>
                 )}

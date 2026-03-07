@@ -12,6 +12,7 @@ const ServiceRequestSchema = new mongoose.Schema(
 
     serviceCategory: String,
     problemDescription: String,
+    problemImage: String,
 
     address: String,
     locality: String,
@@ -35,7 +36,13 @@ const ServiceRequestSchema = new mongoose.Schema(
 
     completionOtp: String,
     completionOtpSentAt: Date,
-    completionOtpExpiresAt: Date
+    completionOtpExpiresAt: Date,
+
+    reviewed: {
+      type: Boolean,
+      default: false
+    },
+    reviewedAt: Date
   },
   { timestamps: true }
 );

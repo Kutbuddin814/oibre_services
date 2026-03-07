@@ -150,6 +150,7 @@ export default function MyOrders() {
         prev ? { ...prev, status: "cancelled", customerCancelReason: updated?.customerCancelReason || reason } : prev
       );
       setShowCancelModal(false);
+      setActiveOrder(null);
       setCancelReason("");
       alert("Booking cancelled. Provider has been notified by email.");
     } catch (err) {
@@ -258,7 +259,7 @@ export default function MyOrders() {
         </div>
       ))}
 
-      {activeOrder && !showReview && (
+      {activeOrder && !showReview && !showCancelModal && (
         <Modal onClose={() => setActiveOrder(null)} title="Booking Status">
           <Timeline status={activeOrder.status} />
 
@@ -318,6 +319,7 @@ export default function MyOrders() {
           onClose={() => {
             if (cancelLoading) return;
             setShowCancelModal(false);
+            setActiveOrder(null);
             setCancelReason("");
           }}
           title="Cancel Booking"
@@ -352,6 +354,7 @@ export default function MyOrders() {
         <Modal
           onClose={() => {
             setShowReview(false);
+            setActiveOrder(null);
             setRating(5);
             setComment("");
           }}

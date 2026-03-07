@@ -194,13 +194,6 @@ const Services = () => {
         <button className="btn-add-service" onClick={handleAddService}>
           + Add New Service
         </button>
-        <button
-          className="btn-add-common"
-          onClick={handleAddCommonServices}
-          disabled={addingDefaults || loading}
-        >
-          {addingDefaults ? "Adding Common Services..." : "Add Common Services"}
-        </button>
       </div>
 
       {services.length === 0 ? (

@@ -80,4 +80,16 @@ router.put("/read/:id", customerAuth, async (req, res) => {
   }
 });
 
+/* =========================
+   CLEAR CUSTOMER NOTIFICATIONS
+========================= */
+router.delete("/clear", customerAuth, async (req, res) => {
+  try {
+    await Notification.deleteMany({ customerId: req.customerId });
+    res.json({ success: true, message: "Notifications cleared" });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to clear notifications" });
+  }
+});
+
 module.exports = router;

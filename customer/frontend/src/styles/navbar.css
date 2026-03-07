@@ -124,29 +124,49 @@
   right: 0;
   background: #FFFFFF;
   color: #000000;
-  min-width: 300px;
-  border-radius: 12px;
-  box-shadow: 0 16px 40px rgba(0,0,0,0.2);
+  width: min(86vw, 360px);
+  min-width: 280px;
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
   overflow: hidden;
   z-index: 2000;
 }
 
 .notifications-header {
-  padding: 12px 16px;
+  padding: 10px 12px;
   font-weight: 600;
   border-bottom: 1px solid #E5E7EB;
-  font-size: 14px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.clear-notifications-btn {
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #334155;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.clear-notifications-btn:hover {
+  background: #f8fafc;
 }
 
 .no-notifications {
-  padding: 16px;
+  padding: 14px 12px;
   text-align: center;
-  font-size: 14px;
+  font-size: 13px;
   color: #6B7280;
 }
 
 .notifications-list {
-  max-height: 300px;
+  max-height: 220px;
   overflow-y: auto;
 }
 
@@ -155,9 +175,10 @@
   text-align: left;
   background: #FFFFFF;
   border: none;
-  padding: 12px 16px;
+  padding: 10px 12px;
   border-bottom: 1px solid #E5E7EB;
-  font-size: 13px;
+  font-size: 12px;
+  line-height: 1.45;
   color: #4B5563;
   cursor: pointer;
 }
@@ -175,6 +196,22 @@
 .notification-item.read {
   background: #ffffff;
   color: #475569;
+}
+
+.more-notifications-btn {
+  width: 100%;
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  background: #f8fafc;
+  color: #1d4ed8;
+  padding: 9px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.more-notifications-btn:hover {
+  background: #eff6ff;
 }
 
 /* PROFILE BUTTON - IMPROVED CIRCLE */

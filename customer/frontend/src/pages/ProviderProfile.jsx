@@ -26,6 +26,8 @@ export default function ProviderProfile() {
   const [problem, setProblem] = useState("");
   const [preferredDate, setPreferredDate] = useState("");
   const [preferredTime, setPreferredTime] = useState("");
+  const [problemImage, setProblemImage] = useState(null);
+  const [problemImagePreview, setProblemImagePreview] = useState("");
 
   const getTodayIsoLocal = () => {
     const now = new Date();
@@ -356,19 +358,21 @@ export default function ProviderProfile() {
         try { location = JSON.parse(storedLocation); } catch(e) { location = null; }
       }
 
+      const formData = new FormData();
+      formData.append("providerId", provider._id);
+      formData.append("serviceCategory", provider.serviceCategory || "");
+      formData.append("problemDescription", problem);
+      formData.append("preferredDate", preferredDate);
+      formData.append("preferredTime", preferredTime);
+      if (location?.address) formData.append("address", location.address);
+      if (location?.locality) formData.append("locality", location.locality);
+      if (location?.lat !== undefined && location?.lat !== null) formData.append("lat", String(location.lat));
+      if (location?.lng !== undefined && location?.lng !== null) formData.append("lng", String(location.lng));
+      if (problemImage) formData.append("problemImage", problemImage);
+
       await api.post(
         "/customer/requests/create",
-        {
-          providerId: provider._id,
-          serviceCategory: provider.serviceCategory,
-          problemDescription: problem,
-          preferredDate,
-          preferredTime,
-          address: location?.address,
-          locality: location?.locality,
-          lat: location?.lat,
-          lng: location?.lng
-        },
+        formData,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -382,6 +386,8 @@ export default function ProviderProfile() {
       setProblem("");
       setPreferredDate("");
       setPreferredTime("");
+      setProblemImage(null);
+      setProblemImagePreview("");
 
     } catch (err) {
       console.error(err);
@@ -660,8 +666,38 @@ export default function ProviderProfile() {
               onChange={(e) => setProblem(e.target.value)}
             />
 
+            <label>Problem Image (Optional)</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0] || null;
+                setProblemImage(file);
+                if (!file) {
+                  setProblemImagePreview("");
+                  return;
+                }
+                setProblemImagePreview(URL.createObjectURL(file));
+              }}
+            />
+            {problemImagePreview && (
+              <div className="problem-image-preview-wrap">
+                <img src={problemImagePreview} alt="Problem preview" className="problem-image-preview" />
+                <button
+                  type="button"
+                  className="remove-problem-image-btn"
+                  onClick={() => {
+                    setProblemImage(null);
+                    setProblemImagePreview("");
+                  }}
+                >
+                  Remove Image
+                </button>
+              </div>
+            )}
+
             <div className="modal-row">
-              <div>
+              <div className="modal-col">
                 <label>Preferred Date</label>
                 <input
                   type="date"
@@ -682,13 +718,15 @@ export default function ProviderProfile() {
                 />
               </div>
 
-              <div>
-                <label>Preferred Time</label>
-                {provider?.availableTime && (
-                  <div className="time-hint">
-                    Available: {provider.availableTime}
-                  </div>
-                )}
+              <div className="modal-col">
+                <label>
+                  Preferred Time
+                  {provider?.availableTime && (
+                    <span className="time-hint">
+                      Available: {provider.availableTime}
+                    </span>
+                  )}
+                </label>
                 {availableRange ? (
                   <select
                     value={preferredTime}
@@ -716,7 +754,11 @@ export default function ProviderProfile() {
             <div className="modal-actions">
               <button
                 className="cancel-btn"
-                onClick={() => setShowModal(false)}
+                onClick={() => {
+                  setShowModal(false);
+                  setProblemImage(null);
+                  setProblemImagePreview("");
+                }}
               >
                 Cancel
               </button>
