@@ -310,6 +310,39 @@ export default function Navbar() {
     }
   };
 
+  const formatNotificationTime = (value) => {
+    if (!value) return "Just now";
+    const dt = new Date(value);
+    if (Number.isNaN(dt.getTime())) return "Just now";
+
+    const diffMs = Date.now() - dt.getTime();
+    const diffMin = Math.floor(diffMs / 60000);
+    if (diffMin < 1) return "Just now";
+    if (diffMin < 60) return `${diffMin}m ago`;
+
+    const diffHr = Math.floor(diffMin / 60);
+    if (diffHr < 24) return `${diffHr}h ago`;
+
+    return dt.toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
+  };
+
+  const getNotificationMeta = (message = "") => {
+    const text = String(message).toLowerCase();
+    if (text.includes("completed")) {
+      return { tag: "Completed", tone: "success", marker: "OK" };
+    }
+    if (text.includes("otp")) {
+      return { tag: "Verification", tone: "info", marker: "OTP" };
+    }
+    if (text.includes("approved") || text.includes("quote") || text.includes("price")) {
+      return { tag: "Quote", tone: "primary", marker: "Q" };
+    }
+    if (text.includes("started") || text.includes("in progress")) {
+      return { tag: "In Progress", tone: "warning", marker: "RUN" };
+    }
+    return { tag: "Update", tone: "neutral", marker: "NEW" };
+  };
+
   const resetChangePasswordForm = () => {
     setPasswordForm({
       currentPassword: "",
@@ -480,7 +513,10 @@ export default function Navbar() {
                 {notificationsOpen && (
                   <div className="notifications-dropdown">
                     <div className="notifications-header">
-                      <span>Notifications</span>
+                      <div className="notifications-header-copy">
+                        <span className="notifications-title">Notifications</span>
+                        <span className="notifications-subtitle">Service and booking updates</span>
+                      </div>
                       {notifications.length > 0 && (
                         <button
                           type="button"
@@ -492,11 +528,11 @@ export default function Navbar() {
                       )}
                     </div>
                     {notifications.length === 0 ? (
-                      <p className="no-notifications">
-                        No notifications yet.
-                        <br />
-                        Booking updates will appear here.
-                      </p>
+                      <div className="no-notifications">
+                        <div className="no-notifications-icon">N</div>
+                        <p className="no-notifications-title">No notifications yet</p>
+                        <p className="no-notifications-text">Booking and payment updates will appear here.</p>
+                      </div>
                     ) : (
                       <>
                         <div className="notifications-list">
@@ -511,7 +547,21 @@ export default function Navbar() {
                               }}
                               type="button"
                             >
-                              {n.message}
+                              {(() => {
+                                const meta = getNotificationMeta(n.message);
+                                return (
+                                  <>
+                                    <span className={`notification-marker ${meta.tone}`}>{meta.marker}</span>
+                                    <div className="notification-content">
+                                      <div className="notification-top-row">
+                                        <span className={`notification-tag ${meta.tone}`}>{meta.tag}</span>
+                                        <span className="notification-time">{formatNotificationTime(n.createdAt)}</span>
+                                      </div>
+                                      <span className="notification-message">{n.message}</span>
+                                    </div>
+                                  </>
+                                );
+                              })()}
                             </button>
                           ))}
                         </div>

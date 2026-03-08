@@ -30,7 +30,10 @@ router.get("/pending", adminAuth, async (req, res) => {
         }
       },
       {
-        $unwind: "$provider"
+        $unwind: {
+          path: "$provider",
+          preserveNullAndEmptyArrays: true // Keep records even if no provider found
+        }
       },
       {
         $project: {
@@ -38,10 +41,10 @@ router.get("/pending", adminAuth, async (req, res) => {
           bookingId: "$_id",
           providerId: 1,
           providerName: 1,
-          providerEmail: "$provider.email",
-          providerPhone: "$provider.mobile",
-          paymentDetails: "$provider.paymentDetails",
-          paymentDetailsCompleted: "$provider.paymentDetailsCompleted",
+          providerEmail: { $ifNull: ["$provider.email", ""] },
+          providerPhone: { $ifNull: ["$provider.mobile", ""] },
+          paymentDetails: { $ifNull: ["$provider.paymentDetails", null] },
+          paymentDetailsCompleted: { $ifNull: ["$provider.paymentDetailsCompleted", false] },
           serviceCategory: 1,
           finalPrice: 1,
           paymentStatus: 1,

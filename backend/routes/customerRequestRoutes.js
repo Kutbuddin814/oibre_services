@@ -538,19 +538,65 @@ router.put("/approve-price/:id", customerAuth, async (req, res) => {
     const provider = await ServiceProvider.findById(request.providerId).select("name email");
     if (provider?.email) {
       const html = `
+        <!DOCTYPE html>
         <html>
-          <body style="font-family: Arial, sans-serif;">
-            <h2>Price Approved!</h2>
-            <p>Hi ${provider.name},</p>
-            <p>The customer has approved your quoted price: <strong>₹${request.finalPrice}</strong></p>
-            <p>You can now proceed with the service.</p>
-            <p>Login to your dashboard to continue.</p>
+          <head>
+            <style>
+              body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fb; margin: 0; padding: 0; }
+              .container { max-width: 620px; margin: 24px auto; }
+              .header { background: #1f2937; color: #fff; padding: 28px 24px; border-radius: 10px 10px 0 0; text-align: center; }
+              .logo { font-size: 34px; font-weight: 700; margin: 0; }
+              .badge { display: inline-block; margin-top: 12px; background: #10b981; color: #fff; padding: 8px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: 0.4px; }
+              .content { background: #fff; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px; padding: 24px; }
+              .title { margin: 0 0 12px; color: #111827; font-size: 22px; font-weight: 700; }
+              .subtitle { margin: 0 0 18px; color: #4b5563; line-height: 1.6; font-size: 15px; }
+              .card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; margin: 16px 0; }
+              .label { color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; margin: 0; font-weight: 700; }
+              .value { color: #111827; font-size: 15px; margin: 4px 0 12px; }
+              .success-box { background: #d1fae5; border-left: 4px solid #10b981; padding: 16px; border-radius: 0 8px 8px 0; margin: 16px 0; color: #065f46; }
+              .price { font-size: 28px; font-weight: 700; color: #10b981; margin: 8px 0; }
+              .cta-wrap { text-align: center; margin: 24px 0 10px; }
+              .cta { display: inline-block; background: #2563eb; color: #fff !important; text-decoration: none; padding: 12px 22px; border-radius: 8px; font-weight: 700; font-size: 14px; }
+              .footer { margin-top: 16px; border-top: 1px solid #e5e7eb; padding-top: 14px; color: #6b7280; font-size: 12px; line-height: 1.6; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1 class="logo">Oibre</h1>
+                <div class="badge">✓ Quote Approved</div>
+              </div>
+              <div class="content">
+                <h2 class="title">Great news, ${provider.name}!</h2>
+                <p class="subtitle">The customer has approved your quoted price. You can now proceed with the service.</p>
+                <div class="success-box">
+                  <p style="margin: 0; font-size: 14px; font-weight: 600;">Approved Quote Amount</p>
+                  <div class="price">₹${request.finalPrice}</div>
+                </div>
+                <div class="card">
+                  <p class="label">Service</p>
+                  <p class="value">${request.serviceCategory || "-"}</p>
+                  <p class="label">Customer</p>
+                  <p class="value">${request.customerName || "-"}</p>
+                  <p class="label">Scheduled Date</p>
+                  <p class="value">${request.visitDate || request.preferredDate || "-"}</p>
+                </div>
+                <p style="color: #374151; font-size: 14px; margin: 16px 0;">Login to your provider dashboard to start the service and manage the booking.</p>
+                <div class="cta-wrap">
+                  <a class="cta" href="${process.env.PROVIDER_APP_URL || "https://oibre-services-provider-web-fronten.vercel.app"}">Open Dashboard</a>
+                </div>
+                <div class="footer">
+                  This is an automated email from Oibre.<br />
+                  Please proceed with the service as scheduled.
+                </div>
+              </div>
+            </div>
           </body>
         </html>
       `;
       await sendBrevoEmail({
         to: provider.email,
-        subject: "Price Approved - Service Request #" + id,
+        subject: "Customer Approved Your Quote - Oibre",
         html: html
       }).catch(err => console.error("Email error:", err));
     }

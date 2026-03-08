@@ -361,11 +361,62 @@ router.put("/submit-price/:id", authMiddleware, async (req, res) => {
       queueEmail(
         sendBrevoEmail({
           to: customer.email,
-          subject: "Final Price Sent - Oibre",
-          html: `<p>Hi ${customer.name || request.customerName || "Customer"},</p>
-                 <p>Your provider has sent the final quote for <strong>${request.serviceCategory}</strong>.</p>
-                 <p><strong>Final Price: Rs ${request.finalPrice}</strong></p>
-                 <p>Please open My Orders and approve to continue service.</p>`
+          subject: "Final Quote Received - Oibre",
+          html: `
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <style>
+                  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fb; margin: 0; padding: 0; }
+                  .container { max-width: 620px; margin: 24px auto; }
+                  .header { background: #1f2937; color: #fff; padding: 28px 24px; border-radius: 10px 10px 0 0; text-align: center; }
+                  .logo { font-size: 34px; font-weight: 700; margin: 0; }
+                  .badge { display: inline-block; margin-top: 12px; background: #2563eb; color: #fff; padding: 8px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: 0.4px; }
+                  .content { background: #fff; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px; padding: 24px; }
+                  .title { margin: 0 0 12px; color: #111827; font-size: 22px; font-weight: 700; }
+                  .subtitle { margin: 0 0 18px; color: #4b5563; line-height: 1.6; font-size: 15px; }
+                  .card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; margin: 16px 0; }
+                  .label { color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; margin: 0; font-weight: 700; }
+                  .value { color: #111827; font-size: 15px; margin: 4px 0 12px; }
+                  .price-box { background: #eff6ff; border-left: 4px solid #2563eb; padding: 16px; border-radius: 0 8px 8px 0; text-align: center; margin: 16px 0; }
+                  .price { font-size: 32px; font-weight: 700; color: #2563eb; margin: 8px 0; }
+                  .cta-wrap { text-align: center; margin: 24px 0 10px; }
+                  .cta { display: inline-block; background: #2563eb; color: #fff !important; text-decoration: none; padding: 12px 22px; border-radius: 8px; font-weight: 700; font-size: 14px; }
+                  .footer { margin-top: 16px; border-top: 1px solid #e5e7eb; padding-top: 14px; color: #6b7280; font-size: 12px; line-height: 1.6; }
+                </style>
+              </head>
+              <body>
+                <div class="container">
+                  <div class="header">
+                    <h1 class="logo">Oibre</h1>
+                    <div class="badge">Final Quote Received</div>
+                  </div>
+                  <div class="content">
+                    <h2 class="title">Hi ${customer.name || request.customerName || "Customer"},</h2>
+                    <p class="subtitle">Your service provider has sent the final quote for <strong>${request.serviceCategory}</strong>.</p>
+                    <div class="price-box">
+                      <p style="margin: 0; font-size: 14px; color: #1e40af; font-weight: 600;">Final Quote Amount</p>
+                      <div class="price">₹${request.finalPrice}</div>
+                    </div>
+                    <div class="card">
+                      <p class="label">Service</p>
+                      <p class="value">${request.serviceCategory || "-"}</p>
+                      <p class="label">Provider</p>
+                      <p class="value">${request.providerName || "-"}</p>
+                    </div>
+                    <p style="color: #374151; font-size: 14px; margin: 16px 0;">Open your <strong>My Orders</strong> page to review and approve the quote to proceed with the service.</p>
+                    <div class="cta-wrap">
+                      <a class="cta" href="${process.env.CUSTOMER_APP_URL || "https://oibre-customer-frontend.vercel.app"}/orders">View My Orders</a>
+                    </div>
+                    <div class="footer">
+                      This is an automated email from Oibre.<br />
+                      Please approve the quote to continue with your service booking.
+                    </div>
+                  </div>
+                </div>
+              </body>
+            </html>
+          `
         }),
         "PRICE QUOTE"
       );
@@ -427,8 +478,137 @@ router.post("/verify-completion/:id", authMiddleware, async (req, res) => {
 
     await createCustomerNotification(
       request,
-      "Your service is marked completed after OTP verification."
+      "Your service is marked completed. Please leave a review!"
     );
+
+    // Send completion email to customer
+    const customer = await Customer.findById(request.customerId).select("email name");
+    if (customer?.email) {
+      queueEmail(
+        sendBrevoEmail({
+          to: customer.email,
+          subject: "Service Completed - Oibre",
+          html: `
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <style>
+                  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fb; margin: 0; padding: 0; }
+                  .container { max-width: 620px; margin: 24px auto; }
+                  .header { background: #1f2937; color: #fff; padding: 28px 24px; border-radius: 10px 10px 0 0; text-align: center; }
+                  .logo { font-size: 34px; font-weight: 700; margin: 0; }
+                  .badge { display: inline-block; margin-top: 12px; background: #10b981; color: #fff; padding: 8px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: 0.4px; }
+                  .content { background: #fff; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px; padding: 24px; }
+                  .title { margin: 0 0 12px; color: #111827; font-size: 22px; font-weight: 700; }
+                  .subtitle { margin: 0 0 18px; color: #4b5563; line-height: 1.6; font-size: 15px; }
+                  .card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; margin: 16px 0; }
+                  .label { color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; margin: 0; font-weight: 700; }
+                  .value { color: #111827; font-size: 15px; margin: 4px 0 12px; }
+                  .success-box { background: #d1fae5; border-left: 4px solid #10b981; padding: 16px; border-radius: 0 8px 8px 0; margin: 16px 0; }
+                  .cta-wrap { text-align: center; margin: 24px 0 10px; }
+                  .cta { display: inline-block; background: #10b981; color: #fff !important; text-decoration: none; padding: 12px 22px; border-radius: 8px; font-weight: 700; font-size: 14px; }
+                  .footer { margin-top: 16px; border-top: 1px solid #e5e7eb; padding-top: 14px; color: #6b7280; font-size: 12px; line-height: 1.6; }
+                </style>
+              </head>
+              <body>
+                <div class="container">
+                  <div class="header">
+                    <h1 class="logo">Oibre</h1>
+                    <div class="badge">✓ Service Completed</div>
+                  </div>
+                  <div class="content">
+                    <h2 class="title">Hi ${customer.name || request.customerName || "Customer"},</h2>
+                    <p class="subtitle">Great news! Your <strong>${request.serviceCategory}</strong> service has been marked as completed.</p>
+                    <div class="success-box">
+                      <p style="margin: 0; color: #065f46; font-weight: 600; font-size: 14px;">✓ Service completion verified successfully</p>
+                    </div>
+                    <div class="card">
+                      <p class="label">Service</p>
+                      <p class="value">${request.serviceCategory || "-"}</p>
+                      <p class="label">Provider</p>
+                      <p class="value">${request.providerName || "-"}</p>
+                      <p class="label">Amount Paid</p>
+                      <p class="value">₹${request.finalPrice || "-"}</p>
+                    </div>
+                    <p style="color: #374151; font-size: 14px; margin: 16px 0;">We hope you're satisfied with the service! Please take a moment to leave a review and help others make informed decisions.</p>
+                    <div class="cta-wrap">
+                      <a class="cta" href="${process.env.CUSTOMER_APP_URL || "https://oibre-customer-frontend.vercel.app"}/orders">Leave a Review</a>
+                    </div>
+                    <div class="footer">
+                      Thank you for choosing Oibre!<br />
+                      Need help? Contact our support team anytime.
+                    </div>
+                  </div>
+                </div>
+              </body>
+            </html>
+          `
+        }),
+        "SERVICE COMPLETED"
+      );
+    }
+
+    // Send notification to provider
+    const provider = await ServiceProvider.findById(request.providerId).select("email name");
+    if (provider?.email) {
+      queueEmail(
+        sendBrevoEmail({
+          to: provider.email,
+          subject: "Service Marked Complete - Oibre",
+          html: `
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <style>
+                  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fb; margin: 0; padding: 0; }
+                  .container { max-width: 620px; margin: 24px auto; }
+                  .header { background: #1f2937; color: #fff; padding: 28px 24px; border-radius: 10px 10px 0 0; text-align: center; }
+                  .logo { font-size: 34px; font-weight: 700; margin: 0; }
+                  .badge { display: inline-block; margin-top: 12px; background: #10b981; color: #fff; padding: 8px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: 0.4px; }
+                  .content { background: #fff; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px; padding: 24px; }
+                  .title { margin: 0 0 12px; color: #111827; font-size: 22px; font-weight: 700; }
+                  .subtitle { margin: 0 0 18px; color: #4b5563; line-height: 1.6; font-size: 15px; }
+                  .card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; margin: 16px 0; }
+                  .label { color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; margin: 0; font-weight: 700; }
+                  .value { color: #111827; font-size: 15px; margin: 4px 0 12px; }
+                  .success-box { background: #d1fae5; border-left: 4px solid #10b981; padding: 16px; border-radius: 0 8px 8px 0; margin: 16px 0; color: #065f46; }
+                  .footer { margin-top: 16px; border-top: 1px solid #e5e7eb; padding-top: 14px; color: #6b7280; font-size: 12px; line-height: 1.6; }
+                </style>
+              </head>
+              <body>
+                <div class="container">
+                  <div class="header">
+                    <h1 class="logo">Oibre</h1>
+                    <div class="badge">✓ Booking Complete</div>
+                  </div>
+                  <div class="content">
+                    <h2 class="title">Hi ${provider.name || "Provider"},</h2>
+                    <p class="subtitle">Your service booking has been successfully marked as completed!</p>
+                    <div class="success-box">
+                      <p style="margin: 0; font-weight: 600;">✓ OTP verified - Service completion confirmed</p>
+                    </div>
+                    <div class="card">
+                      <p class="label">Service</p>
+                      <p class="value">${request.serviceCategory || "-"}</p>
+                      <p class="label">Customer</p>
+                      <p class="value">${request.customerName || "-"}</p>
+                      <p class="label">Amount</p>
+                      <p class="value">₹${request.finalPrice || "-"}</p>
+                    </div>
+                    <p style="color: #374151; font-size: 14px; margin: 16px 0;">Payment settlement will be processed by admin. Check your earnings dashboard to track payout status.</p>
+                    <div class="footer">
+                      Thank you for providing quality service through Oibre!<br />
+                      View your earnings in the provider dashboard.
+                    </div>
+                  </div>
+                </div>
+              </body>
+            </html>
+          `
+        }),
+        "PROVIDER COMPLETION"
+      );
+    }
 
     return res.json({ message: "Service marked completed successfully" });
   } catch (err) {
