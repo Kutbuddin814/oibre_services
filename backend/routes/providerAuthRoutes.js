@@ -19,6 +19,15 @@ router.post("/login", async (req, res) => {
       });
     }
 
+    // Check if email is blacklisted
+    const Blacklist = require("../models/Blacklist");
+    const blacklisted = await Blacklist.findOne({ email: email.toLowerCase() });
+    if (blacklisted) {
+      return res.status(403).json({ 
+        message: "This email has been permanently blocked from using our platform"
+      });
+    }
+
     // 🔑 IMPORTANT: explicitly select password
     const provider = await ServiceProvider
       .findOne({

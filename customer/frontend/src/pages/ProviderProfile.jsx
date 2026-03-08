@@ -4,6 +4,19 @@ import api from "../config/axios";
 import { BACKEND_BASE_URL } from "../config/api";
 import "../styles/providerProfile.css";
 
+// Helper function to resolve image URLs (handles both Cloudinary and local paths)
+const resolveImageUrl = (imagePath) => {
+  if (!imagePath) return "";
+  if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+    return imagePath; // Cloudinary URL
+  }
+  // Local path
+  if (imagePath.startsWith("/uploads/")) {
+    return `${BACKEND_BASE_URL}${imagePath}`;
+  }
+  return `${BACKEND_BASE_URL}/uploads/${imagePath}`;
+};
+
 export default function ProviderProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -129,7 +142,7 @@ export default function ProviderProfile() {
     setEditingRating(Number(review.rating || 5));
     setEditingImage(null);
     setRemoveEditedImage(false);
-    setEditingImagePreview(review.image || "");
+    setEditingImagePreview(resolveImageUrl(review.image) || "");
   };
 
   const cancelEditReview = () => {
@@ -391,7 +404,8 @@ export default function ProviderProfile() {
 
     } catch (err) {
       console.error(err);
-      alert("❌ Booking failed");
+      const errorMsg = err.response?.data?.message || err.message || "Booking failed";
+      alert("❌ " + errorMsg);
     }
   };
 
@@ -628,7 +642,7 @@ export default function ProviderProfile() {
                 <p>{r.comment}</p>
                 {r.image && (
                   <img
-                    src={`${BACKEND_BASE_URL}/uploads/${r.image}`}
+                    src={resolveImageUrl(r.image)}
                     alt="Review attachment"
                     className="review-image"
                   />

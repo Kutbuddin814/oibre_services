@@ -234,14 +234,170 @@ router.get("/users", async (req, res) => {
   }
 });
 
-router.delete("/users/:id", async (req, res) => {
+// Ban user
+router.post("/users/:id/ban", adminAuth, async (req, res) => {
   try {
-    const user = await Customer.findByIdAndDelete(req.params.id);
+    const { reason } = req.body;
+    const user = await Customer.findById(req.params.id);
+    
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.json({ message: "User deleted" });
-  } catch {
+
+    if (user.status === "banned") {
+      return res.status(400).json({ message: "User is already banned" });
+    }
+
+    user.status = "banned";
+    user.bannedAt = new Date();
+    user.banReason = reason || "Violation of terms and conditions";
+    await user.save();
+
+    // Add to blacklist
+    const Blacklist = require("../models/Blacklist");
+    await Blacklist.findOneAndUpdate(
+      { email: user.email?.toLowerCase() },
+      {
+        email: user.email?.toLowerCase(),
+        reason: "banned",
+        bannedBy: req.adminId,
+        message: user.banReason,
+        bannedAt: new Date()
+      },
+      { upsert: true, new: true }
+    );
+
+    // Send ban email
+    if (user.email) {
+      const { sendBrevoEmail } = require("../utils/sendEmail");
+      const subject = "Account Banned - Oibre";
+      const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #dc2626;">Account Banned</h2>
+          <p>Dear ${user.name || "Customer"},</p>
+          <p>Your account has been banned from the Oibre platform.</p>
+          <div style="background: #fee2e2; border-left: 4px solid #dc2626; padding: 15px; margin: 20px 0;">
+            <strong>Reason:</strong> ${user.banReason}
+          </div>
+          <p>If you believe this is a mistake, please contact support.</p>
+          <p>Best regards,<br>Oibre Team</p>
+        </div>
+      `;
+      sendBrevoEmail({ to: user.email, subject, html }).catch(err => 
+        console.error("Ban email error:", err)
+      );
+    }
+
+    res.json({ message: "User banned successfully", user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to ban user" });
+  }
+});
+
+// Unban user
+router.post("/users/:id/unban", adminAuth, async (req, res) => {
+  try {
+    const user = await Customer.findById(req.params.id);
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.status !== "banned") {
+      return res.status(400).json({ message: "User is not banned" });
+    }
+
+    user.status = "active";
+    user.bannedAt = null;
+    user.banReason = null;
+    await user.save();
+
+    // Remove from blacklist
+    const Blacklist = require("../models/Blacklist");
+    await Blacklist.deleteOne({ email: user.email?.toLowerCase(), reason: "banned" });
+
+    // Send unban email
+    if (user.email) {
+      const { sendBrevoEmail } = require("../utils/sendEmail");
+      const subject = "Account Unbanned - Oibre";
+      const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #059669;">Account Unbanned</h2>
+          <p>Dear ${user.name || "Customer"},</p>
+          <p>Good news! Your account has been unbanned and you can now access the Oibre platform again.</p>
+          <p>Please ensure you follow our terms and conditions to avoid future issues.</p>
+          <p>Best regards,<br>Oibre Team</p>
+        </div>
+      `;
+      sendBrevoEmail({ to: user.email, subject, html }).catch(err => 
+        console.error("Unban email error:", err)
+      );
+    }
+
+    res.json({ message: "User unbanned successfully", user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to unban user" });
+  }
+});
+
+// Delete user (permanent blacklist)
+router.delete("/users/:id", adminAuth, async (req, res) => {
+  try {
+    const { reason } = req.body;
+    const user = await Customer.findById(req.params.id);
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const userEmail = user.email;
+    const userName = user.name;
+    const deleteReason = reason || "Account permanently deleted by administrator";
+
+    // Add to permanent blacklist
+    const Blacklist = require("../models/Blacklist");
+    await Blacklist.findOneAndUpdate(
+      { email: userEmail?.toLowerCase() },
+      {
+        email: userEmail?.toLowerCase(),
+        reason: "deleted",
+        bannedBy: req.adminId,
+        message: deleteReason,
+        bannedAt: new Date()
+      },
+      { upsert: true, new: true }
+    );
+
+    // Delete user
+    await Customer.findByIdAndDelete(req.params.id);
+
+    // Send deletion email
+    if (userEmail) {
+      const { sendBrevoEmail } = require("../utils/sendEmail");
+      const subject = "Account Deleted - Oibre";
+      const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #dc2626;">Account Permanently Deleted</h2>
+          <p>Dear ${userName || "Customer"},</p>
+          <p>Your account has been permanently deleted from the Oibre platform.</p>
+          <div style="background: #fee2e2; border-left: 4px solid #dc2626; padding: 15px; margin: 20px 0;">
+            <strong>Reason:</strong> ${deleteReason}
+          </div>
+          <p><strong>Important:</strong> This email address has been permanently blacklisted and cannot be used to create a new account on any Oibre platform (customer, service provider, or admin).</p>
+          <p>If you believe this is a mistake, please contact support immediately.</p>
+          <p>Best regards,<br>Oibre Team</p>
+        </div>
+      `;
+      sendBrevoEmail({ to: userEmail, subject, html }).catch(err => 
+        console.error("Deletion email error:", err)
+      );
+    }
+
+    res.json({ message: "User deleted and email blacklisted permanently" });
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Failed to delete user" });
   }
 });

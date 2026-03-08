@@ -263,6 +263,17 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ message: "Mobile is required" });
     }
 
+    // Check if email is blacklisted
+    if (cleanEmail) {
+      const Blacklist = require("../models/Blacklist");
+      const blacklisted = await Blacklist.findOne({ email: cleanEmail });
+      if (blacklisted) {
+        return res.status(403).json({ 
+          message: "This email has been permanently blocked from using our platform" 
+        });
+      }
+    }
+
     if (await Customer.findOne({ mobile: cleanMobile })) {
       return res.status(400).json({ message: "Mobile already registered" });
     }
@@ -335,6 +346,24 @@ router.post("/login", async (req, res) => {
     const customer = await Customer.findOne({ mobile }).select("+password");
     if (!customer) {
       return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    // Check if email is blacklisted
+    const Blacklist = require("../models/Blacklist");
+    const blacklisted = await Blacklist.findOne({ email: customer.email?.toLowerCase() });
+    if (blacklisted) {
+      return res.status(403).json({ 
+        message: blacklisted.reason === "banned" 
+          ? `Your account has been banned. Reason: ${blacklisted.message || "Violation of terms"}`
+          : "This email has been permanently blocked from using our platform"
+      });
+    }
+
+    // Check if customer is banned
+    if (customer.status === "banned") {
+      return res.status(403).json({ 
+        message: `Your account has been banned. Reason: ${customer.banReason || "Violation of terms"}`
+      });
     }
 
     if (!customer.password) {
@@ -739,9 +768,27 @@ router.post("/google-login", async (req, res) => {
       return res.status(400).json({ message: "Email is required" });
     }
 
+    // Check if email is blacklisted
+    const Blacklist = require("../models/Blacklist");
+    const blacklisted = await Blacklist.findOne({ email: cleanEmail });
+    if (blacklisted) {
+      return res.status(403).json({ 
+        message: blacklisted.reason === "banned" 
+          ? `Your account has been banned. Reason: ${blacklisted.message || "Violation of terms"}`
+          : "This email has been permanently blocked from using our platform"
+      });
+    }
+
     const customer = await findCustomerByEmail(cleanEmail);
     if (!customer) {
       return res.status(404).json({ message: "Email not registered" });
+    }
+
+    // Check if customer is banned
+    if (customer.status === "banned") {
+      return res.status(403).json({ 
+        message: `Your account has been banned. Reason: ${customer.banReason || "Violation of terms"}`
+      });
     }
 
     const token = jwt.sign(

@@ -6,10 +6,12 @@ const { uploadWithCloudinary } = require("../middleware/upload");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const { sendBrevoEmail } = require("../utils/sendEmail");
+const jwt = require("jsonwebtoken");
 
 const ProviderRequest = require("../models/ProviderRequest");
 const ServiceProvider = require("../models/ServiceProvider");
 const EmailOtp = require("../models/EmailOtp");
+const ServiceRequest = require("../models/ServiceRequest");
 
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email || "");
 const EMAIL_DNS_TIMEOUT_MS = 5000;
@@ -131,10 +133,28 @@ const sendOtpEmail = async ({ to, otp }) => {
 
 const generateOtp = () => String(crypto.randomInt(100000, 999999));
 
+// Optional auth middleware - sets req.customerId if token is present, but doesn't fail if not
+const optionalCustomerAuth = (req, res, next) => {
+  const auth = req.headers.authorization;
+  if (auth) {
+    try {
+      const token = auth.split(" ")[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.customerId = decoded.id;
+    } catch (err) {
+      // Token invalid, but that's okay for optional auth
+      req.customerId = null;
+    }
+  } else {
+    req.customerId = null;
+  }
+  next();
+};
+
 /* ===============================
    SEARCH PROVIDERS BY LOCATION & CATEGORY
 =============================== */
-router.get("/", async (req, res) => {
+router.get("/", optionalCustomerAuth, async (req, res) => {
   try {
     const { lat, lng, serviceCategory } = req.query;
 
@@ -214,6 +234,20 @@ router.get("/", async (req, res) => {
       };
     });
 
+    // ✅ Filter out providers with active bookings for authenticated users
+    if (req.customerId) {
+      const activeBookings = await ServiceRequest.find({
+        customerId: req.customerId,
+        status: { $in: ["pending", "accepted", "in_progress"] }
+      }).select("providerId").lean();
+
+      const activeProviderIds = new Set(
+        activeBookings.map(b => String(b.providerId))
+      );
+
+      providers = providers.filter(p => !activeProviderIds.has(String(p._id)));
+    }
+
     res.json(providers);
   } catch (err) {
     console.error("SEARCH PROVIDERS ERROR:", err.message);
@@ -240,7 +274,8 @@ router.get("/:id", async (req, res) => {
     // Fetch reviews for this provider
     const Review = require("../models/Review");
     const reviews = await Review.find({ provider: id })
-      .select("rating text customerName customerPhoto createdAt")
+      .populate("customer", "name email")
+      .select("rating comment image createdAt customer")
       .lean()
       .sort({ createdAt: -1 });
 
@@ -529,6 +564,15 @@ router.post(
 
       otpRecord.consumedAt = new Date();
       await otpRecord.save();
+
+      // Check if email is blacklisted
+      const Blacklist = require("../models/Blacklist");
+      const blacklisted = await Blacklist.findOne({ email: email.toLowerCase() });
+      if (blacklisted) {
+        return res.status(403).json({ 
+          message: "This email has been permanently blocked from using our platform"
+        });
+      }
 
       // Validate "Other" service has valid custom service name
       if (serviceCategory === "Other") {

@@ -116,6 +116,12 @@
   border: 1px solid #7DD3FC;
 }
 
+.status-badge.banned {
+  background: #FEE2E2;
+  color: #991B1B;
+  border: 1px solid #FCA5A5;
+}
+
 .status-badge.inactive {
   background: #F3F4F6;
   color: #6B7280;
@@ -148,6 +154,24 @@
   background: #C7D2FE;
 }
 
+.action-link.warning {
+  color: #D97706;
+  background: #FEF3C7;
+}
+
+.action-link.warning:hover {
+  background: #FDE68A;
+}
+
+.action-link.success {
+  color: #059669;
+  background: #D1FAE5;
+}
+
+.action-link.success:hover {
+  background: #A7F3D0;
+}
+
 .action-link.edit {
   color: #059669;
   background: #D1FAE5;
@@ -164,6 +188,27 @@
 
 .action-link.delete:hover {
   background: #FECACA;
+}
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 @media (max-width: 768px) {

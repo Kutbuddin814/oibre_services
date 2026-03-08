@@ -216,10 +216,10 @@ const Dashboard = ({ setCurrentPage }) => {
             <button className="action-btn secondary" onClick={handleUpdateServicePrices} style={{ background: "#059669", color: "#fff" }}>
               Update Service Prices
             </button>
-            <button className="action-btn secondary" onClick={() => setCurrentPage("provider-requests")}>View Logs</button>
-            <button className="action-btn secondary" onClick={() => setCurrentPage("users")}>Settings</button>
+            <button className="action-btn secondary" onClick={() => setCurrentPage("provider-requests")}>View Provider Logs</button>
+            <button className="action-btn secondary" onClick={() => setCurrentPage("services")}>Manage Services</button>
             <button className="action-btn secondary" onClick={() => setCurrentPage("contact-messages")}>
-              Open Contact Messages ({stats.newContactMessages})
+              Contact Messages ({stats.newContactMessages})
             </button>
           </div>
         </div>

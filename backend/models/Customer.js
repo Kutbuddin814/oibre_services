@@ -17,7 +17,14 @@ const CustomerSchema = new mongoose.Schema(
       },
       coordinates: [Number]
     },
-    authProvider: String
+    authProvider: String,
+    status: {
+      type: String,
+      enum: ["active", "banned"],
+      default: "active"
+    },
+    bannedAt: Date,
+    banReason: String
   },
   { timestamps: true }
 );
