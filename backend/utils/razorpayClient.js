@@ -21,7 +21,6 @@ async function createRazorpayOrder(amount, orderId, customerId) {
       currency: "INR",
       receipt: orderId,
       payment_capture: 1, // Auto-capture payment
-      customer_notify: 1,
       notes: {
         serviceRequestId: orderId,
         customerId: customerId

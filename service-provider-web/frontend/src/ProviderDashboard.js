@@ -128,6 +128,14 @@ const ProviderDashboard = () => {
     return h * 60 + m;
   };
 
+  const getMinimumFinalPrice = (req) => {
+    const minCandidate = Number(req?.basePrice ?? provider?.basePrice);
+    if (Number.isFinite(minCandidate) && minCandidate > 0) {
+      return Math.round(minCandidate);
+    }
+    return 1;
+  };
+
   const refreshRequests = async () => {
     const res = await api.get(
       "/provider/requests/my-requests",
@@ -464,9 +472,15 @@ const ProviderDashboard = () => {
   const submitFinalPrice = async (req) => {
     const entered = String(finalPrices[req._id] || "").trim();
     const amount = Number(entered);
+    const minimumAllowed = getMinimumFinalPrice(req);
 
     if (!Number.isFinite(amount) || amount <= 0) {
       alert("Enter a valid final price.");
+      return;
+    }
+
+    if (amount < minimumAllowed) {
+      alert(`Final price cannot be below starting charge (Rs ${minimumAllowed}).`);
       return;
     }
 
@@ -784,11 +798,22 @@ const ProviderDashboard = () => {
                           <input
                             type="number"
                             placeholder="Enter final price"
-                            min="1"
+                            min={getMinimumFinalPrice(req)}
                             value={finalPrices[req._id] ?? req.finalPrice ?? ""}
-                            onChange={(e) =>
-                              setFinalPrices((prev) => ({ ...prev, [req._id]: e.target.value }))
-                            }
+                            onChange={(e) => {
+                              const raw = e.target.value;
+                              const minFinalPrice = getMinimumFinalPrice(req);
+                              if (raw === "") {
+                                setFinalPrices((prev) => ({ ...prev, [req._id]: "" }));
+                                return;
+                              }
+                              const parsed = Number(raw);
+                              if (Number.isFinite(parsed) && parsed < minFinalPrice) {
+                                setFinalPrices((prev) => ({ ...prev, [req._id]: String(minFinalPrice) }));
+                                return;
+                              }
+                              setFinalPrices((prev) => ({ ...prev, [req._id]: raw }));
+                            }}
                           />
                         </div>
                         <button
@@ -826,11 +851,22 @@ const ProviderDashboard = () => {
                           <input
                             type="number"
                             placeholder="Enter final price"
-                            min="1"
+                            min={getMinimumFinalPrice(req)}
                             value={finalPrices[req._id] ?? req.finalPrice ?? ""}
-                            onChange={(e) =>
-                              setFinalPrices((prev) => ({ ...prev, [req._id]: e.target.value }))
-                            }
+                            onChange={(e) => {
+                              const raw = e.target.value;
+                              const minFinalPrice = getMinimumFinalPrice(req);
+                              if (raw === "") {
+                                setFinalPrices((prev) => ({ ...prev, [req._id]: "" }));
+                                return;
+                              }
+                              const parsed = Number(raw);
+                              if (Number.isFinite(parsed) && parsed < minFinalPrice) {
+                                setFinalPrices((prev) => ({ ...prev, [req._id]: String(minFinalPrice) }));
+                                return;
+                              }
+                              setFinalPrices((prev) => ({ ...prev, [req._id]: raw }));
+                            }}
                           />
                         </div>
                         <button

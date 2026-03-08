@@ -329,6 +329,13 @@ router.put("/submit-price/:id", authMiddleware, async (req, res) => {
       return res.status(404).json({ message: "Request not found" });
     }
 
+    const minimumAllowed = Number(request.basePrice);
+    if (Number.isFinite(minimumAllowed) && minimumAllowed > 0 && parsedPrice < minimumAllowed) {
+      return res.status(400).json({
+        message: `Final price cannot be below starting charge (Rs ${Math.round(minimumAllowed)})`
+      });
+    }
+
     if (request.providerId.toString() !== req.providerId) {
       return res.status(403).json({ message: "Unauthorized" });
     }
