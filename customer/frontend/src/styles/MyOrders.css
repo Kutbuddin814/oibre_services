@@ -42,7 +42,7 @@
 }
 
 .orders-page {
-  padding: 44px 20px;
+  padding: 44px 20px 56px;
   max-width: 920px;
   margin: 0 auto;
 }
@@ -73,12 +73,14 @@
   font-size: 32px;
   font-weight: 800;
   letter-spacing: -0.02em;
+  color: #0f172a;
 }
 
 .orders-subtitle {
   text-align: center;
   color: #6b7280;
   margin: 8px 0 28px;
+  font-size: 16px;
 }
 
 .order-card {
@@ -89,6 +91,12 @@
   margin-bottom: 22px;
   border: 1px solid #eef2f7;
   word-break: break-word;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.order-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.1);
 }
 
 .order-card.cancelled {
@@ -110,6 +118,35 @@
 .order-header h3 {
   font-size: 22px;
   line-height: 1.25;
+  color: #0f172a;
+}
+
+.order-meta {
+  margin: 8px 0;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.order-meta b {
+  color: #0f172a;
+}
+
+.final-price-line {
+  font-weight: 700;
+}
+
+.quote-note {
+  margin-top: 10px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.quote-note-pending {
+  color: #b45309;
+}
+
+.quote-note-approved {
+  color: #15803d;
 }
 
 .status-pill {
@@ -172,6 +209,7 @@
   font-weight: 700;
   font-size: 14px;
   transition: transform 0.15s ease, filter 0.15s ease;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
 }
 
 .track-btn:hover,
@@ -210,6 +248,43 @@
   color: #166534;
   font-size: 13px;
   font-weight: 700;
+}
+
+.booking-details-list {
+  margin-top: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.booking-details-item {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.booking-details-item strong {
+  display: block;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.booking-details-item p {
+  margin: 4px 0 0;
+  color: #334155;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.booking-details-price {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.booking-details-price p {
+  color: #166534;
+  font-weight: 800;
 }
 
 .modal-overlay {
@@ -283,14 +358,19 @@
 }
 
 .timeline {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
   margin: 20px 0 16px;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
 }
 
 .timeline-step {
   text-align: center;
-  flex: 1;
+  min-width: 0;
   position: relative;
 }
 
@@ -299,7 +379,7 @@
   position: absolute;
   top: 7px;
   right: -50%;
-  width: 100%;
+  width: calc(100% - 10px);
   height: 2px;
   background: #e5e7eb;
   z-index: 0;
@@ -322,9 +402,12 @@
 .timeline-step span {
   display: block;
   margin-top: 6px;
-  font-size: 11px;
+  font-size: 10px;
+  font-weight: 700;
   text-transform: uppercase;
   color: #6b7280;
+  line-height: 1.25;
+  word-break: break-word;
 }
 
 .cancelled-banner {
@@ -376,7 +459,8 @@
 
   .track-btn,
   .review-btn,
-  .feedback-btn {
+  .feedback-btn,
+  .cancel-btn {
     width: 100%;
     min-height: 42px;
   }
@@ -390,7 +474,16 @@
     border-radius: 12px;
   }
 
+  .timeline {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px 6px;
+  }
+
+  .timeline-step:not(:last-child)::after {
+    display: none;
+  }
+
   .timeline-step span {
-    font-size: 10px;
+    font-size: 9px;
   }
 }

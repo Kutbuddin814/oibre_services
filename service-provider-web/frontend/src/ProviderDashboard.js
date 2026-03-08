@@ -7,8 +7,6 @@ import PaymentDetailsModal from "./PaymentDetailsModal";
 import PaymentDetailsReminder from "./PaymentDetailsReminder";
 import "./ProviderStyles.css";
 
-const AUTO_REFRESH_MS = 10000;
-
 const ProviderDashboard = () => {
   const [provider, setProvider] = useState(null);
   const [openMenu, setOpenMenu] = useState(false);
@@ -418,15 +416,10 @@ const ProviderDashboard = () => {
       }
     };
 
-    const intervalId = setInterval(() => {
-      refreshIfVisible();
-    }, AUTO_REFRESH_MS);
-
     window.addEventListener("focus", refreshIfVisible);
     document.addEventListener("visibilitychange", refreshIfVisible);
 
     return () => {
-      clearInterval(intervalId);
       window.removeEventListener("focus", refreshIfVisible);
       document.removeEventListener("visibilitychange", refreshIfVisible);
     };

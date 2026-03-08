@@ -8,8 +8,6 @@ import "../styles/unified-modal.css";
 import "../styles/unified-forms.css";
 import "../styles/unified-buttons.css";
 
-const AUTO_REFRESH_MS = 15000;
-
 export default function MyOrders() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
@@ -72,17 +70,10 @@ export default function MyOrders() {
       }
     };
 
-    const intervalId = setInterval(() => {
-      if (document.visibilityState === "visible") {
-        fetchOrders();
-      }
-    }, AUTO_REFRESH_MS);
-
     window.addEventListener("focus", refreshOnFocus);
     document.addEventListener("visibilitychange", refreshOnVisible);
 
     return () => {
-      clearInterval(intervalId);
       window.removeEventListener("focus", refreshOnFocus);
       document.removeEventListener("visibilitychange", refreshOnVisible);
     };
@@ -259,35 +250,35 @@ export default function MyOrders() {
             <span className={`status-pill ${o.status}`}>{o.status.toUpperCase()}</span>
           </div>
 
-          <p>
+          <p className="order-meta">
             <b>Problem:</b> {o.problemDescription}
           </p>
 
-          <p>
+          <p className="order-meta">
             <b>Scheduled Visit:</b>{" "}
             {getScheduledVisitLabel(o)}
           </p>
 
           {o.providerNote && (
-            <p>
+            <p className="order-meta">
               <b>Provider Note:</b> {o.providerNote}
             </p>
           )}
 
           {o.finalPrice && (
-            <p>
+            <p className="order-meta final-price-line">
               <b>Final Price:</b> Rs {o.finalPrice}
             </p>
           )}
 
           {o.priceStatus === "price_sent" && (
-            <p style={{ color: "#b45309", fontWeight: 600 }}>
+            <p className="quote-note quote-note-pending">
               Provider sent final quote. Please approve to continue.
             </p>
           )}
 
           {o.priceStatus === "price_approved" && (
-            <p style={{ color: "#15803d", fontWeight: 600 }}>
+            <p className="quote-note quote-note-approved">
               Final quote approved.
             </p>
           )}
@@ -370,37 +361,37 @@ export default function MyOrders() {
         <Modal onClose={() => setActiveOrder(null)} title="Booking Status">
           <Timeline status={activeOrder.status} priceStatus={activeOrder.priceStatus} />
 
-          <div style={{ marginTop: "16px" }}>
-            <div style={{ marginBottom: "12px" }}>
-              <strong>Problem:</strong>
-              <p style={{ margin: "4px 0 0" }}>{activeOrder.problemDescription}</p>
+          <div className="booking-details-list">
+            <div className="booking-details-item">
+              <strong>Problem</strong>
+              <p>{activeOrder.problemDescription}</p>
             </div>
 
-            <div style={{ marginBottom: "12px" }}>
-              <strong>Scheduled:</strong>
-              <p style={{ margin: "4px 0 0" }}>
+            <div className="booking-details-item">
+              <strong>Scheduled</strong>
+              <p>
                 {getScheduledVisitLabel(activeOrder)}
               </p>
             </div>
 
             {activeOrder.providerNote && (
-              <div style={{ marginBottom: "12px" }}>
-                <strong>Provider Note:</strong>
-                <p style={{ margin: "4px 0 0" }}>{activeOrder.providerNote}</p>
+              <div className="booking-details-item">
+                <strong>Provider Note</strong>
+                <p>{activeOrder.providerNote}</p>
               </div>
             )}
 
             {activeOrder.finalPrice && (
-              <div style={{ marginBottom: "12px" }}>
-                <strong>Final Price:</strong>
-                <p style={{ margin: "4px 0 0" }}>Rs {activeOrder.finalPrice}</p>
+              <div className="booking-details-item booking-details-price">
+                <strong>Final Price</strong>
+                <p>Rs {activeOrder.finalPrice}</p>
               </div>
             )}
 
             {activeOrder.priceStatus === "price_sent" && (
               <button
                 className="btn btn-primary"
-                style={{ width: "100%", marginTop: "8px" }}
+                style={{ width: "100%", marginTop: "10px" }}
                 onClick={() => approveFinalPrice(activeOrder)}
                 disabled={approvePriceLoadingId === activeOrder._id}
               >
@@ -411,7 +402,7 @@ export default function MyOrders() {
             {activeOrder.status === "completed" && activeOrder.priceStatus === "price_approved" && activeOrder.paymentStatus === "pending" && (
               <button
                 className="btn btn-primary"
-                style={{ width: "100%", marginTop: "8px" }}
+                style={{ width: "100%", marginTop: "10px" }}
                 onClick={() => openPayment(activeOrder)}
               >
                 Pay Now
@@ -430,9 +421,9 @@ export default function MyOrders() {
             )}
 
             {activeOrder.customerCancelReason && (
-              <div style={{ marginBottom: "12px" }}>
-                <strong>Cancellation Reason:</strong>
-                <p style={{ margin: "4px 0 0" }}>{activeOrder.customerCancelReason}</p>
+              <div className="booking-details-item">
+                <strong>Cancellation Reason</strong>
+                <p>{activeOrder.customerCancelReason}</p>
               </div>
             )}
 

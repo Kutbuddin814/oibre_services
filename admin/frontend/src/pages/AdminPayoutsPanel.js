@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../api";
-
-const AUTO_REFRESH_MS = 15000;
+import "../styles/AdminPayoutsPanel.css";
 
 const AdminPayoutsPanel = () => {
   const [payouts, setPayouts] = useState([]);
@@ -29,15 +28,10 @@ const AdminPayoutsPanel = () => {
       }
     };
 
-    const intervalId = setInterval(() => {
-      refreshAll();
-    }, AUTO_REFRESH_MS);
-
     window.addEventListener("focus", refreshAll);
     document.addEventListener("visibilitychange", refreshAll);
 
     return () => {
-      clearInterval(intervalId);
       window.removeEventListener("focus", refreshAll);
       document.removeEventListener("visibilitychange", refreshAll);
     };
@@ -122,200 +116,162 @@ const AdminPayoutsPanel = () => {
 
   if (loading && tab === "pending") {
     return (
-      <div className="p-8 text-center">
-        <div className="text-lg font-medium text-gray-600">Loading...</div>
+      <div className="payouts-loading">
+        <div className="payouts-spinner" />
+        <div className="payouts-loading-text">Loading payouts...</div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Payout Management</h1>
-        <p className="text-gray-600">Manage provider payments and settlements</p>
+    <div className="payouts-page">
+      <div className="payouts-header">
+        <h1 className="payouts-title">Payout Management</h1>
+        <p className="payouts-subtitle">Manage provider payments and settlements</p>
       </div>
 
-      {/* Summary Cards */}
       {summary && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600 mb-1">Total Revenue</p>
-            <p className="text-2xl font-bold text-blue-600">
+        <div className="payouts-summary-grid">
+          <div className="payouts-card">
+            <p className="payouts-card-label">Total Revenue</p>
+            <p className="payouts-card-value value-blue">
               {formatCurrency(summary.totalRevenue)}
             </p>
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="payouts-card-note">
               {summary.bookingCount} completed bookings
             </p>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600 mb-1">Our Commission (10%)</p>
-            <p className="text-2xl font-bold text-green-600">
+          <div className="payouts-card">
+            <p className="payouts-card-label">Our Commission (10%)</p>
+            <p className="payouts-card-value value-green">
               {formatCurrency(summary.totalCommission)}
             </p>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600 mb-1">Provider Earnings</p>
-            <p className="text-2xl font-bold text-purple-600">
+          <div className="payouts-card">
+            <p className="payouts-card-label">Provider Earnings</p>
+            <p className="payouts-card-value value-violet">
               {formatCurrency(summary.totalProviderEarnings)}
             </p>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600 mb-1">Status</p>
-            <p className="text-sm font-medium mt-2">
-              <span className="text-orange-600">
-                ⏳ Pending: {summary.pendingPayoutsCount}
-              </span>
-              <br />
-              <span className="text-green-600">
-                ✓ Paid: {summary.paidPayoutsCount}
-              </span>
-            </p>
+          <div className="payouts-card">
+            <p className="payouts-card-label">Status</p>
+            <div className="payouts-status-list">
+              <span className="status-pill status-pending">Pending: {summary.pendingPayoutsCount}</span>
+              <span className="status-pill status-paid">Paid: {summary.paidPayoutsCount}</span>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Tabs */}
-      <div className="mb-6 border-b border-gray-200">
-        <div className="flex gap-4">
+      <div className="payouts-tabs-wrap">
+        <div className="payouts-tabs">
           <button
             onClick={() => setTab("pending")}
-            className={`px-4 py-2 font-medium border-b-2 transition-colors ${
-              tab === "pending"
-                ? "text-blue-600 border-blue-600"
-                : "text-gray-600 border-transparent hover:text-gray-900"
-            }`}
+            className={`payouts-tab ${tab === "pending" ? "active" : ""}`}
           >
             Pending Payouts ({summary?.pendingPayoutsCount || 0})
           </button>
           <button
             onClick={() => setTab("history")}
-            className={`px-4 py-2 font-medium border-b-2 transition-colors ${
-              tab === "history"
-                ? "text-blue-600 border-blue-600"
-                : "text-gray-600 border-transparent hover:text-gray-900"
-            }`}
+            className={`payouts-tab ${tab === "history" ? "active" : ""}`}
           >
             Settlement History ({summary?.paidPayoutsCount || 0})
           </button>
         </div>
       </div>
 
-      {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-          <p className="text-red-600">{error}</p>
+        <div className="payouts-error-box">
+          <p>{error}</p>
         </div>
       )}
 
-      {/* Table */}
       {payouts.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <p className="text-gray-500 text-lg">
+        <div className="payouts-empty">
+          <p>
             {tab === "pending" ? "No pending payouts" : "No settlement history"}
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-100 border-b border-gray-200">
+        <div className="payouts-table-shell">
+          <div className="payouts-table-wrap">
+            <table className="payouts-table">
+              <thead>
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
-                    Booking ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
-                    Provider
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
-                    Service
-                  </th>
-                  <th className="px-6 py-3 text-right text-sm font-medium text-gray-700">
-                    Amount
-                  </th>
-                  <th className="px-6 py-3 text-right text-sm font-medium text-gray-700">
-                    Commission (10%)
-                  </th>
-                  <th className="px-6 py-3 text-right text-sm font-medium text-gray-700">
-                    Provider Gets
-                  </th>
+                  <th>Booking ID</th>
+                  <th>Provider</th>
+                  <th>Service</th>
+                  <th className="text-right">Amount</th>
+                  <th className="text-right">Commission (10%)</th>
+                  <th className="text-right">Provider Gets</th>
                   {tab === "history" && (
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
-                      Paid On
-                    </th>
+                    <th>Paid On</th>
                   )}
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
-                    Payment Details
-                  </th>
+                  <th>Payment Details</th>
                   {tab === "pending" && (
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
-                      Action
-                    </th>
+                    <th>Action</th>
                   )}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody>
                 {payouts.map((payout) => (
-                  <tr key={payout._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                  <tr key={payout._id}>
+                    <td className="booking-id-cell">
                       {payout.bookingId.slice(0, 8)}...
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-700">
-                      {payout.providerName}
-                      <br />
-                      <span className="text-xs text-gray-500">
+                    <td>
+                      <div className="provider-name">{payout.providerName}</div>
+                      <span className="provider-email">
                         {payout.providerEmail}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-700">
+                    <td>
                       {payout.serviceCategory}
                     </td>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900 text-right">
+                    <td className="text-right amount-cell">
                       {formatCurrency(payout.totalAmount)}
                     </td>
-                    <td className="px-6 py-4 text-sm text-red-600 text-right">
+                    <td className="text-right commission-cell">
                       {formatCurrency(payout.commission)}
                     </td>
-                    <td className="px-6 py-4 text-sm font-bold text-green-600 text-right">
+                    <td className="text-right earning-cell">
                       {formatCurrency(payout.providerEarning)}
                     </td>
                     {tab === "history" && (
-                      <td className="px-6 py-4 text-sm text-gray-700">
+                      <td>
                         {formatDate(payout.payoutDate)}
                       </td>
                     )}
-                    <td className="px-6 py-4 text-sm text-gray-700">
+                    <td>
                       {payout.paymentDetailsCompleted ? (
-                        <div className="text-green-600 font-medium">✓ Complete</div>
+                        <div className="payment-status ok">Complete</div>
                       ) : (
-                        <div className="text-red-600 font-medium">✗ Incomplete</div>
+                        <div className="payment-status bad">Incomplete</div>
                       )}
                       {payout.paymentDetails?.accountNumber && (
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="payment-meta">
                           {payout.paymentDetails.accountNumber.slice(-4).padStart(4, "*")} •{" "}
                           {payout.paymentDetails.ifscCode}
                         </p>
                       )}
                     </td>
                     {tab === "pending" && (
-                      <td className="px-6 py-4 text-sm">
+                      <td>
                         {payout.canPay ? (
                           <button
                             onClick={() => handleMarkAsPaid(payout.bookingId)}
                             disabled={markedPaidId === payout.bookingId}
-                            className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            className="mark-paid-btn"
                           >
                             {markedPaidId === payout.bookingId
                               ? "Processing..."
                               : "Mark Paid"}
                           </button>
                         ) : (
-                          <div className="text-xs text-red-600 font-medium">
-                            ⚠ Details incomplete
-                          </div>
+                          <div className="incomplete-note">Details incomplete</div>
                         )}
                       </td>
                     )}
