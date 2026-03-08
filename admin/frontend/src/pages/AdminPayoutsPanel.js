@@ -9,6 +9,7 @@ const AdminPayoutsPanel = () => {
   const [summary, setSummary] = useState(null);
   const [tab, setTab] = useState("pending"); // pending or history
   const [markedPaidId, setMarkedPaidId] = useState(null);
+  const [reminderSendingId, setReminderSendingId] = useState(null);
   const token = localStorage.getItem("adminToken");
 
   const adminName = localStorage.getItem("adminName") || "Admin";
@@ -105,6 +106,24 @@ const AdminPayoutsPanel = () => {
     }
   };
 
+  const handleSendPaymentReminder = async (bookingId) => {
+    setReminderSendingId(bookingId);
+    try {
+      const res = await api.post(
+        `/admin/payouts/${bookingId}/remind-payment-details`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (res.data.success) {
+        alert("Reminder email sent to provider.");
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to send reminder email");
+    } finally {
+      setReminderSendingId(null);
+    }
+  };
+
   const formatDate = (date) => {
     if (!date) return "-";
     return new Date(date).toLocaleDateString("en-IN");
@@ -112,6 +131,24 @@ const AdminPayoutsPanel = () => {
 
   const formatCurrency = (amount) => {
     return `₹${Math.round(amount).toLocaleString("en-IN")}`;
+  };
+
+  const getPaymentRows = (details) => {
+    if (!details) return [];
+    const rows = [];
+    if (details.accountHolderName) {
+      rows.push({ label: "Name", value: details.accountHolderName, mono: false });
+    }
+    if (details.accountNumber) {
+      rows.push({ label: "Account", value: details.accountNumber, mono: true });
+    }
+    if (details.ifscCode) {
+      rows.push({ label: "IFSC", value: details.ifscCode, mono: true });
+    }
+    if (details.upiId) {
+      rows.push({ label: "UPI", value: details.upiId, mono: true });
+    }
+    return rows;
   };
 
   if (loading && tab === "pending") {
@@ -251,12 +288,26 @@ const AdminPayoutsPanel = () => {
                       ) : (
                         <div className="payment-status bad">Incomplete</div>
                       )}
-                      {payout.paymentDetails?.accountNumber && (
-                        <p className="payment-meta">
-                          {payout.paymentDetails.accountNumber.slice(-4).padStart(4, "*")} •{" "}
-                          {payout.paymentDetails.ifscCode}
-                        </p>
-                      )}
+
+                      {(() => {
+                        const paymentRows = getPaymentRows(payout.paymentDetails);
+                        if (!paymentRows.length) {
+                          return <p className="payment-meta">No transfer details added.</p>;
+                        }
+
+                        return (
+                          <div className="payment-details-list">
+                            {paymentRows.map((row) => (
+                              <div key={`${payout._id}-${row.label}`} className="payment-detail-row">
+                                <span className="payment-detail-label">{row.label}</span>
+                                <span className={`payment-detail-value ${row.mono ? "mono" : ""}`}>
+                                  {row.value}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })()}
                     </td>
                     {tab === "pending" && (
                       <td>
@@ -271,7 +322,16 @@ const AdminPayoutsPanel = () => {
                               : "Mark Paid"}
                           </button>
                         ) : (
-                          <div className="incomplete-note">Details incomplete</div>
+                          <div className="action-stack">
+                            <div className="incomplete-note">Details incomplete</div>
+                            <button
+                              onClick={() => handleSendPaymentReminder(payout.bookingId)}
+                              disabled={reminderSendingId === payout.bookingId || !payout.providerEmail}
+                              className="send-reminder-btn"
+                            >
+                              {reminderSendingId === payout.bookingId ? "Sending..." : "Send Reminder Email"}
+                            </button>
+                          </div>
                         )}
                       </td>
                     )}

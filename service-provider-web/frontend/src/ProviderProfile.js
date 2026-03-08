@@ -36,6 +36,9 @@ const ProviderProfile = () => {
   const [emailOtp, setEmailOtp] = useState("");
   const [emailLoading, setEmailLoading] = useState(false);
   const [emailError, setEmailError] = useState("");
+  const [profileTab, setProfileTab] = useState("profile");
+  const [paymentDetails, setPaymentDetails] = useState(null);
+  const [paymentDetailsCompleted, setPaymentDetailsCompleted] = useState(false);
   const token = localStorage.getItem("providerToken");
   const navigate = useNavigate();
   const isCoordinateString = (value) =>
@@ -54,6 +57,23 @@ const ProviderProfile = () => {
           }
         );
         setProvider(res.data);
+
+        try {
+          const paymentRes = await api.get(
+            "/provider/payment/payment-details",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            }
+          );
+          if (paymentRes.data?.success) {
+            setPaymentDetails(paymentRes.data.paymentDetails || {});
+            setPaymentDetailsCompleted(Boolean(paymentRes.data.paymentDetailsCompleted));
+          }
+        } catch (paymentErr) {
+          console.error("Failed to fetch payment details:", paymentErr);
+        }
       } catch {
         localStorage.removeItem("providerToken");
         navigate("/");
@@ -544,54 +564,115 @@ const ProviderProfile = () => {
         </div>
 
         <div className="profile-body">
-          <div className="profile-field">
-            <label>Email Address</label>
-            <p>{provider.email}</p>
-          </div>
-
-          <div className="profile-field">
-            <label>Phone Number</label>
-            <p>{provider.mobile || "N/A"}</p>
-          </div>
-
-          <div className="profile-field">
-            <label>Service Category</label>
-            <p>{provider.serviceCategory}</p>
-          </div>
-
-          <div className="profile-field">
-            <label>Location</label>
-            <p>{resolvedAddress || provider.address || provider.locality || "N/A"}</p>
+          <div className="profile-tabs">
             <button
-              className="profile-location-btn"
-              onClick={() => setShowLocationModal(true)}
+              className={`profile-tab-btn ${profileTab === "profile" ? "active" : ""}`}
+              onClick={() => setProfileTab("profile")}
             >
-              Change Location
+              Profile Details
+            </button>
+            <button
+              className={`profile-tab-btn ${profileTab === "payment" ? "active" : ""}`}
+              onClick={() => setProfileTab("payment")}
+            >
+              Payment Details
             </button>
           </div>
 
-          <div className="profile-field">
-            <label>Remove Account</label>
-            <p>If you want to stop providing services, you can request removal.</p>
-            <button
-              className="profile-remove-btn"
-              onClick={() => setShowRemovalModal(true)}
-            >
-              Request Removal
-            </button>
-          </div>
+          {profileTab === "profile" && (
+            <>
+              <div className="profile-field">
+                <label>Email Address</label>
+                <p>{provider.email}</p>
+              </div>
 
-          <div className="profile-field">
-            <label>Experience</label>
-            <p>{provider.experience || "N/A"}</p>
-          </div>
+              <div className="profile-field">
+                <label>Phone Number</label>
+                <p>{provider.mobile || "N/A"}</p>
+              </div>
 
-          <div className="profile-field">
-            <label>Status</label>
-            <span className="request-status accepted" style={{ display: "inline-block" }}>
-              {provider.status || "Active"}
-            </span>
-          </div>
+              <div className="profile-field">
+                <label>Service Category</label>
+                <p>{provider.serviceCategory}</p>
+              </div>
+
+              <div className="profile-field">
+                <label>Location</label>
+                <p>{resolvedAddress || provider.address || provider.locality || "N/A"}</p>
+                <button
+                  className="profile-location-btn"
+                  onClick={() => setShowLocationModal(true)}
+                >
+                  Change Location
+                </button>
+              </div>
+
+              <div className="profile-field">
+                <label>Remove Account</label>
+                <p>If you want to stop providing services, you can request removal.</p>
+                <button
+                  className="profile-remove-btn"
+                  onClick={() => setShowRemovalModal(true)}
+                >
+                  Request Removal
+                </button>
+              </div>
+
+              <div className="profile-field">
+                <label>Experience</label>
+                <p>{provider.experience || "N/A"}</p>
+              </div>
+
+              <div className="profile-field">
+                <label>Status</label>
+                <span className="request-status accepted" style={{ display: "inline-block" }}>
+                  {provider.status || "Active"}
+                </span>
+              </div>
+            </>
+          )}
+
+          {profileTab === "payment" && (
+            <>
+              <div className="profile-field">
+                <label>Payment Profile Status</label>
+                <span className={`request-status ${paymentDetailsCompleted ? "accepted" : "pending"}`} style={{ display: "inline-block" }}>
+                  {paymentDetailsCompleted ? "Complete" : "Incomplete"}
+                </span>
+              </div>
+
+              <div className="profile-field">
+                <label>Account Holder Name</label>
+                <p>{paymentDetails?.accountHolderName || "N/A"}</p>
+              </div>
+
+              <div className="profile-field">
+                <label>Account Number</label>
+                <p>{paymentDetails?.accountNumber || "N/A"}</p>
+              </div>
+
+              <div className="profile-field">
+                <label>IFSC Code</label>
+                <p>{paymentDetails?.ifscCode || "N/A"}</p>
+              </div>
+
+              <div className="profile-field">
+                <label>UPI ID</label>
+                <p>{paymentDetails?.upiId || "N/A"}</p>
+              </div>
+
+              <div className="profile-field">
+                <label>PAN Number</label>
+                <p>{paymentDetails?.panNumber || "N/A"}</p>
+              </div>
+
+              {!paymentDetailsCompleted && (
+                <div className="profile-field">
+                  <p>Add your payment details from dashboard popup to receive payouts without delay.</p>
+                </div>
+              )}
+            </>
+          )}
         </div>
 
         <div className="profile-footer">

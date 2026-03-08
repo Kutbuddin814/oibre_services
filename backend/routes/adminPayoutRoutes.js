@@ -3,6 +3,7 @@ const router = express.Router();
 const ServiceRequest = require("../models/ServiceRequest");
 const ServiceProvider = require("../models/ServiceProvider");
 const adminAuth = require("../middleware/adminAuth");
+const { sendBrevoEmail } = require("../utils/sendEmail");
 
 const COMMISSION_PERCENTAGE = 10; // 10% commission
 const PENDING_PAYOUT_MATCH = {
@@ -117,7 +118,10 @@ router.get("/history", adminAuth, async (req, res) => {
         }
       },
       {
-        $unwind: "$provider"
+        $unwind: {
+          path: "$provider",
+          preserveNullAndEmptyArrays: true
+        }
       },
       {
         $project: {
@@ -125,7 +129,10 @@ router.get("/history", adminAuth, async (req, res) => {
           bookingId: "$_id",
           providerId: 1,
           providerName: 1,
-          providerEmail: "$provider.email",
+          providerEmail: { $ifNull: ["$provider.email", ""] },
+          providerPhone: { $ifNull: ["$provider.mobile", ""] },
+          paymentDetails: { $ifNull: ["$provider.paymentDetails", null] },
+          paymentDetailsCompleted: { $ifNull: ["$provider.paymentDetailsCompleted", false] },
           serviceCategory: 1,
           finalPrice: 1,
           commission: 1,
@@ -220,8 +227,6 @@ router.put("/:bookingId/mark-paid", adminAuth, async (req, res) => {
 
     await booking.save();
 
-    // TODO: In future, send email to provider confirming payout
-
     res.json({
       success: true,
       message: "Payout marked as paid successfully",
@@ -239,6 +244,117 @@ router.put("/:bookingId/mark-paid", adminAuth, async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error marking payout as paid",
+      error: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/admin/payouts/:bookingId/remind-payment-details
+ * Send reminder email to provider to add bank/payment details
+ */
+router.post("/:bookingId/remind-payment-details", adminAuth, async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+
+    const booking = await ServiceRequest.findById(bookingId).select(
+      "providerId providerName serviceCategory"
+    );
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found"
+      });
+    }
+
+    const provider = await ServiceProvider.findById(booking.providerId).select(
+      "name email paymentDetailsCompleted"
+    );
+
+    if (!provider || !provider.email) {
+      return res.status(404).json({
+        success: false,
+        message: "Provider email not found"
+      });
+    }
+
+    if (provider.paymentDetailsCompleted) {
+      return res.status(400).json({
+        success: false,
+        message: "Provider has already completed payment details"
+      });
+    }
+
+    const providerPortalUrl = process.env.PROVIDER_APP_URL || "https://oibre-services-provider-web-fronten.vercel.app";
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fb; margin: 0; padding: 0; }
+            .container { max-width: 620px; margin: 24px auto; }
+            .header { background: #1f2937; color: #fff; padding: 28px 24px; border-radius: 10px 10px 0 0; text-align: center; }
+            .logo { font-size: 34px; font-weight: 700; margin: 0; }
+            .badge { display: inline-block; margin-top: 12px; background: #f59e0b; color: #fff; padding: 8px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+            .content { background: #fff; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px; padding: 24px; }
+            .title { margin: 0 0 12px; color: #111827; font-size: 22px; font-weight: 700; }
+            .subtitle { margin: 0 0 16px; color: #4b5563; font-size: 15px; line-height: 1.6; }
+            .warn { background: #fffbeb; border-left: 4px solid #f59e0b; border-radius: 0 8px 8px 0; padding: 12px 14px; margin: 16px 0; color: #92400e; font-size: 14px; }
+            .cta-wrap { text-align: center; margin: 22px 0 8px; }
+            .cta { display: inline-block; background: #2563eb; color: #fff !important; text-decoration: none; padding: 12px 22px; border-radius: 8px; font-weight: 700; }
+            .footer { margin-top: 16px; border-top: 1px solid #e5e7eb; padding-top: 14px; color: #6b7280; font-size: 12px; line-height: 1.6; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1 class="logo">Oibre</h1>
+              <div class="badge">Payment Details Needed</div>
+            </div>
+            <div class="content">
+              <h2 class="title">Hi ${provider.name || booking.providerName || "Provider"},</h2>
+              <p class="subtitle">Please add your bank/payment details to receive payouts for completed services.</p>
+              <div class="warn">
+                Your booking payout cannot be processed until account details are completed.
+                <br />Service: <strong>${booking.serviceCategory || "Service"}</strong>
+              </div>
+              <div class="cta-wrap">
+                <a class="cta" href="${providerPortalUrl}/profile">Open Profile & Add Details</a>
+              </div>
+              <div class="footer">
+                This is an automated reminder from Oibre Admin.<br />
+                Add account holder name, account number, IFSC and UPI (if available).
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    const sent = await sendBrevoEmail({
+      to: provider.email,
+      subject: "Action Required: Add Your Payment Details - Oibre",
+      html
+    });
+
+    if (!sent?.sent) {
+      return res.status(500).json({
+        success: false,
+        message: sent?.reason || "Failed to send reminder email"
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Reminder email sent to provider"
+    });
+  } catch (error) {
+    console.error("Send Payment Reminder Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error sending reminder email",
       error: error.message
     });
   }

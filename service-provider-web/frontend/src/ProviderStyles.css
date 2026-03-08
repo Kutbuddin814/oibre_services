@@ -701,6 +701,30 @@ body {
   padding: 30px 20px;
 }
 
+.profile-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.profile-tab-btn {
+  border: 1px solid var(--gray-200);
+  background: #ffffff;
+  color: var(--gray-700);
+  font-weight: 700;
+  font-size: 13px;
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.profile-tab-btn.active {
+  background: var(--primary-color);
+  color: #ffffff;
+  border-color: var(--primary-color);
+}
+
 .profile-field {
   margin-bottom: 18px;
 }

@@ -265,6 +265,39 @@
   font-size: 12px;
 }
 
+.payment-details-list {
+  margin-top: 8px;
+  display: grid;
+  gap: 6px;
+}
+
+.payment-detail-row {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  align-items: center;
+  gap: 6px;
+}
+
+.payment-detail-label {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.payment-detail-value {
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.payment-detail-value.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+}
+
 .mark-paid-btn {
   border: none;
   border-radius: 10px;
@@ -288,6 +321,32 @@
   color: #b91c1c;
   font-size: 12px;
   font-weight: 700;
+}
+
+.action-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.send-reminder-btn {
+  border: 1px solid #fed7aa;
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: #fff7ed;
+  color: #9a3412;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.send-reminder-btn:hover {
+  background: #ffedd5;
+}
+
+.send-reminder-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .payouts-loading {
