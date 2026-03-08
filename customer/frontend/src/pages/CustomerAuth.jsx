@@ -397,15 +397,25 @@ export default function CustomerAuth() {
             </>
           )}
 
-          <label htmlFor="customerMobile" className="form-field-label">Mobile Number</label>
+          <label htmlFor="customerMobile" className="form-field-label">Mobile Number *</label>
           <input
             id="customerMobile"
             name="mobile"
-            placeholder="Mobile Number"
+            placeholder="+91 98765 43210"
             value={form.mobile}
-            onChange={handleChange}
+            onChange={(e) => {
+              let value = e.target.value.replace(/\D/g, '').slice(0, 10);
+              if (value.length > 0) {
+                // Allow any 10 digits for now, validation happens on backend
+                handleChange({ target: { name: 'mobile', value } });
+              } else if (e.target.value === '') {
+                handleChange({ target: { name: 'mobile', value: '' } });
+              }
+            }}
             required
             className="customer-email-input"
+            maxLength="10"
+            title="Enter a valid 10-digit Indian phone number (starting with 6-9)"
           />
 
           {!googleUser && (

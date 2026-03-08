@@ -3,7 +3,15 @@ import api from "../config/axios";
 import "../styles/ProviderRegister.css";
 
 /* VALIDATION HELPERS */
-const isValidMobile = (mobile) => /^[6-9]\d{9}$/.test(mobile);
+// Validate Indian phone number format
+const isValidMobile = (mobile) => {
+  // Accept: 10-digit number starting with 6-9, or +91 prefix
+  const normalized = String(mobile || "").trim();
+  if (normalized.startsWith("+91")) {
+    return /^\+91[6-9]\d{9}$/.test(normalized);
+  }
+  return /^[6-9]\d{9}$/.test(normalized);
+};
 const isValidName = (name) => /^[A-Za-z\s]{3,50}$/.test(name);
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -680,14 +688,21 @@ const ProviderRegister = ({ onSuccess }) => {
             </>
           )}
 
-          <label className="form-field-label" htmlFor="provider-mobile">Mobile Number</label>
+          <label className="form-field-label" htmlFor="provider-mobile">Mobile Number *</label>
           <input
             id="provider-mobile"
             name="mobile"
-            placeholder="Mobile Number (10 digits)"
+            placeholder="+91 98765 43210"
             value={formData.mobile}
-            onChange={(e) => /^\d{0,10}$/.test(e.target.value) && handleChange(e)}
+            onChange={(e) => {
+              let value = e.target.value.replace(/\D/g, '').slice(0, 10);
+              if (value.length > 0 || e.target.value === '') {
+                handleChange({ target: { name: 'mobile', value } });
+              }
+            }}
             required
+            maxLength="10"
+            title="Enter a valid 10-digit Indian phone number starting with 6-9"
           />
 
           <label className="form-field-label" htmlFor="provider-qualification">Qualification</label>

@@ -6,6 +6,7 @@ const RemovalRequest = require("../models/RemovalRequest");
 const EmailOtp = require("../models/EmailOtp");
 const authMiddleware = require("../middleware/authMiddleware");
 const { upload } = require("../middleware/upload");
+const { validateAndNormalizePhone, getPhoneErrorMessage } = require("../utils/phoneValidation");
 
 const router = express.Router();
 const OTP_TTL_MS = 10 * 60 * 1000;
@@ -40,16 +41,16 @@ router.put("/me", authMiddleware, upload.fields([
   try {
     const { mobile, experience, availableTime } = req.body;
 
-    const nextMobile = String(mobile || "").trim();
+    const validatedMobile = validateAndNormalizePhone(mobile);
+    if (!validatedMobile) {
+      return res.status(400).json({ message: getPhoneErrorMessage() });
+    }
+
     const nextExperience = String(experience || "").trim();
     const nextAvailableTime = String(availableTime || "").trim();
 
-    if (!/^[6-9]\d{9}$/.test(nextMobile)) {
-      return res.status(400).json({ message: "Please enter a valid 10-digit mobile number" });
-    }
-
     const mobileTaken = await ServiceProvider.findOne({
-      mobile: nextMobile,
+      mobile: validatedMobile,
       _id: { $ne: req.providerId }
     });
 
@@ -58,7 +59,7 @@ router.put("/me", authMiddleware, upload.fields([
     }
 
     const updateData = {
-      mobile: nextMobile,
+      mobile: validatedMobile,
       experience: nextExperience,
       availableTime: nextAvailableTime
     };

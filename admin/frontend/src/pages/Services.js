@@ -6,7 +6,6 @@ const Services = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [addingDefaults, setAddingDefaults] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -18,28 +17,23 @@ const Services = () => {
 
   const commonIcons = ["\uD83D\uDD27", "\uD83E\uDDF9", "\uD83D\uDCA1", "\uD83D\uDEB0", "\uD83C\uDFA8", "\uD83D\uDD28", "\uD83E\uDDF2", "\u26A1", "\uD83D\uDEE0\uFE0F", "\uD83E\uDEF1", "\uD83E\uDDF0"];
 
-  const defaultServices = [
-  { name: "Electrician", icon: "\u26A1", description: "Wiring, fixtures, and electrical repairs" },
-  { name: "Plumber", icon: "\uD83D\uDD27", description: "Leak fixes, fittings, and pipe services" },
-  { name: "Cleaning", icon: "\uD83E\uDDF9", description: "Home and office cleaning services" },
-  { name: "Taxi", icon: "\uD83D\uDE95", description: "Local pickup, drop, and city rides" },
-  { name: "Carpenter", icon: "\uD83E\uDE9A", description: "Furniture repair and woodwork" },
-  { name: "Mechanic", icon: "\uD83D\uDD29", description: "Vehicle repair and servicing" },
-  { name: "AC Service", icon: "\uD83D\uDCA8", description: "AC installation and maintenance" },
-  { name: "Appliance Repair", icon: "\uD83D\uDEE0\uFE0F", description: "Repair for home appliances" },
-  { name: "Painter", icon: "\uD83C\uDFA8", description: "Interior and exterior painting" },
-  { name: "Pest Control", icon: "\uD83D\uDC1C", description: "Pest removal and prevention" },
-  { name: "Laundry", icon: "\uD83E\uDDFA", description: "Wash, iron, and dry-clean services" },
-  { name: "Salon at Home", icon: "\uD83D\uDC87", description: "Salon and grooming at home" },
-  { name: "Tutor", icon: "\uD83D\uDCDA", description: "Home tutoring and coaching" },
-  { name: "Babysitter", icon: "\uD83D\uDC76", description: "Child care and babysitting" },
-  { name: "Mover & Packer", icon: "\uD83D\uDCE6", description: "Packing and moving services" }
-];
-
-  const serviceIconFallbacks = defaultServices.reduce((acc, item) => {
-    acc[item.name] = item.icon;
-    return acc;
-  }, {});
+  const serviceIconFallbacks = {
+    "Electrician": "\u26A1",
+    "Plumber": "\uD83D\uDD27",
+    "Cleaning": "\uD83E\uDDF9",
+    "Taxi": "\uD83D\uDE95",
+    "Carpenter": "\uD83E\uDE9A",
+    "Mechanic": "\uD83D\uDD29",
+    "AC Service": "\uD83D\uDCA8",
+    "Appliance Repair": "\uD83D\uDEE0\uFE0F",
+    "Painter": "\uD83C\uDFA8",
+    "Pest Control": "\uD83D\uDC1C",
+    "Laundry": "\uD83E\uDDFA",
+    "Salon at Home": "\uD83D\uDC87",
+    "Tutor": "\uD83D\uDCDA",
+    "Babysitter": "\uD83D\uDC76",
+    "Mover & Packer": "\uD83D\uDCE6"
+  };
 
   const getServiceIcon = (service) => {
     const raw = service?.icon || "";
@@ -73,44 +67,6 @@ const Services = () => {
     setIconFile(null);
     setIconPreview("");
     setShowModal(true);
-  };
-
-  const handleAddCommonServices = async () => {
-    setError("");
-    const normalize = (name) => name.trim().toLowerCase();
-    const existingNames = new Set(services.map((s) => normalize(s.name)));
-    const toAdd = defaultServices.filter(
-      (service) => !existingNames.has(normalize(service.name))
-    );
-
-    if (toAdd.length === 0) {
-      setError("All common services are already added.");
-      return;
-    }
-
-    try {
-      setAddingDefaults(true);
-      for (const service of toAdd) {
-        try {
-          const payload = new FormData();
-          payload.append("name", service.name);
-          payload.append("description", service.description || "");
-          payload.append("icon", service.icon || "");
-          await api.post("/admin/services", payload, {
-            headers: { "Content-Type": "multipart/form-data" }
-          });
-        } catch (err) {
-          if (err.response?.status !== 409) {
-            throw err;
-          }
-        }
-      }
-      await fetchServices();
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to add common services");
-    } finally {
-      setAddingDefaults(false);
-    }
   };
 
   const handleEditService = (service) => {

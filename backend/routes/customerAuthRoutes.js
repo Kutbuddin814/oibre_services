@@ -7,6 +7,7 @@ const crypto = require("crypto");
 const Customer = require("../models/Customer");
 const EmailOtp = require("../models/EmailOtp");
 const customerAuth = require("../middleware/customerAuth");
+const { validateAndNormalizePhone, getPhoneErrorMessage } = require("../utils/phoneValidation");
 
 const router = express.Router();
 const OTP_TTL_MS = 10 * 60 * 1000;
@@ -257,10 +258,10 @@ router.post("/register", async (req, res) => {
   try {
     const { name, email, mobile, password, locality, address, emailOtpId } = req.body;
     const cleanEmail = normalizeEmail(email);
-    const cleanMobile = String(mobile || "").trim();
+    const normalizedMobile = validateAndNormalizePhone(mobile);
 
-    if (!cleanMobile) {
-      return res.status(400).json({ message: "Mobile is required" });
+    if (!normalizedMobile) {
+      return res.status(400).json({ message: getPhoneErrorMessage() });
     }
 
     // Check if email is blacklisted
@@ -274,7 +275,7 @@ router.post("/register", async (req, res) => {
       }
     }
 
-    if (await Customer.findOne({ mobile: cleanMobile })) {
+    if (await Customer.findOne({ mobile: normalizedMobile })) {
       return res.status(400).json({ message: "Mobile already registered" });
     }
 
@@ -316,7 +317,7 @@ router.post("/register", async (req, res) => {
     const customer = new Customer({
       name,
       email: cleanEmail || null,
-      mobile: cleanMobile,
+      mobile: normalizedMobile,
       password: hashedPassword,
       locality,
       address,
@@ -445,9 +446,10 @@ router.put("/profile", customerAuth, async (req, res) => {
       });
     }
 
-    if (!/^[6-9]\d{9}$/.test(nextMobile)) {
+    const validatedMobile = validateAndNormalizePhone(nextMobile);
+    if (!validatedMobile) {
       return res.status(400).json({
-        message: "Mobile number must be a valid 10-digit Indian number"
+        message: getPhoneErrorMessage()
       });
     }
 
@@ -464,7 +466,7 @@ router.put("/profile", customerAuth, async (req, res) => {
 
     const duplicateMobile = await Customer.findOne({
       _id: { $ne: customer._id },
-      mobile: nextMobile
+      mobile: validatedMobile
     });
     if (duplicateMobile) {
       return res.status(409).json({ message: "Mobile number already in use" });
@@ -498,7 +500,7 @@ router.put("/profile", customerAuth, async (req, res) => {
 
     customer.name = nextName;
     customer.email = nextEmail || null;
-    customer.mobile = nextMobile;
+    customer.mobile = validatedMobile;
     customer.address = nextAddress;
 
     await customer.save();

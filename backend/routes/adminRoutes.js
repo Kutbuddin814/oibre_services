@@ -270,18 +270,78 @@ router.post("/users/:id/ban", adminAuth, async (req, res) => {
     // Send ban email
     if (user.email) {
       const { sendBrevoEmail } = require("../utils/sendEmail");
-      const subject = "Account Banned - Oibre";
+      const subject = "Oibre Customer Account Banned";
       const html = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #dc2626;">Account Banned</h2>
-          <p>Dear ${user.name || "Customer"},</p>
-          <p>Your account has been banned from the Oibre platform.</p>
-          <div style="background: #fee2e2; border-left: 4px solid #dc2626; padding: 15px; margin: 20px 0;">
-            <strong>Reason:</strong> ${user.banReason}
-          </div>
-          <p>If you believe this is a mistake, please contact support.</p>
-          <p>Best regards,<br>Oibre Team</p>
-        </div>
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 40px 20px;">
+            <tr>
+              <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); overflow: hidden;">
+                  <!-- Header -->
+                  <tr>
+                    <td style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); padding: 40px 30px; text-align: center;">
+                      <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">⚠️ Account Banned</h1>
+                      <p style="margin: 10px 0 0 0; color: #fee2e2; font-size: 14px; font-weight: 500;">Oibre Customer Platform</p>
+                    </td>
+                  </tr>
+                  
+                  <!-- Content -->
+                  <tr>
+                    <td style="padding: 40px 30px;">
+                      <p style="margin: 0 0 20px 0; font-size: 16px; color: #111827; line-height: 1.6;">
+                        Dear <strong>${user.name || "Customer"}</strong>,
+                      </p>
+                      
+                      <p style="margin: 0 0 25px 0; font-size: 15px; color: #374151; line-height: 1.6;">
+                        Your <strong>Oibre Customer Account</strong> has been temporarily banned from accessing our platform.
+                      </p>
+                      
+                      <!-- Reason Box -->
+                      <div style="background: #fee2e2; border-left: 4px solid #dc2626; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0;">
+                        <p style="margin: 0 0 8px 0; font-size: 12px; color: #991b1b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Ban Reason</p>
+                        <p style="margin: 0; font-size: 15px; color: #7f1d1d; font-weight: 600; line-height: 1.5;">
+                          ${user.banReason}
+                        </p>
+                      </div>
+                      
+                      <p style="margin: 0 0 20px 0; font-size: 14px; color: #6b7280; line-height: 1.6;">
+                        <strong>What this means:</strong><br>
+                        • You cannot login to your customer account<br>
+                        • You cannot book new services<br>
+                        • Your existing bookings may be affected<br>
+                        • Your account data is preserved
+                      </p>
+                      
+                      <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 25px 0; border-radius: 0 6px 6px 0;">
+                        <p style="margin: 0; font-size: 13px; color: #92400e; line-height: 1.5;">
+                          <strong>📧 Appeal Process:</strong> If you believe this ban is a mistake or would like to appeal, please contact our support team immediately at <a href="mailto:support@oibre.com" style="color: #d97706; text-decoration: underline;">support@oibre.com</a>
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
+                  
+                  <!-- Footer -->
+                  <tr>
+                    <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
+                      <p style="margin: 0 0 8px 0; font-size: 14px; color: #111827; font-weight: 600;">Oibre</p>
+                      <p style="margin: 0 0 12px 0; font-size: 12px; color: #6b7280;">Your Local Services Platform</p>
+                      <p style="margin: 0; font-size: 11px; color: #9ca3af;">
+                        This is an automated email from the Oibre Customer Platform. Please do not reply to this message.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
       `;
       sendBrevoEmail({ to: user.email, subject, html }).catch(err => 
         console.error("Ban email error:", err)
@@ -320,15 +380,84 @@ router.post("/users/:id/unban", adminAuth, async (req, res) => {
     // Send unban email
     if (user.email) {
       const { sendBrevoEmail } = require("../utils/sendEmail");
-      const subject = "Account Unbanned - Oibre";
+      const subject = "Oibre Customer Account Restored";
       const html = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #059669;">Account Unbanned</h2>
-          <p>Dear ${user.name || "Customer"},</p>
-          <p>Good news! Your account has been unbanned and you can now access the Oibre platform again.</p>
-          <p>Please ensure you follow our terms and conditions to avoid future issues.</p>
-          <p>Best regards,<br>Oibre Team</p>
-        </div>
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 40px 20px;">
+            <tr>
+              <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); overflow: hidden;">
+                  <!-- Header -->
+                  <tr>
+                    <td style="background: linear-gradient(135deg, #059669 0%, #047857 100%); padding: 40px 30px; text-align: center;">
+                      <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">✅ Account Restored</h1>
+                      <p style="margin: 10px 0 0 0; color: #d1fae5; font-size: 14px; font-weight: 500;">Oibre Customer Platform</p>
+                    </td>
+                  </tr>
+                  
+                  <!-- Content -->
+                  <tr>
+                    <td style="padding: 40px 30px;">
+                      <p style="margin: 0 0 20px 0; font-size: 16px; color: #111827; line-height: 1.6;">
+                        Dear <strong>${user.name || "Customer"}</strong>,
+                      </p>
+                      
+                      <div style="background: #d1fae5; border-left: 4px solid #059669; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0;">
+                        <p style="margin: 0 0 8px 0; font-size: 12px; color: #065f46; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🎉 Good News!</p>
+                        <p style="margin: 0; font-size: 15px; color: #047857; font-weight: 600; line-height: 1.5;">
+                          Your <strong>Oibre Customer Account</strong> has been unbanned and fully restored.
+                        </p>
+                      </div>
+                      
+                      <p style="margin: 0 0 20px 0; font-size: 15px; color: #374151; line-height: 1.6;">
+                        You can now access all platform features including:
+                      </p>
+                      
+                      <p style="margin: 0 0 20px 0; font-size: 14px; color: #6b7280; line-height: 1.6;">
+                        ✓ Login to your customer account<br>
+                        ✓ Book services from providers<br>
+                        ✓ View and manage your bookings<br>
+                        ✓ Access your complete account history
+                      </p>
+                      
+                      <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 25px 0; border-radius: 0 6px 6px 0;">
+                        <p style="margin: 0; font-size: 13px; color: #92400e; line-height: 1.5;">
+                          <strong>⚠️ Important Reminder:</strong> Please ensure you follow our terms and conditions to avoid any future issues. Repeated violations may result in permanent account suspension.
+                        </p>
+                      </div>
+                      
+                      <div style="text-align: center; margin: 30px 0 20px 0;">
+                        <a href="https://oibre-customer-frontend.vercel.app" style="display: inline-block; background: #059669; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 15px;">Access Your Account</a>
+                      </div>
+                      
+                      <p style="margin: 20px 0 0 0; font-size: 13px; color: #6b7280; line-height: 1.6; text-align: center;">
+                        Thank you for being part of the Oibre community!
+                      </p>
+                    </td>
+                  </tr>
+                  
+                  <!-- Footer -->
+                  <tr>
+                    <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
+                      <p style="margin: 0 0 8px 0; font-size: 14px; color: #111827; font-weight: 600;">Oibre</p>
+                      <p style="margin: 0 0 12px 0; font-size: 12px; color: #6b7280;">Your Local Services Platform</p>
+                      <p style="margin: 0; font-size: 11px; color: #9ca3af;">
+                        This is an automated email from the Oibre Customer Platform. Please do not reply to this message.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
       `;
       sendBrevoEmail({ to: user.email, subject, html }).catch(err => 
         console.error("Unban email error:", err)
@@ -376,19 +505,90 @@ router.delete("/users/:id", adminAuth, async (req, res) => {
     // Send deletion email
     if (userEmail) {
       const { sendBrevoEmail } = require("../utils/sendEmail");
-      const subject = "Account Deleted - Oibre";
+      const subject = "Oibre Customer Account Permanently Deleted";
       const html = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #dc2626;">Account Permanently Deleted</h2>
-          <p>Dear ${userName || "Customer"},</p>
-          <p>Your account has been permanently deleted from the Oibre platform.</p>
-          <div style="background: #fee2e2; border-left: 4px solid #dc2626; padding: 15px; margin: 20px 0;">
-            <strong>Reason:</strong> ${deleteReason}
-          </div>
-          <p><strong>Important:</strong> This email address has been permanently blacklisted and cannot be used to create a new account on any Oibre platform (customer, service provider, or admin).</p>
-          <p>If you believe this is a mistake, please contact support immediately.</p>
-          <p>Best regards,<br>Oibre Team</p>
-        </div>
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 40px 20px;">
+            <tr>
+              <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); overflow: hidden;">
+                  <!-- Header -->
+                  <tr>
+                    <td style="background: linear-gradient(135deg, #7f1d1d 0%, #450a0a 100%); padding: 40px 30px; text-align: center;">
+                      <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">🚫 Account Deleted</h1>
+                      <p style="margin: 10px 0 0 0; color: #fecaca; font-size: 14px; font-weight: 500;">Oibre Customer Platform</p>
+                    </td>
+                  </tr>
+                  
+                  <!-- Content -->
+                  <tr>
+                    <td style="padding: 40px 30px;">
+                      <p style="margin: 0 0 20px 0; font-size: 16px; color: #111827; line-height: 1.6;">
+                        Dear <strong>${userName || "Customer"}</strong>,
+                      </p>
+                      
+                      <p style="margin: 0 0 25px 0; font-size: 15px; color: #374151; line-height: 1.6;">
+                        Your <strong>Oibre Customer Account</strong> has been permanently deleted from our platform.
+                      </p>
+                      
+                      <!-- Reason Box -->
+                      <div style="background: #fee2e2; border-left: 4px solid #dc2626; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0;">
+                        <p style="margin: 0 0 8px 0; font-size: 12px; color: #991b1b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Deletion Reason</p>
+                        <p style="margin: 0; font-size: 15px; color: #7f1d1d; font-weight: 600; line-height: 1.5;">
+                          ${deleteReason}
+                        </p>
+                      </div>
+                      
+                      <!-- Critical Warning Box -->
+                      <div style="background: #450a0a; border: 2px solid #dc2626; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                        <p style="margin: 0 0 12px 0; font-size: 14px; color: #fef2f2; font-weight: 700; text-align: center;">⚠️ PERMANENT BLACKLIST NOTICE ⚠️</p>
+                        <p style="margin: 0; font-size: 13px; color: #fecaca; line-height: 1.6; text-align: center;">
+                          Your email address <strong style="color: #ffffff;">${userEmail}</strong> has been permanently blacklisted.
+                        </p>
+                      </div>
+                      
+                      <p style="margin: 0 0 15px 0; font-size: 14px; color: #111827; font-weight: 600;">This means:</p>
+                      <p style="margin: 0 0 20px 0; font-size: 14px; color: #6b7280; line-height: 1.8;">
+                        ❌ You cannot create a new <strong>Oibre Customer</strong> account<br>
+                        ❌ You cannot register as an <strong>Oibre Service Provider</strong><br>
+                        ❌ You cannot access <strong>any Oibre platform</strong> with this email<br>
+                        ❌ This action is <strong style="color: #dc2626;">permanent and irreversible</strong>
+                      </p>
+                      
+                      <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 25px 0; border-radius: 0 6px 6px 0;">
+                        <p style="margin: 0; font-size: 13px; color: #92400e; line-height: 1.5;">
+                          <strong>📧 Appeal Process:</strong> If you believe this deletion is an error, please contact our support team immediately at <a href="mailto:support@oibre.com" style="color: #d97706; text-decoration: underline;">support@oibre.com</a> with your account details.
+                        </p>
+                      </div>
+                      
+                      <p style="margin: 25px 0 0 0; font-size: 13px; color: #9ca3af; line-height: 1.6; text-align: center;">
+                        All your account data, bookings, and history have been permanently removed from our systems.
+                      </p>
+                    </td>
+                  </tr>
+                  
+                  <!-- Footer -->
+                  <tr>
+                    <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
+                      <p style="margin: 0 0 8px 0; font-size: 14px; color: #111827; font-weight: 600;">Oibre</p>
+                      <p style="margin: 0 0 12px 0; font-size: 12px; color: #6b7280;">Your Local Services Platform</p>
+                      <p style="margin: 0; font-size: 11px; color: #9ca3af;">
+                        This is an automated email from the Oibre Customer Platform. Please do not reply to this message.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
       `;
       sendBrevoEmail({ to: userEmail, subject, html }).catch(err => 
         console.error("Deletion email error:", err)
@@ -803,14 +1003,192 @@ router.patch("/contact-messages/:id/status", async (req, res) => {
       return res.status(400).json({ message: "Invalid status" });
     }
 
+    // Get the original message to check old status
+    const originalMessage = await ContactMessage.findById(req.params.id);
+    if (!originalMessage) {
+      return res.status(404).json({ message: "Contact message not found" });
+    }
+
+    const oldStatus = originalMessage.status;
+    const newStatus = String(status);
+
     const updated = await ContactMessage.findByIdAndUpdate(
       req.params.id,
-      { status: String(status) },
+      { status: newStatus },
       { new: true }
     );
 
-    if (!updated) {
-      return res.status(404).json({ message: "Contact message not found" });
+    // Send email notification based on status change
+    if (updated && updated.email && oldStatus !== newStatus) {
+      const { sendBrevoEmail } = require("../utils/sendEmail");
+
+      // Case 1: Message closed
+      if (newStatus === "closed" && oldStatus !== "closed") {
+        const subject = "Your Oibre Support Request Has Been Closed";
+        const html = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          </head>
+          <body style="margin: 0; padding: 0; background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 40px 20px;">
+              <tr>
+                <td align="center">
+                  <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); overflow: hidden;">
+                    <!-- Header -->
+                    <tr>
+                      <td style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); padding: 40px 30px; text-align: center;">
+                        <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">✅ Support Request Closed</h1>
+                        <p style="margin: 10px 0 0 0; color: #e0e7ff; font-size: 14px; font-weight: 500;">Oibre Support Team</p>
+                      </td>
+                    </tr>
+                    
+                    <!-- Content -->
+                    <tr>
+                      <td style="padding: 40px 30px;">
+                        <p style="margin: 0 0 20px 0; font-size: 16px; color: #111827; line-height: 1.6;">
+                          Dear <strong>${updated.name || "Valued Customer"}</strong>,
+                        </p>
+                        
+                        <div style="background: #dbeafe; border-left: 4px solid #3b82f6; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0;">
+                          <p style="margin: 0 0 8px 0; font-size: 12px; color: #1e40af; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Status Update</p>
+                          <p style="margin: 0; font-size: 15px; color: #1e3a8a; font-weight: 600; line-height: 1.5;">
+                            Your support request has been marked as <strong>CLOSED</strong>.
+                          </p>
+                        </div>
+                        
+                        <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 20px; margin: 25px 0; border-radius: 8px;">
+                          <p style="margin: 0 0 8px 0; font-size: 12px; color: #6b7280; font-weight: 600;">Your Original Message:</p>
+                          <p style="margin: 0 0 10px 0; font-size: 14px; color: #111827; font-weight: 600;">${updated.subject || "No Subject"}</p>
+                          <p style="margin: 0; font-size: 13px; color: #374151; line-height: 1.5;">${updated.message?.substring(0, 200) || ""}${updated.message?.length > 200 ? "..." : ""}</p>
+                        </div>
+                        
+                        <p style="margin: 0 0 20px 0; font-size: 14px; color: #374151; line-height: 1.6;">
+                          We believe your issue has been addressed. If you need further assistance or would like to reopen this request, please reply to this email or contact us again.
+                        </p>
+                        
+                        <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 25px 0; border-radius: 0 6px 6px 0;">
+                          <p style="margin: 0; font-size: 13px; color: #92400e; line-height: 1.5;">
+                            <strong>📧 Need More Help?</strong> Reply to this email or contact us at <a href="mailto:support@oibre.com" style="color: #d97706; text-decoration: underline;">support@oibre.com</a>
+                          </p>
+                        </div>
+                        
+                        <p style="margin: 25px 0 0 0; font-size: 13px; color: #6b7280; line-height: 1.6; text-align: center;">
+                          Thank you for contacting Oibre. We appreciate your patience!
+                        </p>
+                      </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                      <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
+                        <p style="margin: 0 0 8px 0; font-size: 14px; color: #111827; font-weight: 600;">Oibre</p>
+                        <p style="margin: 0 0 12px 0; font-size: 12px; color: #6b7280;">Your Local Services Platform</p>
+                        <p style="margin: 0; font-size: 11px; color: #9ca3af;">
+                          This is an automated notification from Oibre Support.
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </body>
+          </html>
+        `;
+        sendBrevoEmail({ to: updated.email, subject, html }).catch(err => 
+          console.error("Contact closed email error:", err)
+        );
+      }
+
+      // Case 2: Message reopened (was closed, now changed to new or in_progress)
+      if (oldStatus === "closed" && newStatus !== "closed") {
+        const subject = "Your Oibre Support Request Has Been Reopened";
+        const html = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          </head>
+          <body style="margin: 0; padding: 0; background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 40px 20px;">
+              <tr>
+                <td align="center">
+                  <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); overflow: hidden;">
+                    <!-- Header -->
+                    <tr>
+                      <td style="background: linear-gradient(135deg, #059669 0%, #047857 100%); padding: 40px 30px; text-align: center;">
+                        <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">🔄 Support Request Reopened</h1>
+                        <p style="margin: 10px 0 0 0; color: #d1fae5; font-size: 14px; font-weight: 500;">Oibre Support Team</p>
+                      </td>
+                    </tr>
+                    
+                    <!-- Content -->
+                    <tr>
+                      <td style="padding: 40px 30px;">
+                        <p style="margin: 0 0 20px 0; font-size: 16px; color: #111827; line-height: 1.6;">
+                          Dear <strong>${updated.name || "Valued Customer"}</strong>,
+                        </p>
+                        
+                        <div style="background: #d1fae5; border-left: 4px solid #059669; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0;">
+                          <p style="margin: 0 0 8px 0; font-size: 12px; color: #065f46; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Status Update</p>
+                          <p style="margin: 0; font-size: 15px; color: #047857; font-weight: 600; line-height: 1.5;">
+                            Your support request has been <strong>REOPENED</strong> and our team is reviewing it.
+                          </p>
+                        </div>
+                        
+                        <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 20px; margin: 25px 0; border-radius: 8px;">
+                          <p style="margin: 0 0 8px 0; font-size: 12px; color: #6b7280; font-weight: 600;">Your Original Message:</p>
+                          <p style="margin: 0 0 10px 0; font-size: 14px; color: #111827; font-weight: 600;">${updated.subject || "No Subject"}</p>
+                          <p style="margin: 0; font-size: 13px; color: #374151; line-height: 1.5;">${updated.message?.substring(0, 200) || ""}${updated.message?.length > 200 ? "..." : ""}</p>
+                        </div>
+                        
+                        <p style="margin: 0 0 20px 0; font-size: 14px; color: #374151; line-height: 1.6;">
+                          We're taking another look at your request. Our support team will review the details and get back to you as soon as possible.
+                        </p>
+                        
+                        <div style="background: #dbeafe; border-left: 4px solid #3b82f6; padding: 15px; margin: 25px 0; border-radius: 0 6px 6px 0;">
+                          <p style="margin: 0; font-size: 13px; color: #1e3a8a; line-height: 1.5;">
+                            <strong>📌 Current Status:</strong> ${newStatus === "new" ? "New - Awaiting Review" : "In Progress - Being Handled"}
+                          </p>
+                        </div>
+                        
+                        <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 25px 0; border-radius: 0 6px 6px 0;">
+                          <p style="margin: 0; font-size: 13px; color: #92400e; line-height: 1.5;">
+                            <strong>💬 Additional Information?</strong> If you have more details to add, reply to this email or contact us at <a href="mailto:support@oibre.com" style="color: #d97706; text-decoration: underline;">support@oibre.com</a>
+                          </p>
+                        </div>
+                        
+                        <p style="margin: 25px 0 0 0; font-size: 13px; color: #6b7280; line-height: 1.6; text-align: center;">
+                          We're here to help you! Thank you for your patience.
+                        </p>
+                      </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                      <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
+                        <p style="margin: 0 0 8px 0; font-size: 14px; color: #111827; font-weight: 600;">Oibre</p>
+                        <p style="margin: 0 0 12px 0; font-size: 12px; color: #6b7280;">Your Local Services Platform</p>
+                        <p style="margin: 0; font-size: 11px; color: #9ca3af;">
+                          This is an automated notification from Oibre Support.
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </body>
+          </html>
+        `;
+        sendBrevoEmail({ to: updated.email, subject, html }).catch(err => 
+          console.error("Contact reopened email error:", err)
+        );
+      }
     }
 
     res.json({ message: "Status updated", data: updated });

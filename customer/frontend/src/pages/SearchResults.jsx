@@ -333,6 +333,9 @@ export default function SearchResults() {
             <option value="3">Up to 3 km</option>
             <option value="5">Up to 5 km</option>
             <option value="10">Up to 10 km</option>
+            <option value="25">Up to 25 km</option>
+            <option value="30">Up to 30 km</option>
+            <option value="35">Up to 35 km</option>
           </select>
 
           {/* TIME SLOT FILTER */}

@@ -197,21 +197,23 @@ const ProviderProfile = () => {
   };
 
   const handleEditProfileSave = async () => {
-    const mobile = String(editForm.mobile || "").trim();
-    const experience = String(editForm.experience || "").trim();
-    const availableTime = String(editForm.availableTime || "").trim();
-
-    if (!/^[6-9]\d{9}$/.test(mobile)) {
-      setEditError("Please enter a valid 10-digit mobile number.");
+    const validatedMobile = String(editForm.mobile || "").trim().slice(0, 10);
+    
+    // Validate: 10 digits, must start with 6-9
+    if (!/^[6-9]\d{9}$/.test(validatedMobile)) {
+      setEditError("Please enter a valid 10-digit Indian mobile number starting with 6-9.");
       return;
     }
+
+    const experience = String(editForm.experience || "").trim();
+    const availableTime = String(editForm.availableTime || "").trim();
 
     setEditError("");
     setEditSaving(true);
 
     try {
       const formData = new FormData();
-      formData.append("mobile", mobile);
+      formData.append("mobile", validatedMobile);
       formData.append("experience", experience);
       formData.append("availableTime", availableTime);
 
@@ -646,7 +648,7 @@ const ProviderProfile = () => {
             />
 
             <label className="provider-location-hint" style={{ display: "block", marginTop: 8 }}>
-              Phone Number
+              Phone Number *
             </label>
             <input
               type="text"
@@ -657,10 +659,11 @@ const ProviderProfile = () => {
               onChange={(e) =>
                 setEditForm((prev) => ({
                   ...prev,
-                  mobile: e.target.value.replace(/[^0-9]/g, "")
+                  mobile: e.target.value.replace(/[^0-9]/g, "").slice(0, 10)
                 }))
               }
-              placeholder="10-digit mobile number"
+              placeholder="+91 98765 43210"
+              title="Enter a valid 10-digit Indian mobile number starting with 6-9"
             />
 
             <label className="provider-location-hint" style={{ display: "block", marginTop: 8 }}>

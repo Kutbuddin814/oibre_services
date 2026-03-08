@@ -3,6 +3,8 @@ const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
 const mongoose = require("mongoose");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 const Review = require("../models/Review");
 const ServiceRequest = require("../models/ServiceRequest");
@@ -11,22 +13,51 @@ const customerAuth = require("../middleware/customerAuth");
 
 const router = express.Router();
 
-const reviewUploadDir = path.join(__dirname, "../uploads/reviews");
-if (!fs.existsSync(reviewUploadDir)) {
-  fs.mkdirSync(reviewUploadDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, reviewUploadDir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname || "").toLowerCase();
-    cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext || ".jpg"}`);
-  }
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
+
+// Check if Cloudinary is configured
+const isCloudinaryConfigured = Boolean(
+  process.env.CLOUDINARY_CLOUD_NAME && 
+  process.env.CLOUDINARY_API_KEY && 
+  process.env.CLOUDINARY_API_SECRET
+);
+
+// Setup storage - Cloudinary if configured, otherwise local
+let storage;
+if (isCloudinaryConfigured) {
+  storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+      folder: "oibre/service-provider-review",
+      resource_type: "image",
+      allowed_formats: ["jpg", "jpeg", "png", "webp"]
+    }
+  });
+  console.log("✓ Review images will be stored in Cloudinary (oibre/service-provider-review)");
+} else {
+  // Fallback to local storage if Cloudinary not configured
+  const reviewUploadDir = path.join(__dirname, "../uploads/reviews");
+  if (!fs.existsSync(reviewUploadDir)) {
+    fs.mkdirSync(reviewUploadDir, { recursive: true });
+  }
+  storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, reviewUploadDir),
+    filename: (req, file, cb) => {
+      const ext = path.extname(file.originalname || "").toLowerCase();
+      cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext || ".jpg"}`);
+    }
+  });
+  console.log("⚠ Cloudinary not configured - review images will be stored locally");
+}
 
 const upload = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
   fileFilter: (req, file, cb) => {
     if (!file.mimetype || !file.mimetype.startsWith("image/")) {
       return cb(new Error("Only image files are allowed"));
@@ -87,13 +118,23 @@ router.post("/create", customerAuth, upload.single("image"), async (req, res) =>
       });
     }
 
+    // Handle image URL - Cloudinary returns 'path' as full URL, local storage returns file path
+    let imageUrl = "";
+    if (req.file) {
+      if (isCloudinaryConfigured) {
+        imageUrl = req.file.path; // Cloudinary full URL
+      } else {
+        imageUrl = req.file.path || req.file.filename; // Local file path
+      }
+    }
+
     await Review.create({
       provider: providerIdStr,
       customer: req.customerId,
       booking: bookingIdStr,
       rating: numericRating,
       comment,
-      image: req.file?.path || ""
+      image: imageUrl
     });
 
     await ServiceRequest.findByIdAndUpdate(bookingIdStr, {
@@ -144,7 +185,12 @@ router.patch("/:reviewId", customerAuth, upload.single("image"), async (req, res
     review.comment = comment;
     review.rating = numericRating;
     if (req.file) {
-      review.image = req.file.path || req.file.filename;
+      // Handle image URL - Cloudinary returns 'path' as full URL, local storage returns file path
+      if (isCloudinaryConfigured) {
+        review.image = req.file.path; // Cloudinary full URL
+      } else {
+        review.image = req.file.path || req.file.filename; // Local file path
+      }
     } else if (removeImage) {
       review.image = "";
     }

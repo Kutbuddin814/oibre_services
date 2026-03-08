@@ -7,6 +7,7 @@ const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const { sendBrevoEmail } = require("../utils/sendEmail");
 const jwt = require("jsonwebtoken");
+const { validateAndNormalizePhone, getPhoneErrorMessage } = require("../utils/phoneValidation");
 
 const ProviderRequest = require("../models/ProviderRequest");
 const ServiceProvider = require("../models/ServiceProvider");
@@ -183,7 +184,7 @@ router.get("/", optionalCustomerAuth, async (req, res) => {
               type: "Point",
               coordinates: [longitude, latitude]
             },
-            $maxDistance: 20000
+            $maxDistance: 40000 // 40km to support filter options up to 35km
           }
         }
       })
@@ -244,6 +245,8 @@ router.get("/", optionalCustomerAuth, async (req, res) => {
       const activeProviderIds = new Set(
         activeBookings.map(b => String(b.providerId))
       );
+
+      console.log(`🔒 Customer ${req.customerId}: Hiding ${activeProviderIds.size} providers with active bookings`);
 
       providers = providers.filter(p => !activeProviderIds.has(String(p._id)));
     }
@@ -525,21 +528,10 @@ router.post(
       }
 
       // Validate phone number (Indian format: 10 digits, starts with 6-9)
-      const mobileStr = String(mobile || "").trim();
-      if (!mobileStr) {
+      const normalizedMobile = validateAndNormalizePhone(mobile);
+      if (!normalizedMobile) {
         return res.status(400).json({
-          message: "Please enter a mobile number"
-        });
-      }
-      if (!/^\d{10}$/.test(mobileStr)) {
-        return res.status(400).json({
-          message: "Mobile number must be exactly 10 digits"
-        });
-      }
-      const firstDigit = mobileStr.charAt(0);
-      if (!/^[6-9]$/.test(firstDigit)) {
-        return res.status(400).json({
-          message: "Mobile number must start with 6, 7, 8, or 9"
+          message: getPhoneErrorMessage()
         });
       }
 
@@ -606,7 +598,7 @@ router.post(
         });
       }
 
-      const mobileApproved = await ServiceProvider.findOne({ mobile });
+      const mobileApproved = await ServiceProvider.findOne({ mobile: normalizedMobile });
       if (mobileApproved) {
         return res.status(409).json({
           field: "mobile",
@@ -623,7 +615,7 @@ router.post(
         });
       }
 
-      const mobilePending = await ProviderRequest.findOne({ mobile });
+      const mobilePending = await ProviderRequest.findOne({ mobile: normalizedMobile });
       if (mobilePending) {
         return res.status(409).json({
           field: "mobile",
@@ -639,7 +631,7 @@ router.post(
       const providerRequest = new ProviderRequest({
         name,
         email,
-        mobile,
+        mobile: normalizedMobile,
         qualification,
         serviceCategory,
         otherService: serviceCategory === "Other" ? otherService.trim() : null,
