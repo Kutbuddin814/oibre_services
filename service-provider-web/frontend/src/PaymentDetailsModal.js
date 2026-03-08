@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "../config/axios";
+import api from "./config/axios";
 
 const PaymentDetailsModal = ({ isOpen, onClose, onSave }) => {
   const [formData, setFormData] = useState({
@@ -25,7 +25,7 @@ const PaymentDetailsModal = ({ isOpen, onClose, onSave }) => {
 
   const fetchPaymentDetails = async () => {
     try {
-      const res = await axios.get("/provider/payment/payment-details", {
+      const res = await api.get("/provider/payment/payment-details", {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -54,7 +54,7 @@ const PaymentDetailsModal = ({ isOpen, onClose, onSave }) => {
     setSuccess("");
 
     try {
-      const res = await axios.put("/provider/payment/payment-details", formData, {
+      const res = await api.put("/provider/payment/payment-details", formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
