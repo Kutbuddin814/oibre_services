@@ -495,4 +495,92 @@ router.put("/cancel/:id", customerAuth, async (req, res) => {
   }
 });
 
+/* =========================
+   APPROVE FINAL PRICE
+========================= */
+router.put("/approve-price/:id", customerAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const customerId = req.customerId;
+
+    const request = await ServiceRequest.findOne({
+      _id: id,
+      customerId: customerId
+    });
+
+    if (!request) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found"
+      });
+    }
+
+    if (request.priceStatus !== "price_sent") {
+      return res.status(400).json({
+        success: false,
+        message: "No pending price to approve"
+      });
+    }
+
+    if (!request.finalPrice) {
+      return res.status(400).json({
+        success: false,
+        message: "Final price not set by provider"
+      });
+    }
+
+    // Approve the price
+    request.priceStatus = "price_approved";
+    request.priceApprovedAt = new Date();
+    await request.save();
+
+    // Notify provider that price was approved
+    const provider = await ServiceProvider.findById(request.providerId).select("name email");
+    if (provider?.email) {
+      const html = `
+        <html>
+          <body style="font-family: Arial, sans-serif;">
+            <h2>Price Approved!</h2>
+            <p>Hi ${provider.name},</p>
+            <p>The customer has approved your quoted price: <strong>₹${request.finalPrice}</strong></p>
+            <p>You can now proceed with the service.</p>
+            <p>Login to your dashboard to continue.</p>
+          </body>
+        </html>
+      `;
+      await sendBrevoEmail({
+        to: provider.email,
+        subject: "Price Approved - Service Request #" + id,
+        html: html
+      }).catch(err => console.error("Email error:", err));
+    }
+
+    // Create notification for provider
+    await Notification.create({
+      customerId: customerId,
+      customerName: request.customerName || "",
+      bookingId: request._id,
+      message: `Customer approved price: ₹${request.finalPrice}`
+    });
+
+    return res.json({
+      success: true,
+      message: "Price approved successfully",
+      request: {
+        id: request._id,
+        finalPrice: request.finalPrice,
+        priceStatus: request.priceStatus,
+        priceApprovedAt: request.priceApprovedAt
+      }
+    });
+  } catch (error) {
+    console.error("Approve Price Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error approving price",
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;

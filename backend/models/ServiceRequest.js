@@ -42,7 +42,47 @@ const ServiceRequestSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
-    reviewedAt: Date
+    reviewedAt: Date,
+
+    // Final Price & Payment Fields
+    estimatedPrice: Number,
+    finalPrice: Number,
+    priceStatus: {
+      type: String,
+      enum: ["pending", "price_sent", "price_approved"],
+      default: "pending"
+    },
+    priceSentAt: Date,
+    priceApprovedAt: Date,
+
+    // Payment Information
+    paymentMethod: {
+      type: String,
+      enum: ["cod", "online"],
+      default: "cod"
+    },
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "cod_paid", "online_paid", "failed", "refunded"],
+      default: "pending"
+    },
+    razorpayOrderId: String,
+    razorpayPaymentId: String,
+    razorpaySignature: String,
+    paymentFailureReason: String,
+    paidAt: Date,
+
+    // Payout Information (Admin Settlement)
+    payoutStatus: {
+      type: String,
+      enum: ["pending", "paid", "cancelled"],
+      default: "pending"
+    },
+    payoutAmount: Number,
+    commission: Number,
+    providerEarning: Number,
+    payoutDate: Date,
+    paidByAdmin: String // Admin user ID/name who marked as paid
   },
   { timestamps: true }
 );

@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ProviderDashboard from "./ProviderDashboard";
 import ProviderProfile from "./ProviderProfile";
 import ProviderLogin from "./ProviderLogin";
+import ProviderEarnings from "./ProviderEarnings";
 
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem("providerToken");
@@ -28,6 +29,15 @@ function App() {
           element={
             <PrivateRoute>
               <ProviderProfile />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/earnings"
+          element={
+            <PrivateRoute>
+              <ProviderEarnings />
             </PrivateRoute>
           }
         />

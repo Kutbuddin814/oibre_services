@@ -8,7 +8,8 @@ const Sidebar = ({ currentPage, setCurrentPage, isOpen, setSidebarOpen }) => {
     { id: "removal-requests", label: "Removal Requests", icon: "\uD83D\uDDD1\uFE0F" },
     { id: "users", label: "Users", icon: "\uD83D\uDC65" },
     { id: "providers", label: "Service Providers", icon: "\uD83D\uDD27" },
-    { id: "contact-messages", label: "Contact Messages", icon: "\u2709\uFE0F" }
+    { id: "contact-messages", label: "Contact Messages", icon: "\u2709\uFE0F" },
+    { id: "payouts", label: "Payouts", icon: "\uD83D\uDCB0" }
   ];
 
   return (

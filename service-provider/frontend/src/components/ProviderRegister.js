@@ -36,16 +36,16 @@ const TIME_OPTIONS = [
   "10:00 PM"
 ];
 
-/* HOURLY CHARGE MAPPING BY SERVICE */
-const SERVICE_HOURLY_CHARGES = {
-  // Basic services (₹200 – ₹300 / hour)
+/* STARTING VISIT CHARGE MAPPING BY SERVICE */
+const SERVICE_BASE_CHARGES = {
+  // Basic services (₹200 – ₹300 starting)
   "Cleaning": 250,
   "Laundry": 250,
   "Taxi": 250,
   "Babysitter": 250,
   "Mover & Packer": 300,
   
-  // Skilled services (₹300 – ₹500 / hour)
+  // Skilled services (₹300 – ₹500 starting)
   "Electrician": 400,
   "Plumber": 350,
   "Mechanic": 400,
@@ -53,7 +53,7 @@ const SERVICE_HOURLY_CHARGES = {
   "Painter": 350,
   "Pest Control": 350,
   
-  // Professional services (₹500 – ₹800 / hour)
+  // Professional services (₹500 – ₹800 starting)
   "AC Service": 500,
   "Appliance Repair": 500,
   "Salon at Home": 600,
@@ -163,9 +163,9 @@ const ProviderRegister = ({ onSuccess }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     
-    // Auto-set hourly charge when service category is selected
+    // Auto-set suggested starting visit charge when service category is selected
     if (name === "serviceCategory" && value !== "Other") {
-      const suggestedCharge = SERVICE_HOURLY_CHARGES[value] || 300;
+      const suggestedCharge = SERVICE_BASE_CHARGES[value] || 300;
       setFormData({ 
         ...formData, 
         [name]: value,
@@ -431,7 +431,7 @@ const ProviderRegister = ({ onSuccess }) => {
     }
 
     if (!formData.basePrice || formData.basePrice < 100 || formData.basePrice > 2000) {
-      setError("Please enter a valid hourly charge between ₹100 and ₹2000");
+      setError("Please enter a valid visit charge between ₹100 and ₹2000");
       return;
     }
 
@@ -757,13 +757,13 @@ const ProviderRegister = ({ onSuccess }) => {
 
           <div style={{ marginTop: "12px" }}>
             <label className="form-field-label" htmlFor="provider-base-price" style={{ fontSize: "14px", fontWeight: "600", color: "#1e293b", display: "block", marginBottom: "8px" }}>
-              Hourly Charge (₹)
+              Starting Visit Charge (₹)
             </label>
             <input
               id="provider-base-price"
               type="number"
               name="basePrice"
-              placeholder="Enter hourly charge"
+              placeholder="Enter visit charge"
               value={formData.basePrice}
               onChange={handleChange}
               min="100"
@@ -777,8 +777,8 @@ const ProviderRegister = ({ onSuccess }) => {
             />
             <small style={{ display: "block", color: "#64748b", marginTop: "6px", fontSize: "12px" }}>
               {formData.serviceCategory && formData.serviceCategory !== "Other" 
-                ? `Suggested: ₹${SERVICE_HOURLY_CHARGES[formData.serviceCategory] || 300}/hr` 
-                : "Set your hourly rate (₹100 - ₹2000)"}
+                ? `Suggested starting charge: ₹${SERVICE_BASE_CHARGES[formData.serviceCategory] || 300}` 
+                : "Set your starting visit charge (₹100 - ₹2000)"}
             </small>
           </div>
 

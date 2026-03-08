@@ -13,6 +13,8 @@ const ProviderRequest = require("../models/ProviderRequest");
 const ServiceProvider = require("../models/ServiceProvider");
 const EmailOtp = require("../models/EmailOtp");
 const ServiceRequest = require("../models/ServiceRequest");
+const Customer = require("../models/Customer");
+const Notification = require("../models/Notification");
 
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email || "");
 const EMAIL_DNS_TIMEOUT_MS = 5000;
@@ -662,6 +664,115 @@ router.post(
       console.error("PROVIDER REGISTER ERROR:", err.message);
       res.status(500).json({
         message: err.message || "Registration failed"
+      });
+    }
+  }
+);
+
+/* =========================
+   SUBMIT FINAL PRICE
+========================= */
+router.put(
+  "/requests/:requestId/submit-price",
+  (req, res, next) => {
+    // Authentication middleware
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" });
+    }
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || "your_jwt_secret_key");
+      req.providerId = decoded.id;
+      next();
+    } catch {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+  },
+  async (req, res) => {
+    try {
+      const { requestId } = req.params;
+      const { finalPrice } = req.body;
+      const providerId = req.providerId;
+
+      if (!finalPrice || isNaN(finalPrice) || finalPrice <= 0) {
+        return res.status(400).json({
+          success: false,
+          message: "Valid final price is required"
+        });
+      }
+
+      const serviceRequest = await ServiceRequest.findOne({
+        _id: requestId,
+        providerId: providerId,
+        status: "in_progress"
+      });
+
+      if (!serviceRequest) {
+        return res.status(404).json({
+          success: false,
+          message: "Active service request not found"
+        });
+      }
+
+      if (serviceRequest.priceStatus !== "pending") {
+        return res.status(400).json({
+          success: false,
+          message: "Price has already been submitted"
+        });
+      }
+
+      // Update with final price
+      serviceRequest.finalPrice = Math.round(finalPrice);
+      serviceRequest.priceStatus = "price_sent";
+      serviceRequest.priceSentAt = new Date();
+      await serviceRequest.save();
+
+      // Notify customer
+      const customer = await Customer.findById(serviceRequest.customerId);
+      if (customer?.email) {
+        const html = `
+          <html>
+            <body style="font-family: Arial, sans-serif;">
+              <h2>Price Quote Received!</h2>
+              <p>Hi ${serviceRequest.customerName},</p>
+              <p>Your service provider ${serviceRequest.providerName} has submitted a quote for your service request.</p>
+              <p style="font-size: 20px; color: #2563eb;"><strong>Quoted Price: ₹${serviceRequest.finalPrice}</strong></p>
+              <p>Please review and approve the quote in your Oibre app to proceed with the service.</p>
+              <p>Login to continue.</p>
+            </body>
+          </html>
+        `;
+        await sendBrevoEmail({
+          to: customer.email,
+          subject: "Price Quote for Your Service - Oibre",
+          html: html
+        }).catch(err => console.error("Email error:", err));
+      }
+
+      // Create notification
+      await Notification.create({
+        customerId: serviceRequest.customerId,
+        customerName: serviceRequest.customerName || "",
+        bookingId: serviceRequest._id,
+        message: `Provider quoted ₹${serviceRequest.finalPrice} for your service`
+      });
+
+      return res.json({
+        success: true,
+        message: "Price submitted successfully",
+        request: {
+          id: serviceRequest._id,
+          finalPrice: serviceRequest.finalPrice,
+          priceStatus: serviceRequest.priceStatus,
+          priceSentAt: serviceRequest.priceSentAt
+        }
+      });
+    } catch (error) {
+      console.error("Submit Price Error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Error submitting price",
+        error: error.message
       });
     }
   }

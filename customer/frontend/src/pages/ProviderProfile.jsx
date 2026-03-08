@@ -502,12 +502,12 @@ export default function ProviderProfile() {
 
       {/* ================= PRICE ================= */}
       <div className="price-card card">
-        <h3>Service Price</h3>
-        <h1>₹{finalPrice}</h1>
+        <h3>Starting Price</h3>
+        <h1>Starting from ₹{finalPrice}</h1>
 
         {distanceKm !== null && (
           <p className="subtext">
-            Includes distance charges ({distanceKm} km)
+            Visit charge includes distance for {distanceKm} km. Parts/materials extra if needed.
           </p>
         )}
 

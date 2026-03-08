@@ -8,6 +8,7 @@ import Users from "./pages/Users";
 import Providers from "./pages/Providers";
 import RemovalRequests from "./pages/RemovalRequests";
 import ContactMessages from "./pages/ContactMessages";
+import AdminPayoutsPanel from "./pages/AdminPayoutsPanel";
 
 const AdminDashboard = ({ admin, onLogout }) => {
   const [currentPage, setCurrentPage] = useState("dashboard");
@@ -36,6 +37,7 @@ const AdminDashboard = ({ admin, onLogout }) => {
           {currentPage === "users" && <Users />}
           {currentPage === "providers" && <Providers />}
           {currentPage === "contact-messages" && <ContactMessages />}
+          {currentPage === "payouts" && <AdminPayoutsPanel />}
         </div>
       </div>
     </div>

@@ -393,7 +393,7 @@ export default function SearchResults() {
 
                 <p className="rating">⭐ {getProviderRating(p).toFixed(1)}</p>
 
-                <p className="price">₹{p.finalPrice}</p>
+                <p className="price">Starting from ₹{p.finalPrice}</p>
 
                 {/* 🔥 VIEW PROFILE INSTEAD OF BOOK */}
                 <button className="profile-btn" onClick={() => openProfile(p._id)}>

@@ -3,6 +3,8 @@ import api from "./config/axios";
 import API_BASE_URL from "./config/api";
 import { useNavigate } from "react-router-dom";
 import { convertTo12HourFormat } from "./utils/timeUtils";
+import PaymentDetailsModal from "./PaymentDetailsModal";
+import PaymentDetailsReminder from "./PaymentDetailsReminder";
 import "./ProviderStyles.css";
 
 const ProviderDashboard = () => {
@@ -18,7 +20,9 @@ const ProviderDashboard = () => {
   const [locationResults, setLocationResults] = useState([]);
   const [searchingLocations, setSearchingLocations] = useState(false);
   const [completionOtps, setCompletionOtps] = useState({});
+  const [finalPrices, setFinalPrices] = useState({});
   const [sendingOtpId, setSendingOtpId] = useState(null);
+  const [submittingPriceId, setSubmittingPriceId] = useState(null);
   const [verifyingOtpId, setVerifyingOtpId] = useState(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelTargetRequest, setCancelTargetRequest] = useState(null);
@@ -34,6 +38,8 @@ const ProviderDashboard = () => {
     next: false,
     confirm: false
   });
+  const [showPaymentReminderModal, setShowPaymentReminderModal] = useState(false);
+  const [showPaymentDetailsModal, setShowPaymentDetailsModal] = useState(false);
 
   const navigate = useNavigate();
   const token = localStorage.getItem("providerToken");
@@ -285,6 +291,11 @@ const ProviderDashboard = () => {
         );
         setProvider(res.data);
 
+        // Check if payment details are completed
+        if (res.data?.paymentDetailsCompleted === false) {
+          setShowPaymentReminderModal(true);
+        }
+
         // Only show location modal if provider hasn't set a location yet
         const hasLocationInDb =
           res.data?.location?.coordinates && res.data.location.coordinates.length === 2;
@@ -450,6 +461,31 @@ const ProviderDashboard = () => {
     }
   };
 
+  const submitFinalPrice = async (req) => {
+    const entered = String(finalPrices[req._id] || "").trim();
+    const amount = Number(entered);
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      alert("Enter a valid final price.");
+      return;
+    }
+
+    try {
+      setSubmittingPriceId(req._id);
+      await api.put(
+        `/provider/requests/submit-price/${req._id}`,
+        { finalPrice: amount },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("Final price sent to customer for approval.");
+      await refreshRequests();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to send final price.");
+    } finally {
+      setSubmittingPriceId(null);
+    }
+  };
+
   const verifyCompletionOtp = async (req) => {
     const otp = String(completionOtps[req._id] || "").trim();
     if (!otp) {
@@ -586,6 +622,9 @@ const ProviderDashboard = () => {
                 <button onClick={() => navigate("/profile")}>
                   View Profile
                 </button>
+                <button onClick={() => navigate("/earnings")}>
+                  💰 My Earnings
+                </button>
                 <button
                   onClick={() => {
                     setOpenMenu(false);
@@ -655,6 +694,15 @@ const ProviderDashboard = () => {
                   <p>
                     <strong>Preferred Time:</strong> {req.preferredDate} at {convertTo12HourFormat(req.preferredTime)}
                   </p>
+                  {req.finalPrice ? (
+                    <p>
+                      <strong>Final Quote:</strong> Rs {req.finalPrice} ({(req.priceStatus || "pending").replace("_", " ")})
+                    </p>
+                  ) : (
+                    <p>
+                      <strong>Starting Charge:</strong> Rs {req.basePrice || provider.basePrice || "-"}
+                    </p>
+                  )}
                 </div>
 
                 {req.status === "pending" && (
@@ -730,9 +778,34 @@ const ProviderDashboard = () => {
 
                 {req.status === "accepted" && (
                   <div className="request-actions">
+                    {req.priceStatus !== "price_approved" && (
+                      <>
+                        <div className="request-input-group" style={{ flex: 1 }}>
+                          <input
+                            type="number"
+                            placeholder="Enter final price"
+                            min="1"
+                            value={finalPrices[req._id] ?? req.finalPrice ?? ""}
+                            onChange={(e) =>
+                              setFinalPrices((prev) => ({ ...prev, [req._id]: e.target.value }))
+                            }
+                          />
+                        </div>
+                        <button
+                          onClick={() => submitFinalPrice(req)}
+                          className="action-btn primary"
+                          disabled={submittingPriceId === req._id}
+                        >
+                          {submittingPriceId === req._id ? "Sending..." : "Send Final Price"}
+                        </button>
+                      </>
+                    )}
+
                     <button
                       onClick={() => updateRequestStatus(req, "in_progress")}
                       className="action-btn primary"
+                      disabled={req.priceStatus !== "price_approved"}
+                      title={req.priceStatus !== "price_approved" ? "Wait for customer to approve final price" : "Start service"}
                     >
                       Start Service
                     </button>
@@ -747,6 +820,29 @@ const ProviderDashboard = () => {
 
                 {req.status === "in_progress" && (
                   <div className="request-actions">
+                    {req.priceStatus !== "price_approved" && (
+                      <>
+                        <div className="request-input-group" style={{ flex: 1 }}>
+                          <input
+                            type="number"
+                            placeholder="Enter final price"
+                            min="1"
+                            value={finalPrices[req._id] ?? req.finalPrice ?? ""}
+                            onChange={(e) =>
+                              setFinalPrices((prev) => ({ ...prev, [req._id]: e.target.value }))
+                            }
+                          />
+                        </div>
+                        <button
+                          onClick={() => submitFinalPrice(req)}
+                          className="action-btn primary"
+                          disabled={submittingPriceId === req._id}
+                        >
+                          {submittingPriceId === req._id ? "Sending..." : "Send Final Price"}
+                        </button>
+                      </>
+                    )}
+
                     <button
                       onClick={() => sendCompletionOtp(req)}
                       className="action-btn primary"
@@ -1010,6 +1106,31 @@ const ProviderDashboard = () => {
           </div>
         </div>
       )}
+
+      {/* Payment Details Reminder Modal */}
+      <PaymentDetailsReminder
+        isOpen={showPaymentReminderModal}
+        onClose={() => setShowPaymentReminderModal(false)}
+        onAddDetails={() => {
+          setShowPaymentReminderModal(false);
+          setShowPaymentDetailsModal(true);
+        }}
+      />
+
+      {/* Payment Details Form Modal */}
+      <PaymentDetailsModal
+        isOpen={showPaymentDetailsModal}
+        onClose={() => setShowPaymentDetailsModal(false)}
+        onSave={() => {
+          if (provider?._id) {
+            // Refresh provider data to update paymentDetailsCompleted flag
+            setProvider((prev) => ({
+              ...prev,
+              paymentDetailsCompleted: true
+            }));
+          }
+        }}
+      />
     </div>
   );
 };

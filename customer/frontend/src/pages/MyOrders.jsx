@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../config/axios";
 import { useNavigate } from "react-router-dom";
 import { convertTo12HourFormat } from "../utils/timeUtils";
+import PaymentModal from "../components/PaymentModal";
 import "../styles/MyOrders.css";
 import "../styles/unified-modal.css";
 import "../styles/unified-forms.css";
@@ -14,6 +15,9 @@ export default function MyOrders() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [cancelLoading, setCancelLoading] = useState(false);
+  const [approvePriceLoadingId, setApprovePriceLoadingId] = useState(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentTargetOrder, setPaymentTargetOrder] = useState(null);
 
   // review modal
   const [showReview, setShowReview] = useState(false);
@@ -23,6 +27,20 @@ export default function MyOrders() {
   const [feedbackPreview, setFeedbackPreview] = useState("");
 
   const token = localStorage.getItem("customerToken");
+
+  const fetchOrders = async () => {
+    try {
+      const res = await api.get(
+        "/customer/requests/my-requests",
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      setOrders(res.data);
+    } catch (err) {
+      console.error("Fetch orders error", err);
+    }
+  };
 
   const getScheduledVisitLabel = (order) => {
     if (order?.visitDate && order?.visitTime) {
@@ -36,22 +54,42 @@ export default function MyOrders() {
 
   /* ================= FETCH ORDERS ================= */
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const res = await api.get(
-          "/customer/requests/my-requests",
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
-        setOrders(res.data);
-      } catch (err) {
-        console.error("Fetch orders error", err);
-      }
-    };
-
     fetchOrders();
   }, [token]);
+
+  const approveFinalPrice = async (order) => {
+    try {
+      setApprovePriceLoadingId(order._id);
+      await api.put(
+        `/customer/requests/approve-price/${order._id}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setOrders((prev) =>
+        prev.map((o) =>
+          o._id === order._id
+            ? { ...o, priceStatus: "price_approved", priceApprovedAt: new Date().toISOString() }
+            : o
+        )
+      );
+
+      alert("Final price approved. Provider can now start service.");
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to approve final price.");
+    } finally {
+      setApprovePriceLoadingId(null);
+    }
+  };
+
+  const openPayment = (order) => {
+    setPaymentTargetOrder(order);
+    setShowPaymentModal(true);
+  };
+
+  const onPaymentSuccess = async () => {
+    await fetchOrders();
+  };
 
   /* ================= SUBMIT REVIEW ================= */
   const submitReview = async () => {
@@ -205,6 +243,24 @@ export default function MyOrders() {
             </p>
           )}
 
+          {o.finalPrice && (
+            <p>
+              <b>Final Price:</b> Rs {o.finalPrice}
+            </p>
+          )}
+
+          {o.priceStatus === "price_sent" && (
+            <p style={{ color: "#b45309", fontWeight: 600 }}>
+              Provider sent final quote. Please approve to continue.
+            </p>
+          )}
+
+          {o.priceStatus === "price_approved" && (
+            <p style={{ color: "#15803d", fontWeight: 600 }}>
+              Final quote approved.
+            </p>
+          )}
+
           {o.status === "cancelled" && (
             <p className="cancelled-note">
               {o.customerCancelReason
@@ -222,6 +278,26 @@ export default function MyOrders() {
               <button className="cancel-btn" onClick={() => openCancelModal(o)}>
                 Cancel Booking
               </button>
+            )}
+
+            {o.priceStatus === "price_sent" && (
+              <button
+                className="track-btn"
+                onClick={() => approveFinalPrice(o)}
+                disabled={approvePriceLoadingId === o._id}
+              >
+                {approvePriceLoadingId === o._id ? "Approving..." : "Approve Final Price"}
+              </button>
+            )}
+
+            {o.status === "completed" && o.priceStatus === "price_approved" && o.paymentStatus === "pending" && (
+              <button className="review-btn" onClick={() => openPayment(o)}>
+                Pay Now
+              </button>
+            )}
+
+            {o.status === "completed" && ["cod_paid", "online_paid"].includes(o.paymentStatus) && (
+              <span className="feedback-done">Payment Done ({o.paymentStatus.replace("_", " ")})</span>
             )}
 
             {o.status === "completed" && !o.reviewed && (
@@ -261,7 +337,7 @@ export default function MyOrders() {
 
       {activeOrder && !showReview && !showCancelModal && (
         <Modal onClose={() => setActiveOrder(null)} title="Booking Status">
-          <Timeline status={activeOrder.status} />
+          <Timeline status={activeOrder.status} priceStatus={activeOrder.priceStatus} />
 
           <div style={{ marginTop: "16px" }}>
             <div style={{ marginBottom: "12px" }}>
@@ -281,6 +357,34 @@ export default function MyOrders() {
                 <strong>Provider Note:</strong>
                 <p style={{ margin: "4px 0 0" }}>{activeOrder.providerNote}</p>
               </div>
+            )}
+
+            {activeOrder.finalPrice && (
+              <div style={{ marginBottom: "12px" }}>
+                <strong>Final Price:</strong>
+                <p style={{ margin: "4px 0 0" }}>Rs {activeOrder.finalPrice}</p>
+              </div>
+            )}
+
+            {activeOrder.priceStatus === "price_sent" && (
+              <button
+                className="btn btn-primary"
+                style={{ width: "100%", marginTop: "8px" }}
+                onClick={() => approveFinalPrice(activeOrder)}
+                disabled={approvePriceLoadingId === activeOrder._id}
+              >
+                {approvePriceLoadingId === activeOrder._id ? "Approving..." : "Approve Final Price"}
+              </button>
+            )}
+
+            {activeOrder.status === "completed" && activeOrder.priceStatus === "price_approved" && activeOrder.paymentStatus === "pending" && (
+              <button
+                className="btn btn-primary"
+                style={{ width: "100%", marginTop: "8px" }}
+                onClick={() => openPayment(activeOrder)}
+              >
+                Pay Now
+              </button>
             )}
 
             {activeOrder.status === "cancelled" && (
@@ -434,21 +538,42 @@ export default function MyOrders() {
           </div>
         </Modal>
       )}
+
+      <PaymentModal
+        isOpen={showPaymentModal}
+        serviceRequest={paymentTargetOrder}
+        onClose={() => {
+          setShowPaymentModal(false);
+          setPaymentTargetOrder(null);
+        }}
+        onSuccess={onPaymentSuccess}
+      />
     </div>
   );
 }
 
-function Timeline({ status }) {
+function Timeline({ status, priceStatus }) {
   const steps =
     status === "cancelled"
       ? ["pending", "accepted", "cancelled"]
-      : ["pending", "accepted", "in_progress", "completed"];
+      : ["pending", "accepted", "price_sent", "price_approved", "in_progress", "completed"];
+
+  const getCurrentStep = () => {
+    if (status === "cancelled") return "cancelled";
+    if (status === "completed") return "completed";
+    if (status === "in_progress") return "in_progress";
+    if (priceStatus === "price_approved") return "price_approved";
+    if (priceStatus === "price_sent") return "price_sent";
+    return status;
+  };
+
+  const currentStep = getCurrentStep();
 
   return (
     <div className="timeline">
       {steps.map((s, i) => (
         <div key={s} className="timeline-step">
-          <div className={`dot ${steps.indexOf(status) >= i ? "active" : ""}`} />
+          <div className={`dot ${steps.indexOf(currentStep) >= i ? "active" : ""}`} />
           <span>{s.replace("_", " ").toUpperCase()}</span>
         </div>
       ))}

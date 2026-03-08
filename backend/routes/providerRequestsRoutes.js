@@ -3,8 +3,9 @@ const router = express.Router();
 const ServiceRequest = require("../models/ServiceRequest");
 const ServiceProvider = require("../models/ServiceProvider");
 const Notification = require("../models/Notification");
+const Customer = require("../models/Customer");
 const authMiddleware = require("../middleware/authMiddleware");
-const { sendRejectionEmail, sendCompletionOtpEmail, sendBookingAcceptedEmail } = require("../utils/sendEmail");
+const { sendRejectionEmail, sendCompletionOtpEmail, sendBookingAcceptedEmail, sendBrevoEmail } = require("../utils/sendEmail");
 
 const MAX_DATE_FORWARD_DAYS = 2;
 
@@ -201,6 +202,14 @@ router.put("/update/:id", authMiddleware, async (req, res) => {
           message: `Invalid status transition from ${request.status} to ${nextStatus}`
         });
       }
+
+      // Service can start only after customer approves provider's final quote.
+      if (request.status === "accepted" && nextStatus === "in_progress" && request.priceStatus !== "price_approved") {
+        return res.status(400).json({
+          message: "Submit final price and wait for customer approval before starting service"
+        });
+      }
+
       request.status = nextStatus;
     }
 
@@ -300,6 +309,73 @@ router.put("/update/:id", authMiddleware, async (req, res) => {
   } catch (err) {
     console.error("Update request error:", err);
     res.status(500).json({ message: "Update failed" });
+  }
+});
+
+/* ================================
+   SUBMIT FINAL PRICE (QUOTE)
+================================ */
+router.put("/submit-price/:id", authMiddleware, async (req, res) => {
+  try {
+    const { finalPrice } = req.body;
+    const parsedPrice = Number(finalPrice);
+
+    if (!Number.isFinite(parsedPrice) || parsedPrice <= 0) {
+      return res.status(400).json({ message: "Valid final price is required" });
+    }
+
+    const request = await ServiceRequest.findById(req.params.id);
+    if (!request) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    if (request.providerId.toString() !== req.providerId) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    if (!["accepted", "in_progress"].includes(request.status)) {
+      return res.status(400).json({
+        message: "Final price can be submitted only for accepted/in-progress requests"
+      });
+    }
+
+    request.finalPrice = Math.round(parsedPrice);
+    request.priceStatus = "price_sent";
+    request.priceSentAt = new Date();
+    await request.save();
+
+    await createCustomerNotification(
+      request,
+      `Final quote received: Rs ${request.finalPrice}. Please approve in My Orders to continue.`
+    );
+
+    const customer = await Customer.findById(request.customerId).select("email name");
+    if (customer?.email) {
+      queueEmail(
+        sendBrevoEmail({
+          to: customer.email,
+          subject: "Final Price Sent - Oibre",
+          html: `<p>Hi ${customer.name || request.customerName || "Customer"},</p>
+                 <p>Your provider has sent the final quote for <strong>${request.serviceCategory}</strong>.</p>
+                 <p><strong>Final Price: Rs ${request.finalPrice}</strong></p>
+                 <p>Please open My Orders and approve to continue service.</p>`
+        }),
+        "PRICE QUOTE"
+      );
+    }
+
+    return res.json({
+      message: "Final price sent to customer",
+      request: {
+        id: request._id,
+        finalPrice: request.finalPrice,
+        priceStatus: request.priceStatus,
+        priceSentAt: request.priceSentAt
+      }
+    });
+  } catch (err) {
+    console.error("Submit final price error:", err);
+    return res.status(500).json({ message: "Failed to submit final price" });
   }
 });
 

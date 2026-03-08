@@ -106,6 +106,22 @@ const ServiceProviderSchema = new mongoose.Schema(
     reviewCount: {
       type: Number,
       default: 0
+    },
+
+    /* =========================
+       PAYMENT DETAILS
+    ========================= */
+    paymentDetails: {
+      accountHolderName: String,
+      accountNumber: String,
+      ifscCode: String,
+      upiId: String,
+      panNumber: String
+    },
+
+    paymentDetailsCompleted: {
+      type: Boolean,
+      default: false
     }
   },
   {

@@ -4,16 +4,16 @@ const ServiceProvider = require("../models/ServiceProvider");
 
 console.log("🚀 Starting service price migration...\n");
 
-// Service-based pricing (same as registration form)
-const SERVICE_HOURLY_CHARGES = {
-  // Basic services (₹200 – ₹300 / hour)
+// Service-based starting visit charges (same as registration form)
+const SERVICE_BASE_CHARGES = {
+  // Basic services (₹200 – ₹300 starting)
   "Cleaning": 250,
   "Laundry": 250,
   "Taxi": 250,
   "Babysitter": 250,
   "Mover & Packer": 300,
   
-  // Skilled services (₹300 – ₹500 / hour)
+  // Skilled services (₹300 – ₹500 starting)
   "Electrician": 400,
   "Plumber": 350,
   "Mechanic": 400,
@@ -21,7 +21,7 @@ const SERVICE_HOURLY_CHARGES = {
   "Painter": 350,
   "Pest Control": 350,
   
-  // Professional services (₹500 – ₹800 / hour)
+  // Professional services (₹500 – ₹800 starting)
   "AC Service": 500,
   "Appliance Repair": 500,
   "Salon at Home": 600,
@@ -52,7 +52,7 @@ const updateServicePrices = async () => {
 
     for (const provider of providers) {
       const serviceCategory = provider.serviceCategory;
-      const newBasePrice = SERVICE_HOURLY_CHARGES[serviceCategory] || 300;
+      const newBasePrice = SERVICE_BASE_CHARGES[serviceCategory] || 300;
       const currentPrice = provider.basePrice || 200;
 
       if (currentPrice !== newBasePrice) {

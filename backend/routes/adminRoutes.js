@@ -1256,8 +1256,8 @@ router.post("/contact-messages/:id/reply", async (req, res) => {
 ================================ */
 router.post("/migrate/update-service-prices", async (req, res) => {
   try {
-    // Service-based pricing
-    const SERVICE_HOURLY_CHARGES = {
+    // Service-based starting visit charges
+    const SERVICE_BASE_CHARGES = {
       // Basic services
       "Cleaning": 250,
       "Laundry": 250,
@@ -1287,7 +1287,7 @@ router.post("/migrate/update-service-prices", async (req, res) => {
 
     for (const provider of providers) {
       const serviceCategory = provider.serviceCategory;
-      const newBasePrice = SERVICE_HOURLY_CHARGES[serviceCategory] || 300;
+      const newBasePrice = SERVICE_BASE_CHARGES[serviceCategory] || 300;
       const currentPrice = provider.basePrice || 200;
 
       if (currentPrice !== newBasePrice) {
