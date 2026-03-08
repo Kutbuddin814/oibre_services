@@ -8,6 +8,8 @@ import "../styles/unified-modal.css";
 import "../styles/unified-forms.css";
 import "../styles/unified-buttons.css";
 
+const AUTO_REFRESH_MS = 15000;
+
 export default function MyOrders() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
@@ -55,6 +57,35 @@ export default function MyOrders() {
   /* ================= FETCH ORDERS ================= */
   useEffect(() => {
     fetchOrders();
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return undefined;
+
+    const refreshOnFocus = () => {
+      fetchOrders();
+    };
+
+    const refreshOnVisible = () => {
+      if (document.visibilityState === "visible") {
+        fetchOrders();
+      }
+    };
+
+    const intervalId = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        fetchOrders();
+      }
+    }, AUTO_REFRESH_MS);
+
+    window.addEventListener("focus", refreshOnFocus);
+    document.addEventListener("visibilitychange", refreshOnVisible);
+
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener("focus", refreshOnFocus);
+      document.removeEventListener("visibilitychange", refreshOnVisible);
+    };
   }, [token]);
 
   const approveFinalPrice = async (order) => {

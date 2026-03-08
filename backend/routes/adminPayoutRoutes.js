@@ -5,6 +5,13 @@ const ServiceProvider = require("../models/ServiceProvider");
 const adminAuth = require("../middleware/adminAuth");
 
 const COMMISSION_PERCENTAGE = 10; // 10% commission
+const PENDING_PAYOUT_MATCH = {
+  $or: [
+    { payoutStatus: "pending" },
+    { payoutStatus: { $exists: false } },
+    { payoutStatus: null }
+  ]
+};
 
 /**
  * GET /api/admin/payouts/pending
@@ -18,7 +25,7 @@ router.get("/pending", adminAuth, async (req, res) => {
         $match: {
           status: "completed",
           paymentStatus: "online_paid",
-          payoutStatus: "pending"
+          ...PENDING_PAYOUT_MATCH
         }
       },
       {
@@ -182,7 +189,7 @@ router.put("/:bookingId/mark-paid", adminAuth, async (req, res) => {
       });
     }
 
-    if (booking.payoutStatus !== "pending") {
+    if (booking.payoutStatus && booking.payoutStatus !== "pending") {
       return res.status(400).json({
         success: false,
         message: "Payout already settled"
@@ -283,7 +290,7 @@ router.get("/summary", adminAuth, async (req, res) => {
     const pendingCount = await ServiceRequest.countDocuments({
       status: "completed",
       paymentStatus: "online_paid",
-      payoutStatus: "pending"
+      ...PENDING_PAYOUT_MATCH
     });
 
     const paidCount = await ServiceRequest.countDocuments({

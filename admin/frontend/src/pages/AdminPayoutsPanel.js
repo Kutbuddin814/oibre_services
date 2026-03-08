@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api";
+
+const AUTO_REFRESH_MS = 15000;
 
 const AdminPayoutsPanel = () => {
   const [payouts, setPayouts] = useState([]);
@@ -17,6 +19,30 @@ const AdminPayoutsPanel = () => {
     fetchSummary();
   }, [tab]);
 
+  useEffect(() => {
+    if (!token) return undefined;
+
+    const refreshAll = () => {
+      if (document.visibilityState === "visible") {
+        fetchPayouts();
+        fetchSummary();
+      }
+    };
+
+    const intervalId = setInterval(() => {
+      refreshAll();
+    }, AUTO_REFRESH_MS);
+
+    window.addEventListener("focus", refreshAll);
+    document.addEventListener("visibilitychange", refreshAll);
+
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener("focus", refreshAll);
+      document.removeEventListener("visibilitychange", refreshAll);
+    };
+  }, [token, tab]);
+
   const fetchPayouts = async () => {
     setLoading(true);
     setError("");
@@ -24,10 +50,10 @@ const AdminPayoutsPanel = () => {
     try {
       const endpoint =
         tab === "pending"
-          ? "/api/admin/payouts/pending"
-          : "/api/admin/payouts/history";
+          ? "/admin/payouts/pending"
+          : "/admin/payouts/history";
 
-      const res = await axios.get(endpoint, {
+      const res = await api.get(endpoint, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -43,7 +69,7 @@ const AdminPayoutsPanel = () => {
 
   const fetchSummary = async () => {
     try {
-      const res = await axios.get("/api/admin/payouts/summary", {
+      const res = await api.get("/admin/payouts/summary", {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -67,8 +93,8 @@ const AdminPayoutsPanel = () => {
     setMarkedPaidId(bookingId);
 
     try {
-      const res = await axios.put(
-        `/api/admin/payouts/${bookingId}/mark-paid`,
+      const res = await api.put(
+        `/admin/payouts/${bookingId}/mark-paid`,
         { adminName: adminName },
         { headers: { Authorization: `Bearer ${token}` } }
       );
