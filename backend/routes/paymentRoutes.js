@@ -70,6 +70,7 @@ router.post("/create-order", customerAuthMiddleware, async (req, res) => {
     // If COD, mark as success immediately
     if (paymentMethod === "cod") {
       serviceRequest.paymentStatus = "cod_paid";
+      serviceRequest.payoutStatus = "pending"; // Initialize payout status for admin settlement
       serviceRequest.paidAt = new Date();
       await serviceRequest.save();
 
@@ -196,6 +197,7 @@ router.post("/verify", customerAuthMiddleware, async (req, res) => {
     serviceRequest.razorpayPaymentId = razorpayPaymentId;
     serviceRequest.razorpaySignature = razorpaySignature;
     serviceRequest.paymentStatus = "online_paid";
+    serviceRequest.payoutStatus = "pending"; // Initialize payout status for admin settlement
     serviceRequest.paidAt = new Date();
     await serviceRequest.save();
 
