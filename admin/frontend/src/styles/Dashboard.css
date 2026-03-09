@@ -5,6 +5,7 @@
 .dashboard {
   max-width: 1400px;
   margin: 0 auto;
+  padding: 20px;
 }
 
 .page-header {
@@ -100,6 +101,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+  min-height: auto;
 }
 
 .section {
@@ -108,6 +110,9 @@
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   border: 1px solid #E5E7EB;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .section h3 {
@@ -122,6 +127,9 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  flex: 1;
+  overflow-y: auto;
+  max-height: 400px;
 }
 
 .activity-item {
@@ -131,6 +139,33 @@
   border-radius: 8px;
   background: #F9FAFB;
   border-left: 3px solid #4F46E5;
+  min-height: 60px;
+  align-items: flex-start;
+}
+
+.activity-item-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: inherit;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  width: 100%;
+  display: flex;
+  gap: 12px;
+}
+
+.activity-item-btn:hover {
+  background: #F0F1FF;
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.1);
+}
+
+.activity-item-btn:focus-visible {
+  outline: 3px solid rgba(79, 70, 229, 0.35);
+  outline-offset: 2px;
 }
 
 .activity-icon {
@@ -144,6 +179,13 @@
   justify-content: center;
   font-weight: 700;
   flex-shrink: 0;
+  font-size: 14px;
+}
+
+.activity-details {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
 }
 
 .activity-details p {
@@ -197,9 +239,14 @@
 
 .action-btn.secondary:hover {
   background: #E5E7EB;
+  transform: translateY(-2px);
 }
 
 @media (max-width: 768px) {
+  .dashboard {
+    padding: 12px;
+  }
+
   .stats-grid {
     grid-template-columns: 1fr;
     gap: 16px;
@@ -216,5 +263,9 @@
 
   .stat-number {
     font-size: 24px;
+  }
+
+  .activity-list {
+    max-height: 300px;
   }
 }

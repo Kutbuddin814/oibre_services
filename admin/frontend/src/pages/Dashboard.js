@@ -56,34 +56,8 @@ const Dashboard = ({ setCurrentPage }) => {
     }
   };
 
-  const handleUpdateServicePrices = async () => {
-    if (!window.confirm("This will update all service provider prices based on their service category. Continue?")) {
-      return;
-    }
-    
-    try {
-      const res = await api.post("/admin/migrate/update-service-prices");
-      const { updated, skipped, total, updates } = res.data;
-      
-      let message = `Price Migration Complete!\n\n`;
-      message += `Updated: ${updated} providers\n`;
-      message += `Skipped: ${skipped} providers\n`;
-      message += `Total: ${total} providers\n\n`;
-      
-      if (updates && updates.length > 0) {
-        message += `Updated Providers:\n`;
-        updates.slice(0, 10).forEach(u => {
-          message += `- ${u.name} (${u.service}): ₹${u.oldPrice} → ₹${u.newPrice}\n`;
-        });
-        if (updates.length > 10) {
-          message += `...and ${updates.length - 10} more\n`;
-        }
-      }
-      
-      alert(message);
-    } catch (err) {
-      alert("Failed to update service prices: " + (err.response?.data?.message || err.message));
-    }
+  const handleUpdateServicePrices = () => {
+    setCurrentPage("services");
   };
 
   if (loading) {
@@ -128,8 +102,10 @@ const Dashboard = ({ setCurrentPage }) => {
           </div>
         </button>
 
-        <div
+        <button
+          type="button"
           className="stat-card"
+          onClick={() => setCurrentPage("payouts")}
           title="Total service booking requests from customers"
         >
           <div className="stat-icon" style={{ background: "#FFF3E0" }}>Req</div>
@@ -137,7 +113,7 @@ const Dashboard = ({ setCurrentPage }) => {
             <h3>Service Bookings</h3>
             <p className="stat-number">{stats.totalRequests}</p>
           </div>
-        </div>
+        </button>
 
         <button
           type="button"
@@ -170,41 +146,61 @@ const Dashboard = ({ setCurrentPage }) => {
         <div className="section">
           <h3>Recent Activity</h3>
           <div className="activity-list">
-            <div className="activity-item">
+            <button
+              type="button"
+              className="activity-item-btn activity-item"
+              onClick={() => setCurrentPage("provider-requests")}
+            >
               <span className="activity-icon">1</span>
               <div className="activity-details">
                 <p><b>Pending Provider Registrations</b></p>
                 <p className="activity-time">{stats.pendingRequests} awaiting review</p>
               </div>
-            </div>
-            <div className="activity-item">
+            </button>
+            <button
+              type="button"
+              className="activity-item-btn activity-item"
+              onClick={() => setCurrentPage("users")}
+            >
               <span className="activity-icon">2</span>
               <div className="activity-details">
                 <p><b>Total Customer Accounts</b></p>
                 <p className="activity-time">{stats.totalUsers} users</p>
               </div>
-            </div>
-            <div className="activity-item">
+            </button>
+            <button
+              type="button"
+              className="activity-item-btn activity-item"
+              onClick={() => setCurrentPage("providers")}
+            >
               <span className="activity-icon">3</span>
               <div className="activity-details">
                 <p><b>Approved Service Providers</b></p>
                 <p className="activity-time">{stats.totalProviders} providers</p>
               </div>
-            </div>
-            <div className="activity-item">
+            </button>
+            <button
+              type="button"
+              className="activity-item-btn activity-item"
+              onClick={() => setCurrentPage("payouts")}
+            >
               <span className="activity-icon">4</span>
               <div className="activity-details">
                 <p><b>Service Booking Requests</b></p>
                 <p className="activity-time">{stats.totalRequests} bookings</p>
               </div>
-            </div>
-            <div className="activity-item">
+            </button>
+            <button
+              type="button"
+              className="activity-item-btn activity-item"
+              onClick={() => setCurrentPage("contact-messages")}
+            >
               <span className="activity-icon">5</span>
               <div className="activity-details">
                 <p><b>New Contact Form Messages</b></p>
                 <p className="activity-time">{stats.newContactMessages} new messages</p>
               </div>
-            </div>
+            </button>
           </div>
         </div>
 
