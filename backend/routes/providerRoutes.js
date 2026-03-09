@@ -358,10 +358,32 @@ router.post(
   "/email-otp/send",
   async (req, res) => {
     try {
-      const { email } = req.body;
+      const rawEmail = String(req.body?.email || "").trim();
+      const email = rawEmail.toLowerCase();
 
       if (!email || !isValidEmail(email)) {
         return res.status(400).json({ message: "Please enter a valid email address" });
+      }
+
+      // Hard guard: never issue OTP for already-approved or pending provider emails.
+      const emailExistsApproved = await ServiceProvider.findOne({
+        email: { $regex: `^${email.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, $options: "i" }
+      });
+      if (emailExistsApproved) {
+        return res.status(409).json({
+          field: "email",
+          message: "Email already registered and approved"
+        });
+      }
+
+      const emailExistsPending = await ProviderRequest.findOne({
+        email: { $regex: `^${email.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, $options: "i" }
+      });
+      if (emailExistsPending) {
+        return res.status(409).json({
+          field: "email",
+          message: "Email already submitted and pending approval"
+        });
       }
 
       const emailDomain = String(email).toLowerCase().split("@")[1] || "";
@@ -470,13 +492,17 @@ router.get(
   "/exists",
   async (req, res) => {
     try {
-      const email = String(req.query.email || "").trim();
+      const email = String(req.query.email || "").trim().toLowerCase();
       if (!email) return res.status(400).json({ message: "email is required" });
 
-      const approved = await ServiceProvider.findOne({ email });
+      const approved = await ServiceProvider.findOne({
+        email: { $regex: `^${email.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, $options: "i" }
+      });
       if (approved) return res.json({ exists: true, status: "approved" });
 
-      const pending = await ProviderRequest.findOne({ email });
+      const pending = await ProviderRequest.findOne({
+        email: { $regex: `^${email.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, $options: "i" }
+      });
       if (pending) return res.json({ exists: true, status: "pending" });
 
       return res.json({ exists: false });
@@ -492,6 +518,7 @@ router.post(
   uploadWithCloudinary,
   async (req, res) => {
     try {
+      const normalizedEmail = String(req.body?.email || "").trim().toLowerCase();
       const {
         name,
         email,
@@ -509,19 +536,19 @@ router.post(
       /* ===============================
          VALIDATION
       =============================== */
-      if (!name || !email || !mobile || !serviceCategory || !address || !availableTime) {
+      if (!name || !normalizedEmail || !mobile || !serviceCategory || !address || !availableTime) {
         return res.status(400).json({
           message: "Missing required fields"
         });
       }
 
-      if (!isValidEmail(email)) {
+      if (!isValidEmail(normalizedEmail)) {
         return res.status(400).json({
           message: "Please enter a valid email address"
         });
       }
 
-      const emailDomain = String(email).toLowerCase().split("@")[1] || "";
+      const emailDomain = normalizedEmail.split("@")[1] || "";
       const domainHasMx = emailDomain ? await hasMxRecord(emailDomain) : false;
       if (!domainHasMx) {
         return res.status(400).json({
@@ -546,7 +573,7 @@ router.post(
       const otpRecord = await EmailOtp.findById(emailOtpId);
       if (
         !otpRecord ||
-        otpRecord.email !== email ||
+        String(otpRecord.email || "").toLowerCase() !== normalizedEmail ||
         !otpRecord.verifiedAt ||
         otpRecord.consumedAt ||
         otpRecord.expiresAt.getTime() < Date.now()
@@ -561,7 +588,7 @@ router.post(
 
       // Check if email is blacklisted
       const Blacklist = require("../models/Blacklist");
-      const blacklisted = await Blacklist.findOne({ email: email.toLowerCase() });
+      const blacklisted = await Blacklist.findOne({ email: normalizedEmail });
       if (blacklisted) {
         return res.status(403).json({ 
           message: "This email has been permanently blocked from using our platform"
@@ -592,7 +619,9 @@ router.post(
       =============================== */
 
       // Approved providers
-      const emailApproved = await ServiceProvider.findOne({ email });
+      const emailApproved = await ServiceProvider.findOne({
+        email: { $regex: `^${normalizedEmail.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, $options: "i" }
+      });
       if (emailApproved) {
         return res.status(409).json({
           field: "email",
@@ -609,7 +638,9 @@ router.post(
       }
 
       // Pending requests
-      const emailPending = await ProviderRequest.findOne({ email });
+      const emailPending = await ProviderRequest.findOne({
+        email: { $regex: `^${normalizedEmail.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, $options: "i" }
+      });
       if (emailPending) {
         return res.status(409).json({
           field: "email",
@@ -632,7 +663,7 @@ router.post(
 
       const providerRequest = new ProviderRequest({
         name,
-        email,
+        email: normalizedEmail,
         mobile: normalizedMobile,
         qualification,
         serviceCategory,

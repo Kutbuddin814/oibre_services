@@ -405,8 +405,8 @@ const ProviderRegister = ({ onSuccess }) => {
       return;
     }
 
-    if (!formData.qualification.trim()) {
-      setError("Please enter your qualification");
+    if (!formData.address.trim()) {
+      setError("Please enter your address");
       return;
     }
 
@@ -468,8 +468,8 @@ const ProviderRegister = ({ onSuccess }) => {
       }
     }
 
-    if (!formData.address.trim()) {
-      setError("Please enter your address");
+    if (!formData.qualification.trim()) {
+      setError("Please enter your qualification");
       return;
     }
 
@@ -595,11 +595,13 @@ const ProviderRegister = ({ onSuccess }) => {
                 }
 
                 // Check if email already exists (approved or pending)
+                const normalizedEmail = String(formData.email || "").trim().toLowerCase();
+
                 try {
                   console.log("calling /exists");
                   setOtpMessage("Checking email availability...");
                   const check = await api.get("/providers/exists", {
-                    params: { email: formData.email },
+                    params: { email: normalizedEmail },
                     timeout: 5000
                   });
 
@@ -616,7 +618,10 @@ const ProviderRegister = ({ onSuccess }) => {
                   }
                 } catch (e) {
                   console.warn("Email exists check failed", e?.message || e);
-                  // continue to try sending OTP even if exists check fails
+                  const msg = "Could not verify email availability right now. Please try again.";
+                  setError(msg);
+                  setOtpMessage(msg);
+                  return;
                 }
 
                 try {
@@ -625,7 +630,7 @@ const ProviderRegister = ({ onSuccess }) => {
                   setEmailOtp((prev) => ({ ...prev, sending: true }));
                   const res = await api.post(
                     "/providers/email-otp/send",
-                    { email: formData.email },
+                    { email: normalizedEmail },
                     { timeout: 30000 }
                   );
                   console.log("/email-otp/send response", res?.data);
@@ -767,15 +772,53 @@ const ProviderRegister = ({ onSuccess }) => {
             title="Enter a valid 10-digit Indian phone number starting with 6-9"
           />
 
-          <label className="form-field-label" htmlFor="provider-qualification">Qualification</label>
+          <label className="form-field-label" htmlFor="provider-address">Address</label>
           <input
-            id="provider-qualification"
-            name="qualification"
-            placeholder="Qualification"
-            value={formData.qualification}
+            id="provider-address"
+            name="address"
+            placeholder="House No, Street, Area, City (e.g. Vasco, Goa)"
+            value={formData.address}
             onChange={handleChange}
             required
           />
+
+          <div className="location-actions">
+            <button
+              type="button"
+              className="location-detect-btn"
+              onClick={handleUseCurrentLocation}
+              disabled={detectingLocation}
+            >
+              {detectingLocation ? "Detecting..." : "Detect my location"}
+            </button>
+            <span className="location-hint">Or type to search your address</span>
+          </div>
+
+          {locationError && (
+            <div className="location-error">{locationError}</div>
+          )}
+
+          {locationResults.length > 0 && (
+            <div className="location-results">
+              {locationResults.map((location, idx) => (
+                <button
+                  type="button"
+                  key={`${location.address}-${idx}`}
+                  className="location-result-item"
+                  onClick={() => handleSelectSearchResult(location)}
+                >
+                  <span className="location-result-title">{location.title}</span>
+                  {location.subtitle && (
+                    <span className="location-result-subtitle">{location.subtitle}</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {searchingLocations && locationQuery.trim().length > 0 && (
+            <div className="location-searching">Searching locations...</div>
+          )}
         </div>
         )}
 
@@ -848,53 +891,15 @@ const ProviderRegister = ({ onSuccess }) => {
             </small>
           </div>
 
-          <label className="form-field-label" htmlFor="provider-address">Address</label>
+          <label className="form-field-label" htmlFor="provider-qualification">Qualification</label>
           <input
-            id="provider-address"
-            name="address"
-            placeholder="House No, Street, Area, City (e.g. Vasco, Goa)"
-            value={formData.address}
+            id="provider-qualification"
+            name="qualification"
+            placeholder="Qualification (e.g. 10th Pass, ITI, Diploma, etc.)"
+            value={formData.qualification}
             onChange={handleChange}
             required
           />
-
-          <div className="location-actions">
-            <button
-              type="button"
-              className="location-detect-btn"
-              onClick={handleUseCurrentLocation}
-              disabled={detectingLocation}
-            >
-              {detectingLocation ? "Detecting..." : "Detect my location"}
-            </button>
-            <span className="location-hint">Or type to search your address</span>
-          </div>
-
-          {locationError && (
-            <div className="location-error">{locationError}</div>
-          )}
-
-          {locationResults.length > 0 && (
-            <div className="location-results">
-              {locationResults.map((location, idx) => (
-                <button
-                  type="button"
-                  key={`${location.address}-${idx}`}
-                  className="location-result-item"
-                  onClick={() => handleSelectSearchResult(location)}
-                >
-                  <span className="location-result-title">{location.title}</span>
-                  {location.subtitle && (
-                    <span className="location-result-subtitle">{location.subtitle}</span>
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {searchingLocations && locationQuery.trim().length > 0 && (
-            <div className="location-searching">Searching locations...</div>
-          )}
 
           <label className="form-field-label" htmlFor="provider-start-time">Start Time</label>
           <select
