@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "./config/axios";
 import { useNavigate } from "react-router-dom";
 import "./ProviderStyles.css";
+import PaymentDetailsModal from "./PaymentDetailsModal";
 
 const ProviderProfile = () => {
   const [provider, setProvider] = useState(null);
@@ -39,6 +40,7 @@ const ProviderProfile = () => {
   const [profileTab, setProfileTab] = useState("profile");
   const [paymentDetails, setPaymentDetails] = useState(null);
   const [paymentDetailsCompleted, setPaymentDetailsCompleted] = useState(false);
+  const [showPaymentDetailsModal, setShowPaymentDetailsModal] = useState(false);
   const token = localStorage.getItem("providerToken");
   const navigate = useNavigate();
   const isCoordinateString = (value) =>
@@ -151,6 +153,31 @@ const ProviderProfile = () => {
     setEmailError("");
     setEmailLoading(false);
     setShowEmailChangeModal(true);
+  };
+
+  const openPaymentDetailsModal = () => {
+    setShowPaymentDetailsModal(true);
+  };
+
+  const handlePaymentDetailsSave = async () => {
+    // Refresh payment details after save
+    try {
+      const paymentRes = await api.get(
+        "/provider/payment/payment-details",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      if (paymentRes.data?.success) {
+        setPaymentDetails(paymentRes.data.paymentDetails || {});
+        setPaymentDetailsCompleted(Boolean(paymentRes.data.paymentDetailsCompleted));
+      }
+    } catch (err) {
+      console.error("Failed to refresh payment details:", err);
+    }
+    setShowPaymentDetailsModal(false);
   };
 
   const sendEmailOtp = async () => {
@@ -668,7 +695,7 @@ const ProviderProfile = () => {
 
               {!paymentDetailsCompleted && (
                 <div className="profile-field">
-                  <p>Add your payment details from dashboard popup to receive payouts without delay.</p>
+                  <p>Add your payment details to receive payouts without delay.</p>
                 </div>
               )}
             </>
@@ -685,6 +712,11 @@ const ProviderProfile = () => {
           <button className="edit-btn" onClick={openEditModal}>
             ✏️ Edit Profile
           </button>
+          {profileTab === "payment" && (
+            <button className="edit-btn" onClick={openPaymentDetailsModal}>
+              💳 Edit Payment Details
+            </button>
+          )}
           <button className="edit-btn" onClick={startEmailChange}>
             ✉️ Change Email
           </button>
@@ -1032,6 +1064,13 @@ const ProviderProfile = () => {
           </div>
         </div>
       )}
+
+      {/* Payment Details Modal */}
+      <PaymentDetailsModal
+        isOpen={showPaymentDetailsModal}
+        onClose={() => setShowPaymentDetailsModal(false)}
+        onSave={handlePaymentDetailsSave}
+      />
     </div>
   );
 };

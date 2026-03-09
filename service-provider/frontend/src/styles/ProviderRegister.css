@@ -17,6 +17,8 @@
   width: 100%;
   max-width: 600px;
   padding: 40px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .register-form h2 {
@@ -468,6 +470,8 @@
   gap: 12px;
   margin-top: 20px;
   align-items: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .btn-next,
@@ -482,6 +486,8 @@
   transition: all 0.3s ease;
   background: #2563eb;
   color: white;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 .btn-next:hover,
@@ -561,11 +567,13 @@
 
   .step-navigation {
     flex-direction: column;
+    gap: 10px;
   }
 
   .btn-next,
   .btn-submit,
   .btn-back {
     width: 100%;
+    box-sizing: border-box;
   }
 }
