@@ -7,6 +7,7 @@ const Users = () => {
   const [loading, setLoading] = useState(true);
   const [showBanModal, setShowBanModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [actionReason, setActionReason] = useState("");
   const [processing, setProcessing] = useState(false);
@@ -27,9 +28,8 @@ const Users = () => {
   };
 
   const handleView = (user) => {
-    alert(
-      `Name: ${user.name || "-"}\nEmail: ${user.email || "-"}\nPhone: ${user.mobile || "-"}\nAddress: ${user.address || "-"}\nStatus: ${user.status || "active"}\n${user.status === "banned" ? `Ban Reason: ${user.banReason || "-"}` : ""}`
-    );
+    setSelectedUser(user);
+    setShowViewModal(true);
   };
 
   const openBanModal = (user) => {
@@ -244,6 +244,81 @@ const Users = () => {
                 }}
               >
                 {processing ? "Banning..." : "Ban User"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View Modal */}
+      {showViewModal && selectedUser && (
+        <div className="modal-overlay" onClick={() => setShowViewModal(false)}>
+          <div className="modal-content user-view-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="user-view-header">
+              <div className="user-avatar">
+                {selectedUser.name ? selectedUser.name.charAt(0).toUpperCase() : "U"}
+              </div>
+              <div className="user-view-title">
+                <h3>{selectedUser.name || "User"}</h3>
+                <span className={`status-badge ${selectedUser.status === "banned" ? "banned" : "active"}`}>
+                  {selectedUser.status === "banned" ? "Banned" : "Active"}
+                </span>
+              </div>
+            </div>
+
+            <div className="user-view-body">
+              <div className="info-row">
+                <label>Email Address</label>
+                <p>{selectedUser.email || "-"}</p>
+              </div>
+              <div className="info-row">
+                <label>Phone Number</label>
+                <p>{selectedUser.mobile || "-"}</p>
+              </div>
+              <div className="info-row">
+                <label>Address</label>
+                <p>{selectedUser.address || "-"}</p>
+              </div>
+              <div className="info-row">
+                <label>Join Date</label>
+                <p>
+                  {selectedUser.createdAt 
+                    ? new Date(selectedUser.createdAt).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric"
+                      })
+                    : "-"}
+                </p>
+              </div>
+
+              {selectedUser.status === "banned" && selectedUser.banReason && (
+                <div className="info-row ban-info">
+                  <label>Ban Reason</label>
+                  <p>{selectedUser.banReason}</p>
+                </div>
+              )}
+
+              {selectedUser.status === "banned" && selectedUser.bannedAt && (
+                <div className="info-row ban-info">
+                  <label>Banned On</label>
+                  <p>
+                    {new Date(selectedUser.bannedAt).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric"
+                    })}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="user-view-footer">
+              <button
+                onClick={() => setShowViewModal(false)}
+                className="btn-close-modal"
+              >
+                Close
               </button>
             </div>
           </div>

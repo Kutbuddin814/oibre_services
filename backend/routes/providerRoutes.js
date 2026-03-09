@@ -366,8 +366,10 @@ router.post(
       }
 
       // Hard guard: never issue OTP for already-approved or pending provider emails.
+      const emailRegex = new RegExp(`^${email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
+
       const emailExistsApproved = await ServiceProvider.findOne({
-        email: { $regex: `^${email.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, $options: "i" }
+        email: emailRegex
       });
       if (emailExistsApproved) {
         return res.status(409).json({
@@ -377,7 +379,7 @@ router.post(
       }
 
       const emailExistsPending = await ProviderRequest.findOne({
-        email: { $regex: `^${email.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, $options: "i" }
+        email: emailRegex
       });
       if (emailExistsPending) {
         return res.status(409).json({
@@ -493,22 +495,32 @@ router.get(
   async (req, res) => {
     try {
       const email = String(req.query.email || "").trim().toLowerCase();
-      if (!email) return res.status(400).json({ message: "email is required" });
+      
+      if (!email || !email.includes("@")) {
+        return res.status(400).json({ message: "Invalid email format" });
+      }
 
+      // Simple case-insensitive search without complex regex
       const approved = await ServiceProvider.findOne({
-        email: { $regex: `^${email.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, $options: "i" }
-      });
-      if (approved) return res.json({ exists: true, status: "approved" });
+        email: email
+      }).collation({ locale: "en", strength: 2 });
+      
+      if (approved) {
+        return res.json({ exists: true, status: "approved" });
+      }
 
       const pending = await ProviderRequest.findOne({
-        email: { $regex: `^${email.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, $options: "i" }
-      });
-      if (pending) return res.json({ exists: true, status: "pending" });
+        email: email
+      }).collation({ locale: "en", strength: 2 });
+      
+      if (pending) {
+        return res.json({ exists: true, status: "pending" });
+      }
 
       return res.json({ exists: false });
     } catch (err) {
-      console.error("EMAIL EXISTS CHECK ERROR:", err.message);
-      return res.status(500).json({ message: "Failed to check email" });
+      console.error("EMAIL EXISTS CHECK ERROR:", err);
+      return res.status(500).json({ message: "Failed to check email availability. Please try again." });
     }
   }
 );
