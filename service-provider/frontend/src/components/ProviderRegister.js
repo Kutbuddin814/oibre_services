@@ -135,6 +135,20 @@ const ProviderRegister = ({ onSuccess }) => {
   });
   const [resendTimer, setResendTimer] = useState(0);
   const [otpMessage, setOtpMessage] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({
+    name: "",
+    email: "",
+    mobile: "",
+    address: "",
+    serviceCategory: ""
+  });
+  const [touchedFields, setTouchedFields] = useState({
+    name: false,
+    email: false,
+    mobile: false,
+    address: false,
+    serviceCategory: false
+  });
 
   useEffect(() => {
     if (!resendTimer) return;
@@ -165,6 +179,9 @@ const ProviderRegister = ({ onSuccess }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     
+    // Clear field error when user starts typing
+    setFieldErrors((prev) => ({ ...prev, [name]: "" }));
+    
     // Auto-set suggested starting visit charge when service category is selected
     if (name === "serviceCategory" && value !== "Other") {
       const suggestedCharge = SERVICE_BASE_CHARGES[value] || 300;
@@ -191,6 +208,39 @@ const ProviderRegister = ({ onSuccess }) => {
       });
       setResendTimer(0);
     }
+  };
+
+  const validateField = (fieldName, value) => {
+    switch (fieldName) {
+      case "name":
+        if (!value.trim()) return "Full name is required";
+        if (!isValidName(value)) return "Name must be 3-50 letters only (no numbers or special characters)";
+        return "";
+      case "email":
+        if (!value.trim()) return "Email is required";
+        if (!isValidEmail(value)) return "Please enter a valid email address";
+        return "";
+      case "mobile":
+        if (!value.trim()) return "Mobile number is required";
+        if (!isValidMobile(value)) return "Mobile must be 10 digits or +91 followed by 10 digits";
+        return "";
+      case "address":
+        if (!value.trim()) return "Address is required";
+        if (value.trim().length < 5) return "Please enter a complete address";
+        return "";
+      case "serviceCategory":
+        if (!value) return "Please select a service category";
+        return "";
+      default:
+        return "";
+    }
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouchedFields((prev) => ({ ...prev, [name]: true }));
+    const error = validateField(name, value);
+    setFieldErrors((prev) => ({ ...prev, [name]: error }));
   };
 
   const handleFileChange = (e) => {
@@ -564,8 +614,15 @@ const ProviderRegister = ({ onSuccess }) => {
             placeholder="Full Name"
             value={formData.name}
             onChange={handleChange}
+            onBlur={handleBlur}
+            className={fieldErrors.name ? "input-error" : ""}
             required
           />
+          {fieldErrors.name && (
+            <div className="field-error-message">
+              {fieldErrors.name}
+            </div>
+          )}
 
           <label className="form-field-label" htmlFor="provider-email">Email Address</label>
           <input
@@ -575,9 +632,15 @@ const ProviderRegister = ({ onSuccess }) => {
             placeholder="Enter a valid email (e.g. name@gmail.com)"
             value={formData.email}
             onChange={handleChange}
-            className={emailOtp.verified ? "email-input-verified" : ""}
+            onBlur={handleBlur}
+            className={emailOtp.verified ? "email-input-verified" : fieldErrors.email ? "input-error" : ""}
             required
           />
+          {fieldErrors.email && (
+            <div className="field-error-message">
+              {fieldErrors.email}
+            </div>
+          )}
 
           {formData.email && (
             <>
@@ -767,10 +830,17 @@ const ProviderRegister = ({ onSuccess }) => {
                 handleChange({ target: { name: 'mobile', value } });
               }
             }}
+            onBlur={handleBlur}
+            className={fieldErrors.mobile ? "input-error" : ""}
             required
             maxLength="10"
             title="Enter a valid 10-digit Indian phone number starting with 6-9"
           />
+          {fieldErrors.mobile && (
+            <div className="field-error-message">
+              {fieldErrors.mobile}
+            </div>
+          )}
 
           <label className="form-field-label" htmlFor="provider-address">Address</label>
           <input
@@ -779,8 +849,15 @@ const ProviderRegister = ({ onSuccess }) => {
             placeholder="House No, Street, Area, City (e.g. Vasco, Goa)"
             value={formData.address}
             onChange={handleChange}
+            onBlur={handleBlur}
+            className={fieldErrors.address ? "input-error" : ""}
             required
           />
+          {fieldErrors.address && (
+            <div className="field-error-message">
+              {fieldErrors.address}
+            </div>
+          )}
 
           <div className="location-actions">
             <button
