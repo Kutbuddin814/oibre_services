@@ -1,12 +1,7 @@
-/* IMPORT ORDER (mobile-first, bottom-up cascade) */
+/* IMPORT ORDER: All imports first, then @tailwind, then other rules */
 
 /* 1. Design System Variables & Foundations */
 @import './styles/designSystem.css';
-
-/* 2. Tailwind CSS */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 /* 3. Base Styles */
 @import './styles/base.css';
@@ -35,3 +30,8 @@
 @import './styles/locationModal.css';
 @import './styles/employees.css';
 @import './styles/toast.css';
+
+/* 2. Tailwind CSS (after all imports) */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
