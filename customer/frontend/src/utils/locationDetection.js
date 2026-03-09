@@ -64,10 +64,11 @@ const getGpsLocation = async () => {
   const attempts = [
     { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 },
     { enableHighAccuracy: true, timeout: 18000, maximumAge: 0 },
-    { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
+    { enableHighAccuracy: false, timeout: 8000, maximumAge: 0 }
   ];
 
   let best = null;
+  let lastError = null;
 
   for (const options of attempts) {
     try {
@@ -86,12 +87,16 @@ const getGpsLocation = async () => {
       if (accuracy <= 1200) {
         return best;
       }
-    } catch {
+    } catch (err) {
+      // Log specific error for debugging
+      console.warn(`Geolocation attempt failed: ${err.message}`);
+      lastError = err;
       // Continue to next attempt.
     }
   }
 
   if (!best) {
+    console.warn("Geolocation failed after all attempts:", lastError);
     throw new Error("Could not get GPS location");
   }
 

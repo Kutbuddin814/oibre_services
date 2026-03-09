@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
+import { initializeCacheManagement } from "./utils/cacheManager";
 
 import "./App.css";
 import "./styles/base.css";
@@ -17,6 +18,9 @@ import "./styles/unified-buttons.css";
 import "./index.css";
 import "./styles/toast.css";
 import { installAlertToasts } from "./utils/toast";
+
+// Initialize cache management to prevent stale data
+initializeCacheManagement();
 
 /* Suppress CORS errors from location APIs - Multi-layer suppression */
 const originalError = console.error;

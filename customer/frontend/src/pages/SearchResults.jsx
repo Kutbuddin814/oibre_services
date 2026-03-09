@@ -170,8 +170,11 @@ export default function SearchResults() {
               setProviders(res.data);
               setLoading(false);
             },
-            async () => {
-              // fallback if location denied
+            async (error) => {
+              // Log geolocation error for debugging
+              console.warn("Geolocation error:", error.code, error.message);
+              
+              // fallback if location denied or unavailable
               const res = await api.get(
                 "/providers",
                 {
@@ -181,6 +184,11 @@ export default function SearchResults() {
 
               setProviders(res.data);
               setLoading(false);
+            },
+            { 
+              enableHighAccuracy: false, 
+              timeout: 10000, 
+              maximumAge: 0 // Don't use cached position
             }
           );
         }
@@ -193,10 +201,6 @@ export default function SearchResults() {
 
   // keep a ref for the handler so event listener can call it
   fetchRef.current = fetchProviders;
-
-  useEffect(() => {
-    setSearchText(query);
-  }, [query]);
 
   useEffect(() => {
     // initial load / when query changes
