@@ -680,6 +680,25 @@ const ProviderDashboard = () => {
           <p>Here are your pending service requests</p>
         </div>
 
+        {/* Settlement Information Banner */}
+        <div className="settlement-info-banner">
+          <div className="settlement-icon">ℹ️</div>
+          <div className="settlement-content">
+            <h4>Payment Settlement Process</h4>
+            <p>
+              When a customer completes and pays for your service:
+            </p>
+            <ul className="settlement-steps">
+              <li><strong>Step 1:</strong> Payment received from customer</li>
+              <li><strong>Step 2:</strong> Funds are settling with Razorpay</li>
+              <li><strong>Step 3:</strong> Payout will be processed within <strong>2–3 business days</strong></li>
+            </ul>
+            <p className="settlement-note">
+              You can view all your settled and pending payouts in your <strong>Earnings</strong> section.
+            </p>
+          </div>
+        </div>
+
         <div className="requests-section">
           <h3>Service Requests ({requests.length})</h3>
 

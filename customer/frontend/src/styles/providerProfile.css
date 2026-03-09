@@ -1,16 +1,23 @@
 @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap");
 
 :root {
-  --page-bg: #f3f6fb;
+  --page-bg: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
   --card-bg: #ffffff;
-  --text-strong: #0f172a;
-  --text-body: #334155;
-  --text-muted: #64748b;
-  --line: #e2e8f0;
-  --brand: #0f62fe;
-  --brand-hover: #0a4ece;
-  --chip-bg: #e0ecff;
-  --chip-text: #1245a8;
+  --text-strong: #111827;
+  --text-body: #4b5563;
+  --text-muted: #6b7280;
+  --line: #e5e7eb;
+  --brand: #2563eb;
+  --brand-hover: #1e40af;
+  --chip-bg: #dbeafe;
+  --chip-text: #0c4a6e;
+  --success: #10b981;
+  --success-light: #d1fae5;
+  --warning: #fbbf24;
+  --danger: #ef4444;
+  --border-radius: 16px;
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.15);
 }
 
 .provider-profile-page {
@@ -28,10 +35,7 @@
   content: "";
   position: fixed;
   inset: 0;
-  background:
-    radial-gradient(circle at 14% 12%, rgba(15, 98, 254, 0.14), transparent 34%),
-    radial-gradient(circle at 84% 82%, rgba(14, 165, 233, 0.1), transparent 32%),
-    var(--page-bg);
+  background: var(--page-bg);
   z-index: -1;
 }
 
@@ -79,19 +83,22 @@
 
 .card {
   background: var(--card-bg);
-  border-radius: 18px;
-  padding: 24px;
-  border: 1px solid #e7edf6;
-  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
+  border-radius: var(--border-radius);
+  padding: 32px;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-md);
 }
 
 .profile-header {
   grid-column: 1 / 2;
   display: flex;
   align-items: center;
-  gap: 22px;
-  background:
-    linear-gradient(180deg, rgba(239, 246, 255, 0.85), rgba(255, 255, 255, 0.95));
+  gap: 32px;
+  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+  border-radius: var(--border-radius);
+  padding: 32px;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-md);
 }
 
 .profile-photo-wrapper {
@@ -100,19 +107,19 @@
 
 .profile-photo,
 .profile-photo.fallback {
-  width: 136px;
-  height: 136px;
-  border-radius: 22px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
 }
 
 .profile-photo {
   object-fit: cover;
-  border: 3px solid #d9e7ff;
-  box-shadow: 0 10px 24px rgba(59, 130, 246, 0.2);
+  border: 4px solid white;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.25);
 }
 
 .profile-photo.fallback {
-  background: linear-gradient(145deg, #0f62fe, #0ea5e9);
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -188,27 +195,28 @@
 
 .book-btn {
   width: 100%;
-  margin-top: 18px;
-  padding: 13px 16px;
-  border-radius: 12px;
+  margin-top: 24px;
+  padding: 14px 16px;
+  border-radius: 10px;
   border: none;
-  background: linear-gradient(135deg, var(--brand), #0a4ece);
+  background: linear-gradient(135deg, var(--brand), var(--brand-hover));
   color: #ffffff;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
-  box-shadow: 0 10px 20px rgba(15, 98, 254, 0.3);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
 }
 
 .book-btn:hover {
   transform: translateY(-2px);
-  filter: saturate(1.05);
-  box-shadow: 0 12px 24px rgba(15, 98, 254, 0.35);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
 }
 
 .book-btn:focus-visible {
-  outline: 3px solid rgba(15, 98, 254, 0.35);
+  outline: 3px solid rgba(37, 99, 235, 0.2);
   outline-offset: 2px;
 }
 
@@ -395,20 +403,32 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(2, 6, 23, 0.58);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  backdrop-filter: blur(4px);
 }
 
 .booking-modal {
   width: min(94vw, 500px);
   background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 28px 52px rgba(2, 6, 23, 0.28);
-  padding: 24px;
-  animation: fadeIn 0.2s ease;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-lg);
+  padding: 32px;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .booking-modal h2 {
@@ -436,24 +456,27 @@
 .booking-modal input,
 .booking-modal select {
   width: 100%;
-  padding: 10px 12px;
+  padding: 12px 14px;
   border-radius: 10px;
-  border: 1px solid #d1d5db;
+  border: 2px solid var(--line);
+  background: #f9fafb;
   font-family: inherit;
   font-size: 14px;
+  transition: all 0.2s ease;
 }
 
 .booking-modal textarea {
-  min-height: 92px;
-  resize: none;
+  min-height: 100px;
+  resize: vertical;
 }
 
 .booking-modal textarea:focus,
 .booking-modal input:focus,
 .booking-modal select:focus {
   outline: none;
-  border-color: #6ea5ff;
-  box-shadow: 0 0 0 3px rgba(15, 98, 254, 0.14);
+  border-color: var(--brand);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .problem-image-preview-wrap {

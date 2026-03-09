@@ -379,6 +379,163 @@
   border: 1px solid #fecaca;
 }
 
+/* Multi-Step Progress Stepper */
+.stepper-container {
+  margin-bottom: 35px;
+  padding-bottom: 25px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.step-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  background: #e5e7eb;
+  color: #9ca3af;
+  border: 3px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.step.active .step-circle {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  transform: scale(1.05);
+}
+
+.step.completed .step-circle {
+  background: #10b981;
+  color: white;
+  border-color: #10b981;
+}
+
+.step-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #9ca3af;
+  text-align: center;
+  transition: color 0.3s ease;
+}
+
+.step.active .step-label {
+  color: #2563eb;
+}
+
+.step.completed .step-label {
+  color: #10b981;
+}
+
+.step-line {
+  flex: 1 1 auto;
+  height: 3px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  margin: 0 8px;
+  max-width: 80px;
+  transition: background 0.3s ease;
+}
+
+.step-line.completed {
+  background: #10b981;
+}
+
+/* Step Navigation Buttons */
+.step-navigation {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  align-items: center;
+}
+
+.btn-next,
+.btn-submit {
+  flex: 1;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #2563eb;
+  color: white;
+}
+
+.btn-next:hover,
+.btn-submit:hover:not(:disabled) {
+  background: #1e40af;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+}
+
+.btn-back {
+  flex: 0 0 auto;
+  padding: 14px 20px;
+  border: 2px solid #d1d5db;
+  background: white;
+  color: #374151;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+  border-color: #9ca3af;
+  background: #f9fafb;
+  transform: translateY(-2px);
+}
+
+.btn-submit {
+  flex: 2;
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Smooth fade transition for form sections */
+.form-section {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 640px) {
   .register-form {
     padding: 25px;
@@ -386,5 +543,29 @@
 
   .register-form h2 {
     font-size: 20px;
+  }
+
+  .step-circle {
+    width: 38px;
+    height: 38px;
+    font-size: 14px;
+  }
+
+  .step-label {
+    font-size: 11px;
+  }
+
+  .step-line {
+    max-width: 50px;
+  }
+
+  .step-navigation {
+    flex-direction: column;
+  }
+
+  .btn-next,
+  .btn-submit,
+  .btn-back {
+    width: 100%;
   }
 }

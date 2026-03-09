@@ -130,6 +130,8 @@ const AdminPayoutsPanel = () => {
   };
 
   const formatCurrency = (amount) => {
+    // Handle NaN, null, undefined values
+    if (!amount || isNaN(amount)) return "₹0";
     return `₹${Math.round(amount).toLocaleString("en-IN")}`;
   };
 

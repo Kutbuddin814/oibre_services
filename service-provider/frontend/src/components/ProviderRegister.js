@@ -92,6 +92,8 @@ const getServiceIcon = (service) => {
 };
 
 const ProviderRegister = ({ onSuccess }) => {
+  const [currentStep, setCurrentStep] = useState(1); // Step 1 or 2
+  
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -379,6 +381,47 @@ const ProviderRegister = ({ onSuccess }) => {
     ? TIME_OPTIONS.slice(TIME_OPTIONS.indexOf(startTime) + 1)
     : TIME_OPTIONS.slice(1);
 
+  const handleNextStep = () => {
+    setError("");
+
+    // Validate Step 1 fields
+    if (!isValidName(formData.name)) {
+      setError("Name must contain only letters (min 3 characters)");
+      return;
+    }
+
+    if (!isValidEmail(formData.email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    if (!emailOtp.verified || !emailOtp.otpId) {
+      setError("Please verify your email with OTP before proceeding");
+      return;
+    }
+
+    if (!isValidMobile(formData.mobile)) {
+      setError("Enter a valid 10-digit Indian mobile number");
+      return;
+    }
+
+    if (!formData.qualification.trim()) {
+      setError("Please enter your qualification");
+      return;
+    }
+
+    // All Step 1 validations passed
+    setCurrentStep(2);
+    setError("");
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handlePreviousStep = () => {
+    setCurrentStep(1);
+    setError("");
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -493,6 +536,25 @@ const ProviderRegister = ({ onSuccess }) => {
         <h2>Register as Service Provider</h2>
         <p>Offer your services in your locality</p>
 
+        {/* Progress Stepper */}
+        <div className="stepper-container">
+          <div className="stepper">
+            <div className={`step ${currentStep >= 1 ? 'active' : ''} ${currentStep > 1 ? 'completed' : ''}`}>
+              <div className="step-circle">
+                {currentStep > 1 ? '✓' : '1'}
+              </div>
+              <div className="step-label">Personal Info</div>
+            </div>
+            <div className={`step-line ${currentStep > 1 ? 'completed' : ''}`}></div>
+            <div className={`step ${currentStep >= 2 ? 'active' : ''}`}>
+              <div className="step-circle">2</div>
+              <div className="step-label">Service Details</div>
+            </div>
+          </div>
+        </div>
+
+        {/* STEP 1: Personal Information & Email Verification */}
+        {currentStep === 1 && (
         <div className="form-section">
           <h3>Personal Information</h3>
           <label className="form-field-label" htmlFor="provider-name">Full Name</label>
@@ -715,7 +777,11 @@ const ProviderRegister = ({ onSuccess }) => {
             required
           />
         </div>
+        )}
 
+        {/* STEP 2: Service Information & Documents */}
+        {currentStep === 2 && (
+        <>
         <div className="form-section">
           <h3>Service Information</h3>
           {loadingServices ? (
@@ -909,12 +975,30 @@ const ProviderRegister = ({ onSuccess }) => {
             required
           />
         </div>
+        </>
+        )}
 
         {error && <div className="error-message">{error}</div>}
 
-        <button type="submit" disabled={loading || loadingServices}>
-          {loading ? "⏳ Uploading & Submitting... (this may take 1-2 minutes for large files)" : "Submit for Approval"}
-        </button>
+        {/* Step Navigation Buttons */}
+        <div className="step-navigation">
+          {currentStep === 1 && (
+            <button type="button" className="btn-next" onClick={handleNextStep}>
+              Continue to Service Details →
+            </button>
+          )}
+
+          {currentStep === 2 && (
+            <>
+              <button type="button" className="btn-back" onClick={handlePreviousStep}>
+                ← Back
+              </button>
+              <button type="submit" className="btn-submit" disabled={loading || loadingServices}>
+                {loading ? "⏳ Uploading & Submitting..." : "Submit for Approval"}
+              </button>
+            </>
+          )}
+        </div>
       </form>
     </div>
   );

@@ -55,6 +55,7 @@ router.get("/pending", adminAuth, async (req, res) => {
           paymentDetailsCompleted: { $ifNull: ["$provider.paymentDetailsCompleted", false] },
           serviceCategory: 1,
           finalPrice: 1,
+          estimatedPrice: 1,
           paymentStatus: 1,
           completedAt: "$updatedAt",
           createdAt: 1
@@ -67,12 +68,14 @@ router.get("/pending", adminAuth, async (req, res) => {
 
     // Add commission and earning calculations
     const payoutsWithCalculations = pendingPayouts.map((payout) => {
-      const commission = Math.round(payout.finalPrice * COMMISSION_PERCENTAGE / 100);
-      const providerEarning = payout.finalPrice - commission;
+      // Use finalPrice if available, otherwise use estimatedPrice, otherwise 0
+      const amount = payout.finalPrice || payout.estimatedPrice || 0;
+      const commission = Math.round(amount * COMMISSION_PERCENTAGE / 100);
+      const providerEarning = amount - commission;
 
       return {
         ...payout,
-        totalAmount: payout.finalPrice,
+        totalAmount: amount,
         commission: commission,
         providerEarning: providerEarning,
         canPay: payout.paymentDetailsCompleted // Can only pay if details are complete
@@ -135,6 +138,7 @@ router.get("/history", adminAuth, async (req, res) => {
           paymentDetailsCompleted: { $ifNull: ["$provider.paymentDetailsCompleted", false] },
           serviceCategory: 1,
           finalPrice: 1,
+          estimatedPrice: 1,
           commission: 1,
           providerEarning: 1,
           payoutDate: 1,
@@ -213,9 +217,10 @@ router.put("/:bookingId/mark-paid", adminAuth, async (req, res) => {
       });
     }
 
-    // Calculate commission and earning
-    const commission = Math.round(booking.finalPrice * COMMISSION_PERCENTAGE / 100);
-    const providerEarning = booking.finalPrice - commission;
+    // Calculate commission and earning with fallback for missing finalPrice
+    const amount = booking.finalPrice || booking.estimatedPrice || 0;
+    const commission = Math.round(amount * COMMISSION_PERCENTAGE / 100);
+    const providerEarning = amount - commission;
 
     // Update booking with payout details
     booking.payoutStatus = "paid";
