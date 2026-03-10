@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import api from "../config/axios";
 import MapPicker from "./MapPicker";
 import { detectUserLocation } from "../utils/locationDetection";
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const locationPath = useLocation();
   const [open, setOpen] = useState(false);
   const [location, setLocation] = useState({ label: "Select location", lat: null, lng: null });
   const [detectedLabel, setDetectedLabel] = useState("");
@@ -421,6 +422,12 @@ export default function Navbar() {
 
   const canChangePassword = isLoggedIn && customer?.authProvider !== "google";
 
+  useEffect(() => {
+    setProfileOpen(false);
+    setNotificationsOpen(false);
+    setMobileMenuOpen(false);
+  }, [locationPath.pathname]);
+
   return (
     <>
       <nav className="navbar">
@@ -611,22 +618,31 @@ export default function Navbar() {
                       </div>
                     </div>
                     <hr />
-                    <Link to="/profile" className="profile-link">
+                    <Link to="/profile" className="profile-link" onClick={() => setProfileOpen(false)}>
                       View Profile
                     </Link>
-                    <Link to="/orders" className="profile-link">
+                    <Link to="/orders" className="profile-link" onClick={() => setProfileOpen(false)}>
                       My Orders
                     </Link>
                     {canChangePassword && (
                       <button
                         type="button"
                         className="profile-action-btn"
-                        onClick={handleOpenChangePassword}
+                        onClick={() => {
+                          setProfileOpen(false);
+                          handleOpenChangePassword();
+                        }}
                       >
                         Change Password
                       </button>
                     )}
-                    <button onClick={handleLogout} className="logout-btn">
+                    <button
+                      onClick={() => {
+                        setProfileOpen(false);
+                        handleLogout();
+                      }}
+                      className="logout-btn"
+                    >
                       Logout
                     </button>
                   </div>

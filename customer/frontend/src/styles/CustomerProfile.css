@@ -14,7 +14,7 @@
   justify-content: center;
 }
 
-.back-button {
+.customer-profile-back-button {
   position: fixed;
   top: 80px;
   left: 20px;
@@ -35,7 +35,7 @@
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
-.back-button:hover {
+.customer-profile-back-button:hover {
   background: #f3f4f6;
   border-color: #2563eb;
   color: #2563eb;
@@ -356,7 +356,7 @@
     padding: 32px 24px;
   }
 
-  .back-button {
+  .customer-profile-back-button {
     top: 70px;
     left: 12px;
     padding: 8px 14px;
@@ -399,7 +399,7 @@
     padding: 32px 24px;
   }
 
-  .back-button {
+  .customer-profile-back-button {
     top: 70px;
     left: 12px;
     padding: 8px 14px;

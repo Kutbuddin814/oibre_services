@@ -184,7 +184,7 @@ export default function CustomerProfile() {
     <div className="profile-container">
       <button
         onClick={() => navigate(-1)}
-        className="back-button"
+        className="customer-profile-back-button"
         title="Go back"
       >
         Back
