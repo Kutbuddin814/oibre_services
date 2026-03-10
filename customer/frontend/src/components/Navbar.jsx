@@ -427,6 +427,7 @@ export default function Navbar() {
         {/* LEFT */}
         <div className="nav-left">
           <Link to="/" className="logo-link" onClick={() => setMobileMenuOpen(false)}>
+            <img src="/oibre-logo.jpeg" alt="Oibre Logo" className="logo-image" />
             <h1 className="logo">Oibre</h1>
           </Link>
 

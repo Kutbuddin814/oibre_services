@@ -260,6 +260,42 @@ router.get("/", optionalCustomerAuth, async (req, res) => {
   }
 });
 
+// Check if email already exists (approved or pending)
+router.get(
+  "/exists",
+  async (req, res) => {
+    try {
+      const email = String(req.query.email || "").trim().toLowerCase();
+
+      if (!email || !email.includes("@")) {
+        return res.status(400).json({ message: "Invalid email format" });
+      }
+
+      // Simple case-insensitive search without complex regex
+      const approved = await ServiceProvider.findOne({
+        email: email
+      }).collation({ locale: "en", strength: 2 });
+
+      if (approved) {
+        return res.json({ exists: true, status: "approved" });
+      }
+
+      const pending = await ProviderRequest.findOne({
+        email: email
+      }).collation({ locale: "en", strength: 2 });
+
+      if (pending) {
+        return res.json({ exists: true, status: "pending" });
+      }
+
+      return res.json({ exists: false });
+    } catch (err) {
+      console.error("EMAIL EXISTS CHECK ERROR:", err);
+      return res.status(500).json({ message: "Failed to check email availability. Please try again." });
+    }
+  }
+);
+
 /* ===============================
    GET PROVIDER PROFILE WITH REVIEWS
 =============================== */
@@ -295,9 +331,9 @@ router.get("/:id", async (req, res) => {
         const R = 6371; // Earth's radius in kilometers
         const dLat = (latitude - provider.location.coordinates[1]) * Math.PI / 180;
         const dLng = (longitude - provider.location.coordinates[0]) * Math.PI / 180;
-        const a = 
+        const a =
           Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-          Math.cos(provider.location.coordinates[1] * Math.PI / 180) * 
+          Math.cos(provider.location.coordinates[1] * Math.PI / 180) *
           Math.cos(latitude * Math.PI / 180) *
           Math.sin(dLng / 2) * Math.sin(dLng / 2);
         const c = 2 * Math.asin(Math.sqrt(a));
@@ -485,42 +521,6 @@ router.post(
     } catch (err) {
       console.error("EMAIL OTP VERIFY ERROR:", err.message);
       res.status(500).json({ message: "Failed to verify OTP" });
-    }
-  }
-);
-
-// Check if email already exists (approved or pending)
-router.get(
-  "/exists",
-  async (req, res) => {
-    try {
-      const email = String(req.query.email || "").trim().toLowerCase();
-      
-      if (!email || !email.includes("@")) {
-        return res.status(400).json({ message: "Invalid email format" });
-      }
-
-      // Simple case-insensitive search without complex regex
-      const approved = await ServiceProvider.findOne({
-        email: email
-      }).collation({ locale: "en", strength: 2 });
-      
-      if (approved) {
-        return res.json({ exists: true, status: "approved" });
-      }
-
-      const pending = await ProviderRequest.findOne({
-        email: email
-      }).collation({ locale: "en", strength: 2 });
-      
-      if (pending) {
-        return res.json({ exists: true, status: "pending" });
-      }
-
-      return res.json({ exists: false });
-    } catch (err) {
-      console.error("EMAIL EXISTS CHECK ERROR:", err);
-      return res.status(500).json({ message: "Failed to check email availability. Please try again." });
     }
   }
 );
