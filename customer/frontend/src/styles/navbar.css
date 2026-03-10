@@ -40,6 +40,11 @@
 
 .logo-link:hover {
   color: #FFFFFF;
+  text-decoration: none;
+}
+
+.logo-link:hover .logo {
+  text-decoration: none;
 }
 
 .logo-image {
