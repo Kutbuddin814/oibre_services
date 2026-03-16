@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import api from "../config/axios";
 import MapPicker from "./MapPicker";
 import { detectUserLocation } from "../utils/locationDetection";
@@ -7,9 +7,7 @@ import { detectUserLocation } from "../utils/locationDetection";
 export default function Navbar() {
   const navigate = useNavigate();
   const locationPath = useLocation();
-  const [open, setOpen] = useState(false);
   const [location, setLocation] = useState({ label: "Select location", lat: null, lng: null });
-  const [detectedLabel, setDetectedLabel] = useState("");
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [userLocationSet, setUserLocationSet] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -19,10 +17,8 @@ export default function Navbar() {
   const [notifications, setNotifications] = useState([]);
   const [showAllNotifications, setShowAllNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  const dropdownRef = useRef(null);
   const profileRef = useRef(null);
   const notificationRef = useRef(null);
-  const [mapOpen, setMapOpen] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [changePasswordLoading, setChangePasswordLoading] = useState(false);
   const [changePasswordError, setChangePasswordError] = useState("");
@@ -199,7 +195,6 @@ export default function Navbar() {
         };
 
         setLocation({ label: loc.label, lat: loc.lat, lng: loc.lng });
-        setDetectedLabel(loc.label);
         setIsConfirmed(false);
 
         try {
@@ -248,9 +243,6 @@ export default function Navbar() {
   // Close dropdowns on outside click
   useEffect(() => {
     function handleClickOutside(e) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setOpen(false);
-      }
       if (profileRef.current && !profileRef.current.contains(e.target)) {
         setProfileOpen(false);
       }
@@ -449,15 +441,15 @@ export default function Navbar() {
           </button>
 
           <div className={`nav-links ${mobileMenuOpen ? "mobile-open" : ""}`}>
-            <Link to="/" onClick={() => setMobileMenuOpen(false)}>Home</Link>
-            <Link to="/services" onClick={() => setMobileMenuOpen(false)}>Services</Link>
-            <Link to="/about" onClick={() => setMobileMenuOpen(false)}>About</Link>
-            <Link to="/contact" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
+            <NavLink to="/" end onClick={() => setMobileMenuOpen(false)}>Home</NavLink>
+            <NavLink to="/services" onClick={() => setMobileMenuOpen(false)}>Services</NavLink>
+            <NavLink to="/about" onClick={() => setMobileMenuOpen(false)}>About</NavLink>
+            <NavLink to="/contact" onClick={() => setMobileMenuOpen(false)}>Contact</NavLink>
           </div>
         </div>
 
         {/* RIGHT */}
-        <div className="nav-actions" ref={dropdownRef}>
+        <div className="nav-actions">
           <div className="location-wrapper">
             <div className="location-pill" title={location.address || location.label || "Detecting..."}>
               📍 {location.label || "Detecting..."}

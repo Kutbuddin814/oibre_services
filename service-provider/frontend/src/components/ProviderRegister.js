@@ -1075,7 +1075,11 @@ const ProviderRegister = ({ onSuccess }) => {
               <button type="button" className="btn-back" onClick={handlePreviousStep}>
                 ← Back
               </button>
-              <button type="submit" className="btn-submit" disabled={loading || loadingServices}>
+              <button
+                type="submit"
+                className={`btn-submit ${loading ? "is-loading" : ""}`}
+                disabled={loading || loadingServices}
+              >
                 {loading ? "⏳ Uploading & Submitting..." : "Submit for Approval"}
               </button>
             </>

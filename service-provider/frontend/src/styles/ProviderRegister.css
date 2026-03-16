@@ -492,46 +492,52 @@
 .step-navigation {
   display: flex;
   gap: 12px;
-  margin-top: 20px;
+  margin-top: 24px;
   align-items: center;
   width: 100%;
   box-sizing: border-box;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px;
 }
 
 .btn-next,
 .btn-submit {
   flex: 1;
-  padding: 14px 24px;
+  padding: 14px 20px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
   background: #2563eb;
   color: white;
   box-sizing: border-box;
   min-width: 0;
+  min-height: 48px;
 }
 
 .btn-next:hover,
 .btn-submit:hover:not(:disabled) {
-  background: #1e40af;
+  background: #1d4ed8;
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
 }
 
 .btn-back {
   flex: 0 0 auto;
-  padding: 14px 20px;
+  padding: 14px 18px;
   border: 2px solid #d1d5db;
   background: white;
   color: #374151;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
+  min-height: 48px;
 }
 
 .btn-back:hover {
@@ -542,12 +548,43 @@
 
 .btn-submit {
   flex: 2;
+  position: relative;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 52%, #1e40af 100%);
+  letter-spacing: 0.2px;
+}
+
+.btn-submit.is-loading {
+  padding-left: 44px;
+}
+
+.btn-submit.is-loading::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  animation: submit-spin 0.7s linear infinite;
 }
 
 .btn-submit:disabled {
-  opacity: 0.6;
+  opacity: 0.78;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
+}
+
+@keyframes submit-spin {
+  from {
+    transform: translateY(-50%) rotate(0deg);
+  }
+  to {
+    transform: translateY(-50%) rotate(360deg);
+  }
 }
 
 /* Smooth fade transition for form sections */
@@ -592,6 +629,7 @@
   .step-navigation {
     flex-direction: column;
     gap: 10px;
+    padding: 10px;
   }
 
   .btn-next,
