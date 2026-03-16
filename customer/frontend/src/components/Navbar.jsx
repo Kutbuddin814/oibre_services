@@ -427,17 +427,20 @@ export default function Navbar() {
         <div className="nav-left">
           <Link to="/" className="logo-link" onClick={() => setMobileMenuOpen(false)}>
             <img src="/oibre-logo.png" alt="Oibre Logo" className="logo-image" />
-            <h1 className="logo">Oibre</h1>
           </Link>
 
           <button
-            className="mobile-menu-toggle"
+            className={`mobile-menu-toggle ${mobileMenuOpen ? "is-open" : ""}`}
             type="button"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
             aria-label="Toggle navigation menu"
             aria-expanded={mobileMenuOpen}
           >
-            {mobileMenuOpen ? "\u2715" : "\u2630"}
+            <span className="mobile-menu-icon" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </span>
           </button>
 
           <div className={`nav-links ${mobileMenuOpen ? "mobile-open" : ""}`}>
