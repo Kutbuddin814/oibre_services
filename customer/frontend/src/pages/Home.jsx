@@ -57,26 +57,55 @@ export default function Home() {
     }
   ];
 
-  const serviceIconFallbackByName = {
-    plumber: "🔧",
-    electrician: "⚡",
-    carpenter: "🪚",
-    taxi: "🚕",
-    mechanic: "🔩",
-    painter: "🎨",
-    cleaning: "🧹",
-    cleaningservice: "🧹",
-    acservice: "❄️",
-    appliance: "🛠️"
+  const serviceKeywordIconMap = [
+    { keys: ["electric", "electri"], icon: "⚡" },
+    { keys: ["plumb"], icon: "🔧" },
+    { keys: ["carpent", "wood"], icon: "🪚" },
+    { keys: ["taxi", "cab", "driver"], icon: "🚕" },
+    { keys: ["mechanic", "garage", "repair"], icon: "🔩" },
+    { keys: ["paint"], icon: "🎨" },
+    { keys: ["clean", "housekeep"], icon: "🧹" },
+    { keys: ["babysit", "child"], icon: "👶" },
+    { keys: ["ac", "air", "cool"], icon: "❄️" },
+    { keys: ["appliance"], icon: "🛠️" },
+    { keys: ["beauty", "salon"], icon: "💇" },
+    { keys: ["cook", "chef"], icon: "👨‍🍳" },
+    { keys: ["garden"], icon: "🌿" },
+    { keys: ["laundry", "iron"], icon: "🧺" }
+  ];
+
+  const hasEmoji = (text) => /[\u2600-\u27BF\u{1F300}-\u{1FAFF}]/u.test(text || "");
+
+  const decodeMojibake = (raw) => {
+    if (!raw) return "";
+    try {
+      const decoded = decodeURIComponent(escape(raw));
+      if (hasEmoji(decoded)) return decoded;
+    } catch {
+      // Ignore decode errors and continue with fallback logic.
+    }
+    return raw;
+  };
+
+  const getServiceFallbackIcon = (name) => {
+    const lower = String(name || "").toLowerCase();
+    const match = serviceKeywordIconMap.find((entry) =>
+      entry.keys.some((k) => lower.includes(k))
+    );
+    return match?.icon || "🔧";
   };
 
   const normalizeServiceIcon = (icon, name) => {
     const raw = typeof icon === "string" ? icon.trim() : "";
-    const fallback = serviceIconFallbackByName[String(name || "").toLowerCase().replace(/\s+/g, "")] || "🔧";
+    const fallback = getServiceFallbackIcon(name);
+    if (!raw) return fallback;
 
-    // If icon is missing or appears mojibake, use fallback.
-    if (!raw || /Ã|â|�/.test(raw)) return fallback;
-    return raw;
+    const repaired = decodeMojibake(raw).trim();
+    if (hasEmoji(repaired) && !/Ã|â|�|ðŸ|Ð/.test(repaired)) {
+      return repaired;
+    }
+
+    return fallback;
   };
 
   /* ================= CHECK LOGIN & FETCH CUSTOMER DATA ================= */
