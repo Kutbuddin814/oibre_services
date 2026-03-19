@@ -24,7 +24,24 @@ const CustomerSchema = new mongoose.Schema(
       default: "active"
     },
     bannedAt: Date,
-    banReason: String
+    banReason: String,
+    // Chatbot features
+    favoriteProviders: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "ServiceProvider"
+      }
+    ],
+    recentChatbotSearches: [
+      {
+        serviceType: String,
+        location: String,
+        timestamp: {
+          type: Date,
+          default: Date.now
+        }
+      }
+    ]
   },
   { timestamps: true }
 );

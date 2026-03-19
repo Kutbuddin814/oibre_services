@@ -910,6 +910,9 @@ export default function ProviderProfile() {
                 <div className="chat-modal-header-text">
                   <span className="chat-modal-header-label">Service Provider</span>
                   <h2>{provider.name}</h2>
+                  <span className={`chat-contact-pill ${chatContactUnlocked ? "is-unlocked" : "is-locked"}`}>
+                    {chatContactUnlocked ? "Contact unlocked" : "Contact locked"}
+                  </span>
                 </div>
               </div>
               <button
@@ -925,14 +928,45 @@ export default function ProviderProfile() {
             </div>
 
             {!chatContactUnlocked && (
-              <div className="chat-warning-banner">
-                Contact sharing is blocked before booking. Examples: 98XXXXXX10, user@example.com, WhatsApp/Telegram handle.
+              <div className="chat-contact-card chat-contact-locked">
+                <div className="chat-contact-title-row">
+                  <span className="chat-contact-icon" aria-hidden="true">🔒</span>
+                  <div>
+                    <h3>Contact details are hidden before booking</h3>
+                    <p>
+                      They unlock automatically right after you create a booking request with this provider.
+                    </p>
+                  </div>
+                </div>
+                <div className="chat-contact-meta">
+                  For safety, phone, email, and off-platform handles are blocked in chat until booking.
+                </div>
               </div>
             )}
 
             {chatContactUnlocked && chatProviderContact && (
-              <div className="chat-unlocked-banner">
-                Contact unlocked: {chatProviderContact.mobile || "-"} {chatProviderContact.email ? `| ${chatProviderContact.email}` : ""}
+              <div className="chat-contact-card chat-contact-unlocked">
+                <div className="chat-contact-title-row">
+                  <span className="chat-contact-icon" aria-hidden="true">✓</span>
+                  <div>
+                    <h3>Contact details are now available</h3>
+                    <p>You can now call or email the provider directly.</p>
+                  </div>
+                </div>
+                <div className="chat-contact-chips">
+                  {chatProviderContact.mobile ? (
+                    <a className="chat-contact-chip" href={`tel:${chatProviderContact.mobile}`}>
+                      📞 {chatProviderContact.mobile}
+                    </a>
+                  ) : (
+                    <span className="chat-contact-chip disabled">📞 Phone unavailable</span>
+                  )}
+                  {chatProviderContact.email && (
+                    <a className="chat-contact-chip" href={`mailto:${chatProviderContact.email}`}>
+                      ✉ {chatProviderContact.email}
+                    </a>
+                  )}
+                </div>
               </div>
             )}
 
@@ -940,7 +974,7 @@ export default function ProviderProfile() {
               {chatLoading ? (
                 <p className="chat-muted">Loading chat...</p>
               ) : chatMessages.length === 0 ? (
-                <p className="chat-muted">No messages yet. Start the conversation.</p>
+                <p className="chat-muted">No messages yet. Say hello and describe your issue in one line.</p>
               ) : (
                 chatMessages.map((msg) => (
                   <div
@@ -962,7 +996,7 @@ export default function ProviderProfile() {
             <div className="chat-input-row">
               <input
                 type="text"
-                placeholder="Type your message"
+                placeholder="Type your message..."
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 onKeyDown={(e) => {

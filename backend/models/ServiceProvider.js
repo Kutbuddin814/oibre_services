@@ -109,6 +109,30 @@ const ServiceProviderSchema = new mongoose.Schema(
     },
 
     /* =========================
+       CHATBOT & AVAILABILITY
+    ========================= */
+    emergencyAvailable: {
+      type: Boolean,
+      default: false
+    },
+    availableToday: {
+      type: Boolean,
+      default: true
+    },
+    responseTime: {
+      type: Number, // in minutes
+      default: 30
+    },
+    backgroundChecked: {
+      type: Boolean,
+      default: false
+    },
+    yearExperience: {
+      type: Number,
+      default: 1
+    },
+
+    /* =========================
        PAYMENT DETAILS
     ========================= */
     paymentDetails: {

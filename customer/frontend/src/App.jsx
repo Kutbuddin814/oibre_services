@@ -1,3 +1,4 @@
+import Chatbot from "./components/Chatbot";
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import SearchResults from "./pages/SearchResults";
@@ -37,6 +38,7 @@ export default function App() {
         <Route path="/cookies" element={<Cookies />} />
       </Routes>
       <Footer />
+      <Chatbot />
     </>
   );
 }
