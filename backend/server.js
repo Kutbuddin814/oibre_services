@@ -18,28 +18,50 @@ const allowedOrigins = [
   "https://oibre-customer-frontend.vercel.app",
   "https://oibre-admin-frontend.vercel.app",
   "https://oibre-services-provider-web-fronten.vercel.app",
-
   process.env.REACT_APP_ADMIN_API_URL?.replace(/\/$/, ""),
   process.env.REACT_APP_CUSTOMER_API_URL?.replace(/\/$/, ""),
   process.env.REACT_APP_PROVIDER_API_URL?.replace(/\/$/, ""),
   process.env.REACT_APP_PROVIDER_WEB_API_URL?.replace(/\/$/, "")
 ].filter(Boolean);
 
-console.log("Allowed Origins:", allowedOrigins);
-app.options('*', cors());
+console.log("✅ Allowed Origins:", allowedOrigins);
+console.log("🌍 Environment Frontend URLs loaded");
+
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      // Allow requests with no origin (same-server requests)
+      if (!origin) {
+        return callback(null, true);
+      }
+      
+      if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        console.log("Blocked by CORS:", origin);
+        console.warn("⚠️  CORS Blocked - Origin:", origin);
+        // For production, keep it strict. For debugging, you can allow all.
         callback(new Error("Not allowed by CORS"));
       }
     },
-    credentials: true
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"]
   })
 );
+
+// Preflight handler
+app.options("*", cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(null, false);
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
