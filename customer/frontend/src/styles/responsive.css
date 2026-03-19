@@ -79,7 +79,9 @@ table {
 /* Mobile: Navbar adjustments */
 .navbar {
   padding: 0 var(--space-lg);
-  min-height: 56px;
+  height: 70px;
+  min-height: 70px;
+  max-height: 70px;
   gap: 8px;
 }
 
@@ -91,7 +93,7 @@ table {
   display: flex;
   flex-direction: column;
   position: absolute;
-  top: 56px;
+  top: 70px;
   left: 0;
   right: 0;
   background: var(--secondary);

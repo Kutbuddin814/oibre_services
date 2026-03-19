@@ -3,13 +3,14 @@
 ======================= */
 
 :root {
-  --search-navbar-offset: 78px;
+  --search-navbar-offset: 82px;
+  --search-floating-gap: 10px;
 }
 
-.back-button {
+.search-back-button {
   position: fixed;
-  top: calc(env(safe-area-inset-top, 0px) + var(--search-navbar-offset));
-  left: 12px;
+  top: calc(var(--search-navbar-offset) + var(--search-floating-gap));
+  left: 16px;
   background: #FFFFFF;
   color: #000000;
   border: 1px solid #E5E7EB;
@@ -19,7 +20,7 @@
   font-weight: 600;
   font-size: 14px;
   transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  z-index: 9999;
+  z-index: 2000;
   min-height: 44px;
   min-width: 44px;
   display: flex;
@@ -28,29 +29,31 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   margin: 0;
   white-space: nowrap;
+  transform: translateZ(0);
+  will-change: transform;
 }
 
-.back-button:hover {
+.search-back-button:hover {
   background: #F3F4F6;
   border-color: #D1D5DB;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.back-button:active {
+.search-back-button:active {
   background: #E5E7EB;
 }
 
 @media (max-width: 768px) {
-  .back-button {
-    top: calc(env(safe-area-inset-top, 0px) + 68px);
-    left: 10px;
+  .search-back-button {
+    top: calc(var(--search-navbar-offset) + 8px);
+    left: 12px;
     padding: 8px 12px;
     font-size: 13px;
   }
 }
 
 .search-page {
-  padding-top: 6px;
+  padding-top: calc(var(--search-navbar-offset) + 26px);
   padding-bottom: 80px;
 }
 
@@ -550,8 +553,8 @@
     min-height: 42px;
   }
 
-  .back-button {
-    top: calc(env(safe-area-inset-top, 0px) + 64px);
+  .search-back-button {
+    top: 80px;
     left: 12px;
     padding: 8px 14px;
     font-size: 13px;
