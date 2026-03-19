@@ -2,16 +2,23 @@
    NAVBAR
 ======================= */
 .navbar {
-  position: sticky;
-  top: 0;
+  position: fixed;
+  top: 0 !important;
+  left: 0;
+  width: 100%;
   z-index: 1000;
   background: linear-gradient(90deg, #050505 0%, #111827 52%, #0f172a 100%);
   color: #FFFFFF;
-  padding: 0 24px;
+  padding: 0 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  min-height: 64px;
+  height: 70px;
+  min-height: 70px;
+  max-height: 70px;
+  transition: none;
+  margin: 0 !important;
+  transform: none !important;
   box-sizing: border-box;
   gap: 16px;
   border-bottom: 1px solid #1f2937;
@@ -50,8 +57,8 @@
 }
 
 .logo-image {
-  width: 100px;
-  height: 100px;
+  width: 56px;
+  height: 56px;
   display: block;
   object-fit: contain;
   background: transparent;
@@ -1018,13 +1025,16 @@
 
 @media (max-width: 1024px) {
   .navbar {
-    padding: 10px 14px;
-    flex-wrap: wrap;
+    padding: 0 12px;
+    flex-wrap: nowrap;
     gap: 10px;
+    height: 70px;
+    min-height: 70px;
+    max-height: 70px;
   }
 
   .nav-left {
-    width: 100%;
+    width: auto;
     justify-content: space-between;
     gap: 12px;
   }
@@ -1037,16 +1047,21 @@
 
   .nav-links {
     display: none;
-    width: 100%;
+    width: auto;
     gap: 8px;
     flex-direction: column;
     padding: 10px;
-    margin-top: 8px;
+    margin-top: 0;
     background: #111111;
     border: 1px solid #1f2937;
     border-radius: 12px;
     z-index: 1050;
-    position: relative;
+    position: fixed;
+    top: 72px;
+    left: 12px;
+    right: 12px;
+    max-height: calc(100vh - 88px);
+    overflow-y: auto;
   }
 
   .nav-links.mobile-open {
@@ -1064,9 +1079,9 @@
   }
 
   .nav-actions {
-    width: 100%;
+    width: auto;
     justify-content: flex-end;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
   }
 
   .location-wrapper {
@@ -1098,7 +1113,15 @@
 
 @media (max-width: 640px) {
   .navbar {
-    padding: 10px 10px;
+    padding: 0 10px;
+    height: 70px;
+    min-height: 70px;
+    max-height: 70px;
+  }
+
+  .nav-left,
+  .nav-actions {
+    width: auto;
   }
 
   .logo {

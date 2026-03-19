@@ -2,14 +2,10 @@
    SEARCH RESULT PAGE
 ======================= */
 
-:root {
-  --search-navbar-offset: 78px;
-}
-
 .search-back-button {
   position: fixed !important;
-  top: 80px !important;
-  left: 12px !important;
+  top: 90px !important;
+  left: 16px !important;
   background: #FFFFFF;
   color: #000000;
   border: 1px solid #E5E7EB;
@@ -43,15 +39,17 @@
 
 @media (max-width: 768px) {
   .search-back-button {
-    top: 72px !important;
-    left: 10px !important;
+    top: 90px !important;
+    left: 12px !important;
     padding: 8px 12px;
     font-size: 13px;
   }
 }
 
 .search-page {
-  padding-top: 6px;
+  min-height: 100vh;
+  overflow: visible;
+  padding-top: 90px;
   padding-bottom: 80px;
 }
 
@@ -228,6 +226,7 @@
   display: grid;
   grid-template-columns: 240px 1fr;
   gap: 32px;
+  overflow: visible;
 }
 
 /* Filters */
@@ -552,7 +551,7 @@
   }
 
   .search-back-button {
-    top: 72px !important;
+    top: 90px !important;
     left: 12px !important;
     padding: 8px 14px;
     font-size: 13px;
