@@ -3,7 +3,7 @@
 ======================= */
 .home {
   background: #FAFAFA;
-  padding-top: 48px;
+  padding-top: calc(var(--navbar-height, 82px) + 20px);
 }
 
 /* =======================

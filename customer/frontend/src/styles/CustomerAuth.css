@@ -286,12 +286,12 @@
 
 /* Container & Layout */
 .customer-auth-container {
-  min-height: 100vh;
+  min-height: calc(100vh - var(--navbar-height, 82px));
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
-  padding: 20px;
+  padding: calc(var(--navbar-height, 82px) + 20px) 20px 20px;
 }
 
 .customer-auth-card {

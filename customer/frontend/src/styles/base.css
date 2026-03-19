@@ -5,6 +5,10 @@
 
 /* Remove duplicate resets - design system handles this */
 
+:root {
+  --navbar-height: 82px;
+}
+
 /* Ensure text rendering is crisp */
 html,
 body,
