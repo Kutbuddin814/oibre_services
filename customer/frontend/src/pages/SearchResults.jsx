@@ -1,5 +1,6 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import api from "../config/axios";
 import "../styles/search.css";
 
@@ -46,22 +47,55 @@ const rangesOverlap = (a, b) => {
 const getProviderRating = (provider) =>
   Number(provider?.averageRating ?? provider?.rating ?? 0);
 
-const serviceIconFallbackByName = {
-  plumber: "🔧",
-  electrician: "⚡",
-  carpenter: "🪚",
-  taxi: "🚕",
-  mechanic: "🔩",
-  painter: "🎨",
-  cleaning: "🧹",
-  acservice: "❄️"
+const serviceKeywordIconMap = [
+  { keys: ["electric", "electri"], icon: "⚡" },
+  { keys: ["plumb"], icon: "🔧" },
+  { keys: ["carpent", "wood"], icon: "🪚" },
+  { keys: ["taxi", "cab", "driver"], icon: "🚕" },
+  { keys: ["mechanic", "garage", "repair"], icon: "🔩" },
+  { keys: ["paint"], icon: "🎨" },
+  { keys: ["clean", "housekeep"], icon: "🧹" },
+  { keys: ["babysit", "child"], icon: "👶" },
+  { keys: ["ac", "air", "cool"], icon: "❄️" },
+  { keys: ["appliance"], icon: "🛠️" },
+  { keys: ["beauty", "salon"], icon: "💇" },
+  { keys: ["cook", "chef"], icon: "👨‍🍳" },
+  { keys: ["garden"], icon: "🌿" },
+  { keys: ["laundry", "iron"], icon: "🧺" }
+];
+
+const hasEmoji = (text) => /[\u2600-\u27BF\u{1F300}-\u{1FAFF}]/u.test(text || "");
+
+const decodeMojibake = (raw) => {
+  if (!raw) return "";
+  try {
+    const decoded = decodeURIComponent(escape(raw));
+    if (hasEmoji(decoded)) return decoded;
+  } catch {
+    // Ignore decode failures and continue with fallback.
+  }
+  return raw;
+};
+
+const getServiceFallbackIcon = (name) => {
+  const lower = String(name || "").toLowerCase();
+  const match = serviceKeywordIconMap.find((entry) =>
+    entry.keys.some((k) => lower.includes(k))
+  );
+  return match?.icon || "🔧";
 };
 
 const normalizeServiceIcon = (icon, name) => {
   const raw = typeof icon === "string" ? icon.trim() : "";
-  const fallback = serviceIconFallbackByName[String(name || "").toLowerCase().replace(/\s+/g, "")] || "🔧";
-  if (!raw || /Ã|â|�/.test(raw)) return fallback;
-  return raw;
+  const fallback = getServiceFallbackIcon(name);
+  if (!raw) return fallback;
+
+  const repaired = decodeMojibake(raw).trim();
+  if (hasEmoji(repaired) && !/Ã|â|�|ðŸ|Ð|Â/.test(repaired)) {
+    return repaired;
+  }
+
+  return fallback;
 };
 
 export default function SearchResults() {
@@ -123,7 +157,7 @@ export default function SearchResults() {
           try {
             const parsed = JSON.parse(storedLocation);
             if (parsed) return parsed;
-          } catch (e) {
+          } catch {
             // ignore parse errors
           }
         }
@@ -252,9 +286,11 @@ export default function SearchResults() {
 
   useEffect(() => {
     // initial load / when query changes
-    fetchProviders();
-  // Fetch recommendations when query changes
-  fetchRecommendations(query);
+    if (fetchRef.current) {
+      fetchRef.current();
+    }
+    // Fetch recommendations when query changes
+    fetchRecommendations(query);
 
     // react to programmatic changes to user location
     const handler = () => {
@@ -310,15 +346,22 @@ export default function SearchResults() {
     navigate(`/search?query=${encodeURIComponent(trimmed)}`);
   };
 
+  const backButton = (
+    <button
+      type="button"
+      onClick={() => navigate(-1)}
+      className="back-button"
+      title="Go back"
+      aria-label="Go back"
+    >
+      ← Back
+    </button>
+  );
+
   return (
-    <div className="search-page">
-      <button 
-        onClick={() => navigate(-1)} 
-        className="back-button"
-        title="Go back"
-      >
-        ← Back
-      </button>
+    <>
+      {typeof document !== "undefined" ? createPortal(backButton, document.body) : backButton}
+      <div className="search-page">
 
       {/* SEARCH BAR */}
       <div className="search-header">
@@ -490,7 +533,8 @@ export default function SearchResults() {
           </div>
         </section>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
  

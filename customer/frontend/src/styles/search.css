@@ -2,9 +2,13 @@
    SEARCH RESULT PAGE
 ======================= */
 
+:root {
+  --search-navbar-offset: 78px;
+}
+
 .back-button {
   position: fixed;
-  top: calc(env(safe-area-inset-top, 0px) + 10px);
+  top: calc(env(safe-area-inset-top, 0px) + var(--search-navbar-offset));
   left: 12px;
   background: #FFFFFF;
   color: #000000;
@@ -15,7 +19,7 @@
   font-weight: 600;
   font-size: 14px;
   transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  z-index: 1300;
+  z-index: 9999;
   min-height: 44px;
   min-width: 44px;
   display: flex;
@@ -38,7 +42,7 @@
 
 @media (max-width: 768px) {
   .back-button {
-    top: calc(env(safe-area-inset-top, 0px) + 8px);
+    top: calc(env(safe-area-inset-top, 0px) + 68px);
     left: 10px;
     padding: 8px 12px;
     font-size: 13px;
@@ -547,7 +551,7 @@
   }
 
   .back-button {
-    top: 72px;
+    top: calc(env(safe-area-inset-top, 0px) + 64px);
     left: 12px;
     padding: 8px 14px;
     font-size: 13px;
