@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../config/axios";
 import { BACKEND_BASE_URL } from "../config/api";
@@ -41,6 +41,18 @@ export default function ProviderProfile() {
   const [preferredTime, setPreferredTime] = useState("");
   const [problemImage, setProblemImage] = useState(null);
   const [problemImagePreview, setProblemImagePreview] = useState("");
+
+  // chat modal states
+  const [showChatModal, setShowChatModal] = useState(false);
+  const [chatConversationId, setChatConversationId] = useState("");
+  const [chatMessages, setChatMessages] = useState([]);
+  const [chatInput, setChatInput] = useState("");
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatSending, setChatSending] = useState(false);
+  const [chatError, setChatError] = useState("");
+  const [chatContactUnlocked, setChatContactUnlocked] = useState(false);
+  const [chatProviderContact, setChatProviderContact] = useState(null);
+  const chatEndRef = useRef(null);
 
   const getTodayIsoLocal = () => {
     const now = new Date();
@@ -333,6 +345,98 @@ export default function ProviderProfile() {
     setShowModal(true);
   };
 
+  const fetchChatMessages = async (conversationId) => {
+    const res = await api.get(`/chat/customer/${conversationId}/messages`);
+    setChatMessages(res.data?.messages || []);
+    setChatContactUnlocked(Boolean(res.data?.contactUnlocked));
+    setChatProviderContact(res.data?.providerContact || null);
+  };
+
+  const handleOpenChat = async () => {
+    if (!isLoggedIn) {
+      navigate("/auth");
+      return;
+    }
+
+    try {
+      setShowChatModal(true);
+      setChatLoading(true);
+      setChatError("");
+
+      const startRes = await api.post(`/chat/customer/start/${provider._id}`);
+      const conversationId = startRes.data?.conversationId;
+
+      if (!conversationId) {
+        throw new Error("Unable to open conversation");
+      }
+
+      setChatConversationId(conversationId);
+      await fetchChatMessages(conversationId);
+    } catch (err) {
+      console.error(err);
+      setChatError(err.response?.data?.message || "Failed to open chat");
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
+  const handleSendChatMessage = async () => {
+    const text = String(chatInput || "").trim();
+    if (!text || !chatConversationId) return;
+
+    const tempId = `temp-${Date.now()}`;
+    const optimistic = {
+      _id: tempId,
+      senderType: "customer",
+      senderId: currentCustomerId,
+      text,
+      createdAt: new Date().toISOString()
+    };
+
+    try {
+      setChatSending(true);
+      setChatError("");
+      setChatMessages((prev) => [...prev, optimistic]);
+      setChatInput("");
+
+      const sendRes = await api.post(`/chat/customer/${chatConversationId}/messages`, {
+        text
+      });
+
+      if (sendRes.data?.message) {
+        setChatMessages((prev) => prev.map((m) => (m._id === tempId ? sendRes.data.message : m)));
+      }
+      if (typeof sendRes.data?.contactUnlocked === "boolean") {
+        setChatContactUnlocked(sendRes.data.contactUnlocked);
+      }
+
+      await fetchChatMessages(chatConversationId);
+    } catch (err) {
+      console.error(err);
+      setChatMessages((prev) => prev.filter((m) => m._id !== tempId));
+      setChatError(err.response?.data?.message || "Failed to send message");
+    } finally {
+      setChatSending(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!showChatModal) return;
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [chatMessages, showChatModal]);
+
+  useEffect(() => {
+    if (!showChatModal || !chatConversationId) return undefined;
+
+    const timer = setInterval(() => {
+      fetchChatMessages(chatConversationId).catch(() => {
+        // Polling errors are non-blocking in UI.
+      });
+    }, 8000);
+
+    return () => clearInterval(timer);
+  }, [showChatModal, chatConversationId]);
+
   const handleConfirmBooking = async () => {
     if (!token) {
       navigate("/auth");
@@ -368,7 +472,7 @@ export default function ProviderProfile() {
       const storedLocation = localStorage.getItem("userLocation");
       let location = null;
       if (storedLocation) {
-        try { location = JSON.parse(storedLocation); } catch(e) { location = null; }
+        try { location = JSON.parse(storedLocation); } catch { location = null; }
       }
 
       const formData = new FormData();
@@ -516,6 +620,13 @@ export default function ProviderProfile() {
           onClick={handleBookServiceClick}
         >
           {isLoggedIn ? "Book Service" : "Login to Book"}
+        </button>
+
+        <button
+          className="chat-btn"
+          onClick={handleOpenChat}
+        >
+          {isLoggedIn ? "Chat Now" : "Login to Chat"}
         </button>
       </div>
 
@@ -782,6 +893,100 @@ export default function ProviderProfile() {
                 onClick={handleConfirmBooking}
               >
                 Confirm Booking
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showChatModal && (
+        <div className="chat-modal-overlay">
+          <div className="chat-modal-card">
+            <div className="chat-modal-header">
+              <div>
+                <h2>Chat with {provider.name}</h2>
+                <p>Use chat for service details. Book through platform for secure support.</p>
+              </div>
+              <button
+                className="chat-close-btn"
+                onClick={() => {
+                  setShowChatModal(false);
+                  setChatError("");
+                }}
+                type="button"
+              >
+                X
+              </button>
+            </div>
+
+            {!chatContactUnlocked && (
+              <div className="chat-warning-banner">
+                Contact sharing is blocked before booking. Examples: 98XXXXXX10, user@example.com, WhatsApp/Telegram handle.
+              </div>
+            )}
+
+            {chatContactUnlocked && chatProviderContact && (
+              <div className="chat-unlocked-banner">
+                Contact unlocked: {chatProviderContact.mobile || "-"} {chatProviderContact.email ? `| ${chatProviderContact.email}` : ""}
+              </div>
+            )}
+
+            <div className="chat-message-list">
+              {chatLoading ? (
+                <p className="chat-muted">Loading chat...</p>
+              ) : chatMessages.length === 0 ? (
+                <p className="chat-muted">No messages yet. Start the conversation.</p>
+              ) : (
+                chatMessages.map((msg) => (
+                  <div
+                    key={msg._id}
+                    className={`chat-bubble ${msg.senderType === "customer" ? "chat-bubble-me" : msg.senderType === "system" ? "chat-bubble-system" : "chat-bubble-other"}`}
+                  >
+                    <div className="chat-bubble-text">{msg.text}</div>
+                    <div className="chat-bubble-time">
+                      {new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    </div>
+                  </div>
+                ))
+              )}
+              <div ref={chatEndRef} />
+            </div>
+
+            {chatError && <div className="chat-error-box">{chatError}</div>}
+
+            <div className="chat-input-row">
+              <input
+                type="text"
+                placeholder="Type your message"
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSendChatMessage();
+                  }
+                }}
+              />
+              <button
+                type="button"
+                className="chat-send-btn"
+                onClick={handleSendChatMessage}
+                disabled={chatSending}
+              >
+                {chatSending ? "Sending..." : "Send"}
+              </button>
+            </div>
+
+            <div className="chat-modal-actions">
+              <button
+                type="button"
+                className="book-btn"
+                onClick={() => {
+                  setShowChatModal(false);
+                  handleBookServiceClick();
+                }}
+              >
+                Book Now
               </button>
             </div>
           </div>

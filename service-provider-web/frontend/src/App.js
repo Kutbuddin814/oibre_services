@@ -3,6 +3,7 @@ import ProviderDashboard from "./ProviderDashboard";
 import ProviderProfile from "./ProviderProfile";
 import ProviderLogin from "./ProviderLogin";
 import ProviderEarnings from "./ProviderEarnings";
+import ProviderMessages from "./ProviderMessages";
 
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem("providerToken");
@@ -38,6 +39,15 @@ function App() {
           element={
             <PrivateRoute>
               <ProviderEarnings />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/messages"
+          element={
+            <PrivateRoute>
+              <ProviderMessages />
             </PrivateRoute>
           }
         />

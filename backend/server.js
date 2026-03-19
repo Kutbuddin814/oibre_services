@@ -135,6 +135,7 @@ const notificationRoutes = require("./routes/notifications");
 const reviewRoutes = require("./routes/reviews");
 const servicesRoutes = require("./routes/servicesRoutes");
 const contactRoutes = require("./routes/contactRoutes");
+const chatRoutes = require("./routes/chatRoutes");
 
 app.use("/api/customers", customerAuthRoutes);
 app.use("/api/customer/requests", customerRequestRoutes);
@@ -144,6 +145,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/services", servicesRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/chat", chatRoutes);
 
 // Payment Routes
 const paymentRoutes = require("./routes/paymentRoutes");

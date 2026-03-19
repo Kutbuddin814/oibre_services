@@ -659,6 +659,9 @@ const ProviderDashboard = () => {
                 <button onClick={() => navigate("/earnings")}>
                   💰 My Earnings
                 </button>
+                <button onClick={() => navigate("/messages")}>
+                  Messages
+                </button>
                 <button
                   onClick={() => {
                     setOpenMenu(false);
