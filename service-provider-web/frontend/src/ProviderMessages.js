@@ -170,8 +170,16 @@ const ProviderMessages = () => {
             {selectedConversation ? (
               <>
                 <div className="provider-chat-topbar">
+                  <div className="provider-chat-topbar-header">
+                    <div className="provider-chat-avatar">
+                      {selectedConversation.customer?.name?.charAt(0).toUpperCase() || "C"}
+                    </div>
+                    <div className="provider-chat-topbar-text">
+                      <span className="provider-chat-topbar-label">Customer</span>
+                      <h3>{selectedConversation.customer?.name || "Customer"}</h3>
+                    </div>
+                  </div>
                   <div>
-                    <h3>{selectedConversation.customer?.name || "Customer"}</h3>
                     {!contactUnlocked ? (
                       <p className="provider-chat-warning">Contact hidden until booking is created.</p>
                     ) : (

@@ -903,9 +903,14 @@ export default function ProviderProfile() {
         <div className="chat-modal-overlay">
           <div className="chat-modal-card">
             <div className="chat-modal-header">
-              <div>
-                <h2>Chat with {provider.name}</h2>
-                <p>Use chat for service details. Book through platform for secure support.</p>
+              <div className="chat-modal-header-left">
+                <div className="chat-modal-avatar">
+                  {provider.name?.charAt(0).toUpperCase() || "S"}
+                </div>
+                <div className="chat-modal-header-text">
+                  <span className="chat-modal-header-label">Service Provider</span>
+                  <h2>{provider.name}</h2>
+                </div>
               </div>
               <button
                 className="chat-close-btn"
@@ -915,7 +920,7 @@ export default function ProviderProfile() {
                 }}
                 type="button"
               >
-                X
+                ✕
               </button>
             </div>
 
