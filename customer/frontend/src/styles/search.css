@@ -6,10 +6,10 @@
   --search-navbar-offset: 78px;
 }
 
-.back-button {
-  position: fixed;
-  top: calc(env(safe-area-inset-top, 0px) + var(--search-navbar-offset));
-  left: 12px;
+.search-back-button {
+  position: fixed !important;
+  top: 80px !important;
+  left: 12px !important;
   background: #FFFFFF;
   color: #000000;
   border: 1px solid #E5E7EB;
@@ -19,7 +19,7 @@
   font-weight: 600;
   font-size: 14px;
   transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  z-index: 9999;
+  z-index: 999999 !important;
   min-height: 44px;
   min-width: 44px;
   display: flex;
@@ -28,22 +28,23 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   margin: 0;
   white-space: nowrap;
+  transform: none !important;
 }
 
-.back-button:hover {
+.search-back-button:hover {
   background: #F3F4F6;
   border-color: #D1D5DB;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.back-button:active {
+.search-back-button:active {
   background: #E5E7EB;
 }
 
 @media (max-width: 768px) {
-  .back-button {
-    top: calc(env(safe-area-inset-top, 0px) + 68px);
-    left: 10px;
+  .search-back-button {
+    top: 72px !important;
+    left: 10px !important;
     padding: 8px 12px;
     font-size: 13px;
   }
@@ -550,9 +551,9 @@
     min-height: 42px;
   }
 
-  .back-button {
-    top: calc(env(safe-area-inset-top, 0px) + 64px);
-    left: 12px;
+  .search-back-button {
+    top: 72px !important;
+    left: 12px !important;
     padding: 8px 14px;
     font-size: 13px;
   }
