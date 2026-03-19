@@ -88,13 +88,13 @@ app.use((req, res, next) => {
 // Serve uploaded files from single uploads folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// ===============================
-// DATABASE CONNECTIONS
-// ===============================
-const ADMIN_MONGO_URI = process.env.ADMIN_MONGO_URI;
-const CUSTOMER_MONGO_URI = process.env.CUSTOMER_MONGO_URI;
-const PROVIDER_MONGO_URI = process.env.PROVIDER_MONGO_URI;
-const PROVIDER_WEB_MONGO_URI = process.env.PROVIDER_WEB_MONGO_URI;
+// // ===============================
+// // DATABASE CONNECTIONS
+// // ===============================
+// const ADMIN_MONGO_URI = process.env.ADMIN_MONGO_URI;
+// const CUSTOMER_MONGO_URI = process.env.CUSTOMER_MONGO_URI;
+// const PROVIDER_MONGO_URI = process.env.PROVIDER_MONGO_URI;
+// const PROVIDER_WEB_MONGO_URI = process.env.PROVIDER_WEB_MONGO_URI;
 
 // Helper to connect to a database
 

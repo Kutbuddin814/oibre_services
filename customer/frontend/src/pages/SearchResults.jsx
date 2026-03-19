@@ -59,11 +59,41 @@ export default function SearchResults() {
   const [searchText, setSearchText] = useState(query);
   const [providers, setProviders] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  
+  // 🆕 Recommendations state
+  const [recommendations, setRecommendations] = useState([]);
+  const [recommendationsLoading, setRecommendationsLoading] = useState(false);
   /* ==========================
      FETCH PROVIDERS
   ========================== */
   const fetchRef = useRef(null);
+
+  /* ==========================
+     FETCH RECOMMENDATIONS
+  ========================== */
+  const fetchRecommendations = async (searchQuery) => {
+    if (!searchQuery || searchQuery.trim().length === 0) {
+      setRecommendations([]);
+      return;
+    }
+
+    try {
+      setRecommendationsLoading(true);
+      const encodedQuery = encodeURIComponent(searchQuery.trim());
+      const res = await api.get(`/services/recommendations/${encodedQuery}`);
+      
+      if (res.data.recommendations && res.data.recommendations.length > 0) {
+        setRecommendations(res.data.recommendations);
+      } else {
+        setRecommendations([]);
+      }
+    } catch (error) {
+      console.warn("Failed to fetch recommendations:", error);
+      setRecommendations([]);
+    } finally {
+      setRecommendationsLoading(false);
+    }
+  };
 
   const fetchProviders = async () => {
     try {
@@ -205,6 +235,8 @@ export default function SearchResults() {
   useEffect(() => {
     // initial load / when query changes
     fetchProviders();
+  // Fetch recommendations when query changes
+  fetchRecommendations(query);
 
     // react to programmatic changes to user location
     const handler = () => {
@@ -293,6 +325,29 @@ export default function SearchResults() {
       <h2 className="results-header">
         Results for <span>"{query}"</span>
       </h2>
+
+      {/* 🆕 SERVICE RECOMMENDATIONS SECTION */}
+      {recommendations.length > 0 && !recommendationsLoading && (
+        <div className="recommendations-section">
+          <h3 className="recommendations-title">📌 Related Services</h3>
+          <div className="recommendations-list">
+            {recommendations.map((service) => (
+              <button
+                key={service._id}
+                className="recommendation-chip"
+                onClick={() => {
+                  setSearchText(service.name);
+                  navigate(`/search?query=${encodeURIComponent(service.name)}`);
+                }}
+                title={service.description}
+              >
+                <span className="recommendation-icon">{service.icon || "🔧"}</span>
+                <span className="recommendation-name">{service.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="mobile-filter-row">
         <button
