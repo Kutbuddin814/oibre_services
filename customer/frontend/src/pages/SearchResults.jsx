@@ -350,7 +350,7 @@ export default function SearchResults() {
     <button
       type="button"
       onClick={() => navigate(-1)}
-      className="search-back-button"
+      className="back-button"
       title="Go back"
       aria-label="Go back"
     >

@@ -5,33 +5,14 @@
 
 /* Remove duplicate resets - design system handles this */
 
-* {
-  box-sizing: border-box;
-}
-
 /* Ensure text rendering is crisp */
 html,
 body,
 #root {
-  margin: 0;
-  padding: 0;
-  height: 100%;
   max-width: 100%;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  transform: none !important;
-}
-
-#root {
-  min-height: 100vh;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
 }
 
 img,
