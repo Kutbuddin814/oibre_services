@@ -178,6 +178,13 @@
   font-size: 16px;
 }
 
+.recommendation-icon-image {
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
 .recommendation-name {
   font-size: 14px;
 }
@@ -200,6 +207,11 @@
 
   .recommendation-icon {
     font-size: 14px;
+  }
+
+  .recommendation-icon-image {
+    width: 16px;
+    height: 16px;
   }
 }
 

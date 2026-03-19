@@ -46,6 +46,24 @@ const rangesOverlap = (a, b) => {
 const getProviderRating = (provider) =>
   Number(provider?.averageRating ?? provider?.rating ?? 0);
 
+const serviceIconFallbackByName = {
+  plumber: "🔧",
+  electrician: "⚡",
+  carpenter: "🪚",
+  taxi: "🚕",
+  mechanic: "🔩",
+  painter: "🎨",
+  cleaning: "🧹",
+  acservice: "❄️"
+};
+
+const normalizeServiceIcon = (icon, name) => {
+  const raw = typeof icon === "string" ? icon.trim() : "";
+  const fallback = serviceIconFallbackByName[String(name || "").toLowerCase().replace(/\s+/g, "")] || "🔧";
+  if (!raw || /Ã|â|�/.test(raw)) return fallback;
+  return raw;
+};
+
 export default function SearchResults() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
@@ -341,7 +359,16 @@ export default function SearchResults() {
                 }}
                 title={service.description}
               >
-                <span className="recommendation-icon">{service.icon || "🔧"}</span>
+                {service.iconImage ? (
+                  <img
+                    src={service.iconImage}
+                    alt=""
+                    className="recommendation-icon-image"
+                    loading="lazy"
+                  />
+                ) : (
+                  <span className="recommendation-icon">{normalizeServiceIcon(service.icon, service.name)}</span>
+                )}
                 <span className="recommendation-name">{service.name}</span>
               </button>
             ))}

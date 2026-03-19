@@ -14,13 +14,8 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     
-    // Add cache-control headers to prevent aggressive caching on dynamic data
+    // Add timestamp to force fresh data on dynamic endpoints
     if (config.url && (config.url.includes("/providers") || config.url.includes("/search"))) {
-      config.headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
-      config.headers["Pragma"] = "no-cache";
-      config.headers["Expires"] = "0";
-      
-      // Add timestamp to force fresh data
       const timestamp = Date.now();
       config.params = { ...config.params, t: timestamp };
     }

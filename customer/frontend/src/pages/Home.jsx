@@ -10,6 +10,9 @@ export default function Home() {
   const navigate = useNavigate();
 
   const [searchText, setSearchText] = useState("");
+  const [services, setServices] = useState([]);
+  const [serviceSuggestions, setServiceSuggestions] = useState([]);
+  const [showServiceSuggestions, setShowServiceSuggestions] = useState(false);
   const [slide, setSlide] = useState(0);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -30,6 +33,7 @@ export default function Home() {
 
   const menuRef = useRef();
   const notificationRef = useRef();
+  const homeSearchRef = useRef();
 
   const token = localStorage.getItem("customerToken");
   const providerPortalUrl =
@@ -52,6 +56,28 @@ export default function Home() {
       image: "/images/easy-booking.png"
     }
   ];
+
+  const serviceIconFallbackByName = {
+    plumber: "🔧",
+    electrician: "⚡",
+    carpenter: "🪚",
+    taxi: "🚕",
+    mechanic: "🔩",
+    painter: "🎨",
+    cleaning: "🧹",
+    cleaningservice: "🧹",
+    acservice: "❄️",
+    appliance: "🛠️"
+  };
+
+  const normalizeServiceIcon = (icon, name) => {
+    const raw = typeof icon === "string" ? icon.trim() : "";
+    const fallback = serviceIconFallbackByName[String(name || "").toLowerCase().replace(/\s+/g, "")] || "🔧";
+
+    // If icon is missing or appears mojibake, use fallback.
+    if (!raw || /Ã|â|�/.test(raw)) return fallback;
+    return raw;
+  };
 
   /* ================= CHECK LOGIN & FETCH CUSTOMER DATA ================= */
   useEffect(() => {
@@ -303,6 +329,37 @@ export default function Home() {
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
+  /* ================= FETCH SERVICES FOR TYPEAHEAD ================= */
+  useEffect(() => {
+    const loadServices = async () => {
+      try {
+        const res = await api.get("/services");
+        setServices(Array.isArray(res.data) ? res.data : []);
+      } catch (err) {
+        console.error("Failed to load services for suggestions", err);
+        setServices([]);
+      }
+    };
+
+    loadServices();
+  }, []);
+
+  useEffect(() => {
+    const q = String(searchText || "").trim().toLowerCase();
+    if (!q) {
+      setServiceSuggestions([]);
+      setShowServiceSuggestions(false);
+      return;
+    }
+
+    const suggestions = services
+      .filter((s) => String(s?.name || "").toLowerCase().includes(q))
+      .slice(0, 6);
+
+    setServiceSuggestions(suggestions);
+    setShowServiceSuggestions(suggestions.length > 0);
+  }, [searchText, services]);
+
   /* ================= MARK AS READ ================= */
   const markAsRead = async (id) => {
     try {
@@ -345,6 +402,9 @@ export default function Home() {
       ) {
         setShowNotifications(false);
       }
+      if (homeSearchRef.current && !homeSearchRef.current.contains(e.target)) {
+        setShowServiceSuggestions(false);
+      }
     };
 
     const keyHandler = (e) => {
@@ -365,7 +425,14 @@ export default function Home() {
 
   const handleSearch = () => {
     if (!searchText.trim()) return;
+    setShowServiceSuggestions(false);
     navigate(`/search?query=${encodeURIComponent(searchText)}`);
+  };
+
+  const handlePickSuggestion = (serviceName) => {
+    setSearchText(serviceName);
+    setShowServiceSuggestions(false);
+    navigate(`/search?query=${encodeURIComponent(serviceName)}`);
   };
 
   const handleLogout = () => {
@@ -385,11 +452,14 @@ export default function Home() {
         <p>Plumbers, Electricians, Carpenters, Taxi, Mechanics & more</p>
 
         <div className="home-search">
-          <div className="search-wrapper">
+          <div className="search-wrapper" ref={homeSearchRef}>
             <input
               className="search-input"
               placeholder="Search service (Plumber, Electrician...)"
               value={searchText}
+              onFocus={() => {
+                if (serviceSuggestions.length > 0) setShowServiceSuggestions(true);
+              }}
               onChange={(e) => setSearchText(e.target.value)}
               onKeyDown={(e) =>
                 e.key === "Enter" && handleSearch()
@@ -401,6 +471,33 @@ export default function Home() {
             >
               Search
             </button>
+
+            {showServiceSuggestions && (
+              <div className="home-service-suggestions" role="listbox" aria-label="Service suggestions">
+                {serviceSuggestions.map((service) => (
+                  <button
+                    key={service._id || service.name}
+                    type="button"
+                    className="home-service-suggestion-item"
+                    onClick={() => handlePickSuggestion(service.name)}
+                  >
+                    {service.iconImage ? (
+                      <img
+                        src={service.iconImage}
+                        alt=""
+                        className="home-service-suggestion-image"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <span className="home-service-suggestion-icon" aria-hidden="true">
+                        {normalizeServiceIcon(service.icon, service.name)}
+                      </span>
+                    )}
+                    <span className="home-service-suggestion-name">{service.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
