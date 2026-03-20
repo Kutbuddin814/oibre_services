@@ -626,12 +626,21 @@ body {
   min-height: calc(100vh - 200px);
 }
 
+.provider-messages-subtitle {
+  margin: 6px 0 0;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 600;
+}
+
 .provider-conversations-panel,
 .provider-chat-panel {
-  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(59, 130, 246, 0.08), rgba(59, 130, 246, 0) 36%),
+    linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
   border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
 }
 
 .provider-conversations-panel {
@@ -641,19 +650,40 @@ body {
   transition: all 0.2s ease;
 }
 
+.provider-conversations-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
 .provider-conversations-panel h3 {
-  margin: 0 0 16px;
+  margin: 0;
   color: #111827;
   font-size: 18px;
   font-weight: 700;
   letter-spacing: -0.3px;
 }
 
+.provider-conversation-count {
+  min-width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  color: #0f172a;
+  font-size: 12px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+}
+
 .provider-conversation-item {
   width: 100%;
   text-align: left;
   border: 1.5px solid #e5e7eb;
-  background: #ffffff;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   border-radius: 12px;
   padding: 14px;
   margin-bottom: 10px;
@@ -673,7 +703,7 @@ body {
 
 .provider-conversation-item.active {
   border-color: #3b82f6;
-  background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+  background: linear-gradient(135deg, #eff6ff 0%, #ecfeff 100%);
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
 }
 
@@ -714,6 +744,7 @@ body {
   font-size: 13px;
   line-height: 1.4;
   display: -webkit-box;
+  line-clamp: 1;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -732,9 +763,9 @@ body {
 }
 
 .provider-chat-topbar {
-  padding: 24px;
+  padding: 22px 24px 18px;
   border-bottom: 1px solid #f0f1f8;
-  background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+  background: linear-gradient(145deg, #f8fafc 0%, #ffffff 100%);
 }
 
 .provider-chat-topbar-header {
@@ -775,14 +806,32 @@ body {
 
 .provider-chat-topbar h3 {
   margin: 0;
-  font-size: 16px;
+  font-size: 19px;
   color: #0f172a;
   font-weight: 700;
 }
 
+.provider-contact-state {
+  margin-top: 10px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  padding: 10px 12px;
+}
+
+.provider-contact-state.is-locked {
+  border-color: #fdba74;
+  background: linear-gradient(135deg, #fff8ef 0%, #ffedd5 100%);
+}
+
+.provider-contact-state.is-unlocked {
+  border-color: #86efac;
+  background: linear-gradient(135deg, #ecfdf3 0%, #dcfce7 100%);
+}
+
 .provider-chat-warning,
 .provider-chat-success {
-  margin: 8px 0 0;
+  margin: 0;
   font-size: 13px;
   font-weight: 600;
   display: flex;
@@ -810,11 +859,42 @@ body {
   color: #15803d;
 }
 
+.provider-contact-meta {
+  margin: 6px 0 0;
+  color: #92400e;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.provider-contact-links {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.provider-contact-links a,
+.provider-contact-links span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  border-radius: 999px;
+  border: 1px solid rgba(22, 101, 52, 0.25);
+  background: rgba(255, 255, 255, 0.8);
+  color: #166534;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .provider-chat-messages {
   flex: 1;
   overflow-y: auto;
   padding: 20px 24px;
-  background: linear-gradient(180deg, #f9fafb 0%, #ffffff 100%);
+  background:
+    linear-gradient(160deg, rgba(191, 219, 254, 0.25) 0%, rgba(191, 219, 254, 0) 28%),
+    linear-gradient(180deg, #f9fafb 0%, #ffffff 100%);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -834,6 +914,7 @@ body {
   font-size: 13px;
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
   animation: slideUp 0.3s ease;
+  line-height: 1.45;
 }
 
 @keyframes slideUp {
@@ -881,7 +962,7 @@ body {
   padding: 16px 24px 24px;
   display: flex;
   gap: 12px;
-  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
 }
 
 .provider-chat-input-row input {
@@ -911,6 +992,7 @@ body {
   border-radius: 12px;
   font-size: 14px;
   padding: 12px 20px;
+  min-width: 102px;
 }
 
 @media (max-width: 900px) {

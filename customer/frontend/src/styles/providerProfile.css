@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap");
 
 :root {
+  --navbar-offset: 104px;
   --page-bg: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
   --card-bg: #ffffff;
   --text-strong: #111827;
@@ -22,7 +23,7 @@
 
 .provider-profile-page {
   max-width: 1180px;
-  margin: 30px auto 52px;
+  margin: var(--navbar-offset) auto 52px;
   padding: 0 18px;
   display: grid;
   grid-template-columns: 1.9fr 1fr;
@@ -41,7 +42,7 @@
 
 .back-button {
   position: fixed;
-  top: 72px;
+  top: 96px;
   left: 16px;
   background: rgba(255, 255, 255, 0.95);
   color: #0f172a;
@@ -74,7 +75,7 @@
 
 @media (max-width: 768px) {
   .back-button {
-    top: 68px;
+    top: 88px;
     left: 12px;
     padding: 6px 12px;
     font-size: 13px;
@@ -1078,7 +1079,7 @@
   }
 
   .provider-profile-page {
-    margin-top: 16px;
+    margin-top: 96px;
     padding: 0 12px 24px;
     gap: 12px;
   }

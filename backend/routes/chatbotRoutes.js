@@ -10,15 +10,16 @@ const customerAuth = require("../middleware/customerAuth");
 router.get("/services/categories", async (req, res) => {
   try {
     const categories = await Service.find({ isActive: true })
-      .select("name icon description estimatedPrice")
+      .select("name category icon description estimatedPrice")
       .sort({ name: 1 });
 
     const grouped = {};
     categories.forEach((cat) => {
-      if (!grouped[cat.category]) {
-        grouped[cat.category] = [];
+      const categoryKey = String(cat.category || cat.name || "General").trim();
+      if (!grouped[categoryKey]) {
+        grouped[categoryKey] = [];
       }
-      grouped[cat.category].push(cat);
+      grouped[categoryKey].push(cat);
     });
 
     res.json({ success: true, categories: grouped });
@@ -31,14 +32,27 @@ router.get("/services/categories", async (req, res) => {
 router.get("/services/problems/:category", async (req, res) => {
   try {
     const { category } = req.params;
+    
+    // Search by exact category or by name (for fallback)
     const problems = await Service.find({
-      category: category,
+      $or: [
+        { category: category },
+        { name: category }
+      ],
       isActive: true
     })
       .select("name estimatedPrice description")
       .limit(10);
 
-    res.json({ success: true, problems });
+    // If no results, return all active services as fallback
+    let results = problems;
+    if (results.length === 0) {
+      results = await Service.find({ isActive: true })
+        .select("name estimatedPrice description")
+        .limit(10);
+    }
+
+    res.json({ success: true, problems: results });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

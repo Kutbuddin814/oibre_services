@@ -135,7 +135,10 @@ const ProviderMessages = () => {
     <div className="dashboard-container">
       <div className="dashboard-wrapper">
         <div className="dashboard-header">
-          <h1>Customer Messages</h1>
+          <div>
+            <h1>Customer Messages</h1>
+            <p className="provider-messages-subtitle">Manage conversations, reply faster, and keep bookings on-platform.</p>
+          </div>
           <button className="action-btn secondary" onClick={() => navigate("/dashboard")}>Back to Dashboard</button>
         </div>
 
@@ -143,7 +146,10 @@ const ProviderMessages = () => {
 
         <div className="provider-messages-layout">
           <aside className="provider-conversations-panel">
-            <h3>Conversations</h3>
+            <div className="provider-conversations-header">
+              <h3>Conversations</h3>
+              <span className="provider-conversation-count">{conversations.length}</span>
+            </div>
             {loadingConversations ? (
               <p className="provider-chat-muted">Loading...</p>
             ) : conversations.length === 0 ? (
@@ -179,13 +185,26 @@ const ProviderMessages = () => {
                       <h3>{selectedConversation.customer?.name || "Customer"}</h3>
                     </div>
                   </div>
-                  <div>
+                  <div className={`provider-contact-state ${contactUnlocked ? "is-unlocked" : "is-locked"}`}>
                     {!contactUnlocked ? (
-                      <p className="provider-chat-warning">Contact hidden until booking is created.</p>
+                      <>
+                        <p className="provider-chat-warning">Contact hidden until booking is created.</p>
+                        <p className="provider-contact-meta">Phone number and email unlock automatically once a booking exists.</p>
+                      </>
                     ) : (
-                      <p className="provider-chat-success">
-                        Contact unlocked: {customerContact?.mobile || "-"} {customerContact?.email ? `| ${customerContact.email}` : ""}
-                      </p>
+                      <>
+                        <p className="provider-chat-success">Contact unlocked for this chat.</p>
+                        <div className="provider-contact-links">
+                          {customerContact?.mobile ? (
+                            <a href={`tel:${customerContact.mobile}`}>📞 {customerContact.mobile}</a>
+                          ) : (
+                            <span>📞 Phone unavailable</span>
+                          )}
+                          {customerContact?.email ? (
+                            <a href={`mailto:${customerContact.email}`}>✉ {customerContact.email}</a>
+                          ) : null}
+                        </div>
+                      </>
                     )}
                   </div>
                 </div>

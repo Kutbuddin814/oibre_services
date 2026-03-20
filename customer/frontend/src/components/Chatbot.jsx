@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import api from "../config/axios";
 import "../styles/chatbot.css";
+
+const DEFAULT_CATEGORY_OPTIONS = ["Electrician", "Plumber", "Carpenter", "AC Repair"];
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,11 +16,55 @@ const Chatbot = () => {
   const [categories, setCategories] = useState([]);
   const [problems, setProblems] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
+  const [locationStatus, setLocationStatus] = useState("unknown"); // unknown, granted, denied, skipped
+  const [serviceDropdownOpen, setServiceDropdownOpen] = useState(true);
+  const [showAllServices, setShowAllServices] = useState(false);
   const chatEndRef = useRef(null);
 
   const addMessage = useCallback((msg) => {
     setMessages((prev) => [...prev, msg]);
   }, []);
+
+  const requestUserLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      setLocationStatus("denied");
+      addMessage({
+        type: "bot",
+        text: "Location is not supported on this device.",
+        options: [
+          { label: "🔁 Retry location", value: "retry-location" },
+          { label: "➡ Continue without location", value: "continue-without-location" }
+        ]
+      });
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocationStatus("granted");
+        setUserLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+          name: "Current Location"
+        });
+        addMessage({
+          type: "bot",
+          text: "📍 Location detected! What service do you need?"
+        });
+      },
+      () => {
+        setLocationStatus("denied");
+        addMessage({
+          type: "bot",
+          text: "Location access was cancelled. You can retry or continue without location.",
+          options: [
+            { label: "🔁 Retry location", value: "retry-location" },
+            { label: "➡ Continue without location", value: "continue-without-location" }
+          ]
+        });
+      }
+    );
+  }, [addMessage]);
 
   useEffect(() => {
     scrollToBottom();
@@ -27,30 +72,10 @@ const Chatbot = () => {
 
   // Get user's current location
   useEffect(() => {
-    if (isOpen && !userLocation) {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            setUserLocation({
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-              name: "Current Location"
-            });
-            addMessage({
-              type: "bot",
-              text: "📍 Location detected! What service do you need?"
-            });
-          },
-          () => {
-            addMessage({
-              type: "bot",
-              text: "Couldn't detect location. Where are you located?"
-            });
-          }
-        );
-      }
+    if (isOpen && !userLocation && locationStatus === "unknown") {
+      requestUserLocation();
     }
-  }, [isOpen, userLocation, addMessage]);
+  }, [isOpen, userLocation, locationStatus, requestUserLocation]);
   // Load categories on first open
   useEffect(() => {
     if (isOpen && categories.length === 0) {
@@ -75,15 +100,35 @@ const Chatbot = () => {
     try {
       const res = await api.get("/chatbot/services/categories");
       if (res.data.success) {
-        setCategories(res.data.categories);
+        const fetched = res.data.categories || {};
+        const keys = Object.keys(fetched);
+
+        if (keys.length > 0) {
+          setCategories(fetched);
+        } else {
+          const fallbackCategories = DEFAULT_CATEGORY_OPTIONS.reduce((acc, name) => {
+            acc[name] = [];
+            return acc;
+          }, {});
+          setCategories(fallbackCategories);
+        }
       }
     } catch (err) {
       console.error("Error loading problems:", err?.message);
+
+      const fallbackCategories = DEFAULT_CATEGORY_OPTIONS.reduce((acc, name) => {
+        acc[name] = [];
+        return acc;
+      }, {});
+      setCategories(fallbackCategories);
     }
   };
 
   const handleServiceSelect = async (serviceName) => {
     setSelectedService(serviceName);
+    setServiceDropdownOpen(false);
+    setShowAllServices(false);
+    setStep("problem");
     addMessage({ type: "user", text: serviceName });
     addMessage({
       type: "bot",
@@ -94,11 +139,17 @@ const Chatbot = () => {
     try {
       const res = await api.get(`/chatbot/services/problems/${serviceName}`);
       if (res.data.success) {
-        setProblems(res.data.problems);
-        setStep("problem");
+        setProblems(res.data.problems || []);
+      } else {
+        setProblems([]);
       }
     } catch (err) {
       console.error(err);
+      setProblems([]);
+      addMessage({
+        type: "bot",
+        text: "I could not load issue list right now. You can continue by selecting urgency after choosing any service."
+      });
     }
   };
 
@@ -150,6 +201,41 @@ const Chatbot = () => {
     }
 
     loadProviders(urgency);
+  };
+
+  const handleOptionSelect = (value) => {
+    if (value === "retry-location") {
+      addMessage({ type: "user", text: "Retry location" });
+      requestUserLocation();
+      return;
+    }
+
+    if (value === "continue-without-location") {
+      setLocationStatus("skipped");
+      addMessage({ type: "user", text: "Continue without location" });
+      addMessage({
+        type: "bot",
+        text: "No problem. I will show providers without distance sorting. Select a service to continue."
+      });
+      return;
+    }
+
+    if (["emergency", "today", "later"].includes(value)) {
+      handleUrgencySelect(value);
+      return;
+    }
+
+    if (value === "callback") {
+      addMessage({
+        type: "bot",
+        text: "We will arrange a callback shortly. You can also try another service or urgency option."
+      });
+      return;
+    }
+
+    if (value === "change-location") {
+      requestUserLocation();
+    }
   };
 
   const loadProviders = async (urgency) => {
@@ -271,6 +357,9 @@ const Chatbot = () => {
     setIsOpen(!isOpen);
   };
 
+  const categoryKeys = Object.keys(categories || {});
+  const visibleCategoryKeys = showAllServices ? categoryKeys : categoryKeys.slice(0, 4);
+
   return (
     <>
       {/* Floating Button */}
@@ -290,12 +379,6 @@ const Chatbot = () => {
               <h3>🤖 Service Assistant</h3>
               <p>Find services in seconds</p>
             </div>
-            <button
-              className="chatbot-close-btn"
-              onClick={() => setIsOpen(false)}
-            >
-              ✕
-            </button>
           </div>
 
           <div className="chatbot-messages">
@@ -309,7 +392,7 @@ const Chatbot = () => {
                       <button
                         key={i}
                         className="chatbot-option-btn"
-                        onClick={() => handleUrgencySelect(opt.value)}
+                        onClick={() => handleOptionSelect(opt.value)}
                       >
                         {opt.label}
                       </button>
@@ -387,20 +470,43 @@ const Chatbot = () => {
             <div ref={chatEndRef} />
           </div>
 
-          {step === "greeting" && categories && Object.keys(categories).length > 0 && (
+          {step === "greeting" && categoryKeys.length > 0 && (
             <div className="chatbot-input-area">
-              <div className="chatbot-categories">
-                {Object.keys(categories)
-                  .slice(0, 4)
-                  .map((cat) => (
-                    <button
-                      key={cat}
-                      className="chatbot-category-btn"
-                      onClick={() => handleServiceSelect(cat)}
-                    >
-                      {cat}
-                    </button>
-                  ))}
+              <div className="chatbot-service-picker">
+                <button
+                  type="button"
+                  className="chatbot-service-toggle"
+                  onClick={() => setServiceDropdownOpen((prev) => !prev)}
+                >
+                  Select a service
+                  <span>{serviceDropdownOpen ? "▴" : "▾"}</span>
+                </button>
+
+                {serviceDropdownOpen && (
+                  <div className="chatbot-service-dropdown">
+                    <div className="chatbot-categories">
+                      {visibleCategoryKeys.map((cat) => (
+                        <button
+                          key={cat}
+                          className="chatbot-category-btn"
+                          onClick={() => handleServiceSelect(cat)}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+
+                    {categoryKeys.length > 4 && (
+                      <button
+                        type="button"
+                        className="chatbot-show-more-btn"
+                        onClick={() => setShowAllServices((prev) => !prev)}
+                      >
+                        {showAllServices ? "Show less" : `Show more (${categoryKeys.length - 4})`}
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}
