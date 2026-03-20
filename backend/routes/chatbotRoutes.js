@@ -367,16 +367,8 @@ router.post("/request-callback", customerAuth, async (req, res) => {
     const { customerId } = req;
     const { serviceType, location, preferredTime } = req.body;
 
-    // Fetch customer info
-    const customer = await Customer.findById(customerId);
-    if (!customer) {
-      return res.status(404).json({ success: false, message: "Customer not found" });
-    }
-
     const callbackRequest = new CallbackRequest({
       customerId,
-      name: customer.name || "",
-      phone: customer.mobile || customer.phone || "",
       serviceType,
       location,
       preferredTime,

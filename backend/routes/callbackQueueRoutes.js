@@ -31,15 +31,4 @@ router.post("/update-status", adminAuth, async (req, res) => {
   }
 });
 
-// Cancel/delete callback request
-router.post("/cancel", adminAuth, async (req, res) => {
-  try {
-    const { callbackId } = req.body;
-    await CallbackRequest.findByIdAndUpdate(callbackId, { status: "cancelled", updatedAt: new Date() });
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
-
 module.exports = router;

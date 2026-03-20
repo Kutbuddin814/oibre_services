@@ -24,7 +24,7 @@ const allowedOrigins = [
   process.env.REACT_APP_PROVIDER_WEB_API_URL?.replace(/\/$/, "")
 ].filter(Boolean);
 
-console.log("✅ Allowed Origins:");
+console.log("✅ Allowed Origins for CORS:", allowedOrigins);
 console.log("🌍 Environment Frontend URLs loaded");
 
 app.use(

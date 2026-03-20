@@ -22,24 +22,27 @@ export default function App() {
     <>
       <ScrollToTop />
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/search" element={<SearchResults />} />
-        <Route path="/auth" element={<CustomerAuth />} />
-        <Route path="/profile" element={<CustomerProfile />} />
-        <Route path="/provider/:id" element={<ProviderProfile />} />
-        <Route path="/orders" element={<MyOrders />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/services" element={<Services />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/faq" element={<FAQ />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/cookies" element={<Cookies />} />
-      </Routes>
-      <Footer />
+      <div className="flex min-h-[calc(100vh-80px)] flex-col bg-gray-50 px-2 sm:px-4 md:px-6 lg:px-8 mx-auto max-w-screen-2xl">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/search" element={<SearchResults />} />
+          <Route path="/auth" element={<CustomerAuth />} />
+          <Route path="/profile" element={<CustomerProfile />} />
+          <Route path="/provider/:id" element={<ProviderProfile />} />
+          <Route path="/orders" element={<MyOrders />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/cookies" element={<Cookies />} />
+        </Routes>
+        <Footer />
+      </div>
       <Chatbot />
     </>
   );
 }
+
 

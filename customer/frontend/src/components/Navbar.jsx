@@ -422,15 +422,15 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="navbar">
+<nav className="navbar sticky top-0 z-50 bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-2xl border-b border-gray-800/50 backdrop-blur-sm">
         {/* LEFT */}
-        <div className="nav-left">
+        <div className="nav-left flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
           <Link to="/" className="logo-link" onClick={() => setMobileMenuOpen(false)}>
             <img src="/oibre-logo.png" alt="Oibre Logo" className="logo-image" />
           </Link>
 
           <button
-            className={`mobile-menu-toggle ${mobileMenuOpen ? "is-open" : ""}`}
+            className={`mobile-menu-toggle md:hidden p-2 rounded-lg hover:bg-white/10 ${mobileMenuOpen ? "is-open" : ""}`}
             type="button"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
             aria-label="Toggle navigation menu"
@@ -452,7 +452,7 @@ export default function Navbar() {
         </div>
 
         {/* RIGHT */}
-        <div className="nav-actions">
+        <div className="nav-actions flex items-center gap-2 sm:gap-3">
           <div className="location-wrapper">
             <div className="location-pill" title={location.address || location.label || "Detecting..."}>
               📍 {location.label || "Detecting..."}
@@ -646,8 +646,8 @@ export default function Navbar() {
             </>
           ) : (
             /* WHEN NOT LOGGED IN */
-            <Link to="/auth">
-              <button className="login-btn">Login / Signup</button>
+            <Link to="/auth" className="block sm:inline-block">
+              <button className="login-btn px-6 py-2 sm:py-3 text-sm font-semibold rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all bg-blue-600 hover:bg-blue-700">Login / Signup</button>
             </Link>
           )}
         </div>

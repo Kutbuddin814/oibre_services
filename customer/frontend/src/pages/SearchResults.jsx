@@ -429,7 +429,7 @@ export default function SearchResults() {
         </button>
       </div>
 
-      <div className="search-layout">
+      <div className="search-layout grid grid-cols-1 lg:grid-cols-4 lg:gap-6 p-4 sm:p-6">
         {/* FILTERS */}
         <aside className={`filters ${mobileFiltersOpen ? "mobile-open" : ""}`}>
           <h3>Filters</h3>
@@ -494,7 +494,7 @@ export default function SearchResults() {
 
         {/* RESULTS */}
         <section className="results">
-          <div className="results-grid">
+            <div className="results-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
             {loading && <p>Loading...</p>}
 
             {!loading && filtered.length === 0 && (
