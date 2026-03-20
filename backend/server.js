@@ -24,7 +24,7 @@ const allowedOrigins = [
   process.env.REACT_APP_PROVIDER_WEB_API_URL?.replace(/\/$/, "")
 ].filter(Boolean);
 
-console.log("✅ Allowed Origins:", allowedOrigins);
+console.log("✅ Allowed Origins:");
 console.log("🌍 Environment Frontend URLs loaded");
 
 app.use(
@@ -165,6 +165,10 @@ app.use("/api/provider", providerProfileRoutes);
 app.use("/api/provider/payment", providerPaymentRoutes);
 app.use("/api/provider/earnings", providerEarningsRoutes);
 app.use("/api/provider/requests", providerRequestsRoutes);
+
+// Callback Queue Routes
+const callbackQueueRoutes = require("./routes/callbackQueueRoutes");
+app.use("/api/callback-queue", callbackQueueRoutes);
 
 // Public Services Endpoint (No authentication required)
 const Service = require("./models/Service");

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import api from "./config/axios";
 import API_BASE_URL from "./config/api";
 import { useNavigate } from "react-router-dom";
@@ -44,14 +44,10 @@ const ProviderDashboard = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("providerToken");
   const getLocationSetupKey = (providerId) => `providerLocationChosen:${providerId}`;
-  const isCoordinateString = (value) =>
-    typeof value === "string" &&
-    /^\s*-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?\s*$/.test(value);
-
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem("providerToken");
     navigate("/");
-  };
+  }, [navigate]);
 
   const resolveImageUrl = (value) => {
     if (!value || typeof value !== "string") return "";
@@ -136,7 +132,7 @@ const ProviderDashboard = () => {
     return 1;
   };
 
-  const refreshRequests = async () => {
+  const refreshRequests = useCallback(async () => {
     const res = await api.get(
       "/provider/requests/my-requests",
       {
@@ -144,7 +140,7 @@ const ProviderDashboard = () => {
       }
     );
     setRequests(formatRequests(res.data));
-  };
+  }, [token]);
 
   const reverseGeocode = async (lat, lng) => {
     const coordsFallback = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
@@ -233,24 +229,6 @@ const ProviderDashboard = () => {
     }
   };
 
-  const handleUseRegisteredLocation = async () => {
-    const coords = provider?.location?.coordinates || [];
-    if (coords.length !== 2) {
-      setLocationError("Registered location is unavailable. Please use current location.");
-      return;
-    }
-
-    const maybeAddress = provider.address || "";
-    const resolvedAddress = isCoordinateString(maybeAddress) || !maybeAddress.trim()
-      ? await reverseGeocode(coords[1], coords[0])
-      : maybeAddress;
-
-    await saveProviderLocation({
-      address: resolvedAddress,
-      lat: coords[1],
-      lng: coords[0]
-    });
-  };
 
   const handleUseCurrentLocation = () => {
     if (!navigator.geolocation) {
@@ -322,7 +300,7 @@ const ProviderDashboard = () => {
     };
 
     fetchProfile();
-  }, []);
+  }, [logout, token]);
 
   useEffect(() => {
     if (!showLocationModal) return;
@@ -403,7 +381,7 @@ const ProviderDashboard = () => {
     };
 
     fetchRequests();
-  }, [provider, token]);
+  }, [provider, token, refreshRequests]);
 
   useEffect(() => {
     if (!provider || !token) return undefined;
@@ -423,7 +401,7 @@ const ProviderDashboard = () => {
       window.removeEventListener("focus", refreshIfVisible);
       document.removeEventListener("visibilitychange", refreshIfVisible);
     };
-  }, [provider, token]);
+  }, [provider, token, refreshRequests]);
 
   /* ==========================
      UPDATE REQUEST

@@ -5,6 +5,7 @@ const Service = require("../models/Service");
 const ServiceRequest = require("../models/ServiceRequest");
 const Customer = require("../models/Customer");
 const customerAuth = require("../middleware/customerAuth");
+const CallbackRequest = require("../models/CallbackRequest");
 
 // ==================== SERVICE CATEGORIES ====================
 router.get("/services/categories", async (req, res) => {
@@ -366,22 +367,27 @@ router.post("/request-callback", customerAuth, async (req, res) => {
     const { customerId } = req;
     const { serviceType, location, preferredTime } = req.body;
 
-    // Log callback request (store in database)
-    const callbackRequest = {
+    // Fetch customer info
+    const customer = await Customer.findById(customerId);
+    if (!customer) {
+      return res.status(404).json({ success: false, message: "Customer not found" });
+    }
+
+    const callbackRequest = new CallbackRequest({
       customerId,
+      name: customer.name || "",
+      phone: customer.mobile || customer.phone || "",
       serviceType,
       location,
       preferredTime,
-      createdAt: new Date(),
       status: "pending"
-    };
-
-    // TODO: Save to database (create CallbackRequest model if needed)
-    console.log("Callback request:", callbackRequest);
+    });
+    await callbackRequest.save();
 
     res.json({
       success: true,
-      message: "Request received. We'll notify you when a provider is available."
+      message: "Request received. We'll notify you when a provider is available.",
+      callbackId: callbackRequest._id
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

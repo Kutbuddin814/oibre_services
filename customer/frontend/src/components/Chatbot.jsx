@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import api from "../config/axios";
+import MapPicker from "./MapPicker";
 import "../styles/chatbot.css";
 
 const DEFAULT_CATEGORY_OPTIONS = ["Electrician", "Plumber", "Carpenter", "AC Repair"];
@@ -19,6 +20,7 @@ const Chatbot = () => {
   const [locationStatus, setLocationStatus] = useState("unknown"); // unknown, granted, denied, skipped
   const [serviceDropdownOpen, setServiceDropdownOpen] = useState(true);
   const [showAllServices, setShowAllServices] = useState(false);
+  const [showMapPicker, setShowMapPicker] = useState(false);
   const chatEndRef = useRef(null);
 
   const addMessage = useCallback((msg) => {
@@ -32,8 +34,7 @@ const Chatbot = () => {
         type: "bot",
         text: "Location is not supported on this device.",
         options: [
-          { label: "🔁 Retry location", value: "retry-location" },
-          { label: "➡ Continue without location", value: "continue-without-location" }
+          { label: "🗺 Select from map", value: "pick-location-map" }
         ]
       });
       return;
@@ -42,11 +43,12 @@ const Chatbot = () => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setLocationStatus("granted");
-        setUserLocation({
+        const resolvedLocation = {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
           name: "Current Location"
-        });
+        };
+        setUserLocation(resolvedLocation);
         addMessage({
           type: "bot",
           text: "📍 Location detected! What service do you need?"
@@ -56,15 +58,58 @@ const Chatbot = () => {
         setLocationStatus("denied");
         addMessage({
           type: "bot",
-          text: "Location access was cancelled. You can retry or continue without location.",
+          text: "Location access was cancelled. Please retry or select your location on map.",
           options: [
             { label: "🔁 Retry location", value: "retry-location" },
-            { label: "➡ Continue without location", value: "continue-without-location" }
+            { label: "🗺 Select from map", value: "pick-location-map" }
           ]
         });
       }
     );
   }, [addMessage]);
+
+  const requestCallback = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      addMessage({
+        type: "bot",
+        text: "Please login first to request a callback."
+      });
+      return;
+    }
+
+    try {
+      const locationText =
+        userLocation?.name ||
+        (userLocation?.lat && userLocation?.lng
+          ? `${userLocation.lat}, ${userLocation.lng}`
+          : "Not specified");
+
+      const res = await api.post(
+        "/chatbot/request-callback",
+        {
+          serviceType: selectedService || "General",
+          location: locationText,
+          preferredTime: "as soon as possible"
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      addMessage({
+        type: "bot",
+        text:
+          res?.data?.message ||
+          "Request received. We will notify you when a provider is available."
+      });
+    } catch (err) {
+      console.error("Callback request failed:", err?.message);
+      addMessage({
+        type: "bot",
+        text: "Could not place callback request right now. Please try again in a moment."
+      });
+    }
+  };
 
   useEffect(() => {
     scrollToBottom();
@@ -139,9 +184,42 @@ const Chatbot = () => {
     try {
       const res = await api.get(`/chatbot/services/problems/${serviceName}`);
       if (res.data.success) {
-        setProblems(res.data.problems || []);
+        const fetchedProblems = res.data.problems || [];
+        setProblems(fetchedProblems);
+
+        // If no problems are configured for this service, continue without blocking the user.
+        if (fetchedProblems.length === 0) {
+          addMessage({
+            type: "bot",
+            text: "I could not find predefined issues for this service. You can continue by selecting urgency."
+          });
+          addMessage({
+            type: "bot",
+            text: "⏰ When do you need this service?",
+            options: [
+              { label: "🚨 Emergency (within 1 hour)", value: "emergency" },
+              { label: "📅 Today", value: "today" },
+              { label: "📆 Schedule later", value: "later" }
+            ]
+          });
+          setStep("urgency");
+        }
       } else {
         setProblems([]);
+        addMessage({
+          type: "bot",
+          text: "I could not fetch issues for this service. You can continue by selecting urgency."
+        });
+        addMessage({
+          type: "bot",
+          text: "⏰ When do you need this service?",
+          options: [
+            { label: "🚨 Emergency (within 1 hour)", value: "emergency" },
+            { label: "📅 Today", value: "today" },
+            { label: "📆 Schedule later", value: "later" }
+          ]
+        });
+        setStep("urgency");
       }
     } catch (err) {
       console.error(err);
@@ -150,6 +228,16 @@ const Chatbot = () => {
         type: "bot",
         text: "I could not load issue list right now. You can continue by selecting urgency after choosing any service."
       });
+      addMessage({
+        type: "bot",
+        text: "⏰ When do you need this service?",
+        options: [
+          { label: "🚨 Emergency (within 1 hour)", value: "emergency" },
+          { label: "📅 Today", value: "today" },
+          { label: "📆 Schedule later", value: "later" }
+        ]
+      });
+      setStep("urgency");
     }
   };
 
@@ -210,31 +298,34 @@ const Chatbot = () => {
       return;
     }
 
-    if (value === "continue-without-location") {
-      setLocationStatus("skipped");
-      addMessage({ type: "user", text: "Continue without location" });
-      addMessage({
-        type: "bot",
-        text: "No problem. I will show providers without distance sorting. Select a service to continue."
-      });
-      return;
-    }
-
     if (["emergency", "today", "later"].includes(value)) {
       handleUrgencySelect(value);
       return;
     }
 
     if (value === "callback") {
-      addMessage({
-        type: "bot",
-        text: "We will arrange a callback shortly. You can also try another service or urgency option."
-      });
+      addMessage({ type: "user", text: "Request callback" });
+      requestCallback();
       return;
     }
 
     if (value === "change-location") {
-      requestUserLocation();
+      addMessage({ type: "user", text: "Try different location" });
+      addMessage({
+        type: "bot",
+        text: "Choose how you want to set location:",
+        options: [
+          { label: "📍 Auto detect current location", value: "retry-location" },
+          { label: "🗺 Select from map", value: "pick-location-map" }
+        ]
+      });
+      return;
+    }
+
+    if (value === "pick-location-map") {
+      addMessage({ type: "user", text: "Select from map" });
+      setShowMapPicker(true);
+      return;
     }
   };
 
@@ -525,6 +616,38 @@ const Chatbot = () => {
                 ))}
               </div>
             </div>
+          )}
+
+          {showMapPicker && (
+            <MapPicker
+              initialLat={userLocation?.lat}
+              initialLng={userLocation?.lng}
+              onClose={() => setShowMapPicker(false)}
+              onConfirm={(lat, lng, fullAddress, locality, displayLabel) => {
+                const resolved = {
+                  lat,
+                  lng,
+                  name: displayLabel || locality || fullAddress || "Pinned location"
+                };
+
+                setUserLocation(resolved);
+                setLocationStatus("granted");
+                setShowMapPicker(false);
+
+                addMessage({
+                  type: "bot",
+                  text: `📍 Location set to ${resolved.name}.`
+                });
+
+                if (selectedService && _selectedUrgency) {
+                  addMessage({
+                    type: "bot",
+                    text: "Retrying provider search with your new location..."
+                  });
+                  loadProviders(_selectedUrgency);
+                }
+              }}
+            />
           )}
         </div>
       )}
