@@ -1,5 +1,6 @@
 /* Blinkit Style Location Modal */
 
+.modal-backdrop,
 .blinkit-location-backdrop {
   position: fixed;
   inset: 0;
@@ -9,9 +10,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 16px;
   animation: fadeIn 0.2s ease-in;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 @keyframes fadeIn {
@@ -23,8 +24,9 @@
   }
 }
 
+.modal-container,
 .blinkit-location-modal {
-  width: 92%;
+  width: 100%;
   max-width: 520px;
   background: #ffffff;
   border-radius: 18px;
@@ -35,7 +37,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  max-height: 90vh;
+  height: calc(100vh - 40px);
 }
 
 @keyframes slideUp {
@@ -190,7 +192,8 @@
 
 .map-wrapper {
   width: 100%;
-  height: 220px;
+  min-height: 150px;
+  max-height: 220px;
   border-radius: 12px;
   overflow: hidden;
   position: relative;
@@ -207,7 +210,6 @@
 }
 
 .modal-container {
-  max-height: 90vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -216,6 +218,11 @@
 .modal-body {
   overflow-y: auto;
   flex: 1;
+}
+
+.modal-header,
+.modal-footer {
+  flex-shrink: 0;
 }
 
 /* Search Results */
@@ -321,45 +328,16 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .blinkit-location-backdrop {
-    align-items: flex-end;
-    padding-top: 0;
+  .modal-backdrop {
+    align-items: center;
+    padding: 16px;
   }
 
-  .blinkit-location-modal {
-    width: 100%;
-    max-width: 100%;
-    border-radius: 16px 16px 0 0;
-    animation: slideUpMobile 0.3s ease-out;
-  }
-
-  @keyframes slideUpMobile {
-    from {
-      transform: translateY(100%);
-    }
-    to {
-      transform: translateY(0);
-    }
-  }
-
-  .blinkit-location-title {
-    font-size: 22px;
+  .modal-container {
+    height: calc(100vh - 40px);
   }
 
   .map-wrapper {
-    height: 180px;
-  }
-}
-
-@media (max-height: 640px) {
-  .blinkit-location-backdrop {
-    align-items: flex-start;
-    padding-top: 40px;
-    overflow-y: auto;
-  }
-
-  .blinkit-location-modal {
-    max-height: calc(100vh - 80px);
-    overflow-y: auto;
+    min-height: 140px;
   }
 }

@@ -45,11 +45,11 @@
 }
 
 .services-container {
-  width: min(1400px, 100%);
+  width: min(1200px, 100%);
   margin: 0 auto;
   padding: 0 var(--space-xl, 24px);
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--space-2xl, 32px);
 }
 
@@ -231,7 +231,7 @@
 /* RESPONSIVE */
 @media (max-width: 1200px) {
   .services-container {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: var(--space-xl, 24px);
   }
 

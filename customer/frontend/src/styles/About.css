@@ -43,7 +43,10 @@
 
 /* ABOUT SECTION */
 .about-section {
-  padding: 60px 0;
+  padding: 60px 20px;
+  max-width: 960px;
+  margin: 0 auto;
+  text-align: center;
   border-bottom: 1px solid #E5E7EB;
 }
 
@@ -56,12 +59,14 @@
   font-weight: 700;
   color: #111827;
   margin-bottom: 24px;
+  text-align: center;
 }
 
 .about-section p {
   font-size: 15px;
   color: #4B5563;
   line-height: 1.8;
+  text-align: center;
 }
 
 /* MISSION & VISION */
