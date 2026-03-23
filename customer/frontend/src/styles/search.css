@@ -228,11 +228,11 @@
 /* Layout */
 .search-layout {
   width: 100%;
-  max-width: 1300px;
+  max-width: 1400px;
   margin: var(--space-xl, 24px) auto;
   padding: 0 20px;
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 260px 1fr;
   gap: var(--space-2xl, 32px);
 }
 
@@ -244,7 +244,7 @@
   box-shadow: var(--shadow-md, 0 4px 6px rgba(0,0,0,0.1));
   height: fit-content;
   border: 1px solid var(--border-light);
-  max-width: 280px;
+  max-width: 260px;
   position: sticky;
   top: calc(var(--search-navbar-offset) + 20px);
 }
@@ -327,7 +327,7 @@
 /* Results grid - PC 3-col */
 .results-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--space-xl, 24px);
   width: 100%;
   box-sizing: border-box;
@@ -354,6 +354,8 @@
   height: 100%;
   box-sizing: border-box;
   overflow: hidden;
+  width: 100%;
+  min-width: 0;
 }
 
 .result-card:hover {
