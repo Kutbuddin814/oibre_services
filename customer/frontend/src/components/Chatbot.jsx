@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import ReactDOM from "react-dom";
 import api from "../config/axios";
 import MapPicker from "./MapPicker";
 import "../styles/chatbot.css";
@@ -22,9 +23,25 @@ const Chatbot = () => {
   const [showAllServices, setShowAllServices] = useState(false);
   const [showMapPicker, setShowMapPicker] = useState(false);
   const chatEndRef = useRef(null);
+  const [portalContainer, setPortalContainer] = useState(null);
 
   const addMessage = useCallback((msg) => {
     setMessages((prev) => [...prev, msg]);
+  }, []);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return undefined;
+
+    const container = document.createElement("div");
+    container.setAttribute("data-chatbot-portal", "true");
+    document.body.appendChild(container);
+    setPortalContainer(container);
+
+    return () => {
+      if (document.body.contains(container)) {
+        document.body.removeChild(container);
+      }
+    };
   }, []);
 
   const requestUserLocation = useCallback(() => {
@@ -448,10 +465,18 @@ const Chatbot = () => {
     setIsOpen(!isOpen);
   };
 
+  const closeChatbot = () => {
+    setIsOpen(false);
+  };
+
   const categoryKeys = Object.keys(categories || {});
   const visibleCategoryKeys = showAllServices ? categoryKeys : categoryKeys.slice(0, 4);
 
-  return (
+  if (!portalContainer) {
+    return null;
+  }
+
+  return ReactDOM.createPortal(
     <>
       {/* Floating Button */}
       <button
@@ -470,6 +495,13 @@ const Chatbot = () => {
               <h3>🤖 Service Assistant</h3>
               <p>Find services in seconds</p>
             </div>
+            <button
+              className="chatbot-close-btn"
+              onClick={closeChatbot}
+              aria-label="Close chat"
+            >
+              ×
+            </button>
           </div>
 
           <div className="chatbot-messages">
@@ -651,7 +683,8 @@ const Chatbot = () => {
           )}
         </div>
       )}
-    </>
+    </>,
+    portalContainer
   );
 };
 

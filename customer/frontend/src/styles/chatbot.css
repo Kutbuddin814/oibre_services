@@ -71,6 +71,7 @@
   justify-content: space-between;
   align-items: start;
   gap: 12px;
+  position: relative;
 }
 
 .chatbot-header-content h3 {
@@ -84,6 +85,30 @@
   margin: 0;
   font-size: 13px;
   opacity: 0.9;
+}
+
+.chatbot-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: white;
+  font-size: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.chatbot-close-btn:hover,
+.chatbot-close-btn:focus-visible {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 
@@ -406,6 +431,7 @@
     right: 0;
     left: 0;
     border-radius: 16px 16px 0 0;
+    margin: 0;
   }
 
   .chatbot-floating-btn {
@@ -427,6 +453,50 @@
 
   .chatbot-action-btn {
     width: 100%;
+  }
+
+  .chatbot-close-btn {
+    top: 10px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 768px) and (min-width: 481px) {
+  .chatbot-window {
+    width: min(420px, 92vw);
+    right: 4vw;
+    left: auto;
+    bottom: 16px;
+    border-radius: 20px;
+    max-height: calc(100vh - 32px);
+  }
+
+  .chatbot-floating-btn {
+    bottom: 120px;
+    right: 16px;
+  }
+
+  .chatbot-messages {
+    padding: 16px 18px;
+    gap: 10px;
+  }
+
+  .chatbot-input-area {
+    padding: 12px 14px 16px;
+  }
+
+  .chatbot-option-btn,
+  .chatbot-category-btn,
+  .chatbot-problem-btn {
+    font-size: 13px;
+    padding: 10px 12px;
+  }
+
+  .chatbot-service-toggle {
+    font-size: 14px;
+    padding: 12px 14px;
   }
 }
 
