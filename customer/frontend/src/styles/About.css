@@ -6,13 +6,14 @@
   min-height: calc(100vh - 80px);
   background: #FFFFFF;
   padding-bottom: 60px;
+  width: 100%;
 }
 
 /* HERO SECTION */
 .about-hero {
   background: linear-gradient(135deg, #111827 0%, #1F2937 100%);
   color: #FFFFFF;
-  padding: 80px 20px;
+  padding: 90px 0;
   text-align: center;
 }
 
@@ -20,6 +21,9 @@
   font-size: 42px;
   font-weight: 700;
   margin-bottom: 16px;
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .about-hero p {
@@ -32,9 +36,9 @@
 
 /* MAIN CONTAINER */
 .about-container {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 0 20px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 /* ABOUT SECTION */
@@ -66,6 +70,11 @@
   grid-template-columns: 1fr 1fr;
   gap: 30px;
   margin: 60px 0;
+  width: min(1240px, 100%);
+  padding: 0 20px;
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .mission-vision .card {
@@ -94,6 +103,11 @@
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 30px;
   margin-top: 32px;
+  width: min(1240px, 100%);
+  padding: 0 20px;
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .value-item {
@@ -135,13 +149,11 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 30px;
-  padding: 60px 0;
   background: #F9FAFB;
-  margin: 0 -20px;
-  padding: 60px 20px;
+  margin: 0 auto;
   border-radius: 16px;
-  margin-left: -20px;
-  margin-right: -20px;
+  width: min(1240px, 100%);
+  padding: 60px 20px;
 }
 
 .stat {
@@ -167,6 +179,11 @@
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 30px;
   margin-top: 32px;
+  width: min(1240px, 100%);
+  padding: 0 20px;
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .step {
@@ -206,6 +223,7 @@
   text-align: center;
   padding: 60px 0;
   border-top: 1px solid #E5E7EB;
+  width: 100%;
 }
 
 .about-cta h2 {
@@ -213,12 +231,18 @@
   font-weight: 700;
   color: #111827;
   margin-bottom: 12px;
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .about-cta p {
   font-size: 15px;
   color: #6B7280;
   margin-bottom: 32px;
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .cta-buttons {
@@ -226,6 +250,10 @@
   gap: 16px;
   justify-content: center;
   flex-wrap: wrap;
+  width: min(1100px, 100%);
+  margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
 .btn {

@@ -243,6 +243,9 @@
   box-shadow: var(--shadow-md, 0 4px 6px rgba(0,0,0,0.1));
   height: fit-content;
   border: 1px solid var(--border-light);
+  max-width: 280px;
+  position: sticky;
+  top: calc(var(--search-navbar-offset) + 20px);
 }
 
 .filters h3 {
@@ -251,6 +254,10 @@
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.3px;
+}
+
+.results {
+  width: 100%;
 }
 
 .filters label {
@@ -319,7 +326,7 @@
 /* Results grid - PC 3-col */
 .results-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(280px, 1fr));
   gap: var(--space-xl, 24px);
   width: 100%;
   box-sizing: border-box;

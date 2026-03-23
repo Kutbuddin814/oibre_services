@@ -1,7 +1,9 @@
 .eom-showcase {
-  padding: 70px 6%;
+  width: 100%;
+  padding: 70px 20px;
   text-align: center;
   background: #fafafa;
+  box-sizing: border-box;
 }
 
 .eom-heading {

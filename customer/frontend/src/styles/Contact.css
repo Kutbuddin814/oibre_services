@@ -12,14 +12,20 @@
 .contact-hero {
   background: linear-gradient(135deg, #111827 0%, #1F2937 100%);
   color: #FFFFFF;
-  padding: 80px 20px;
+  padding: 90px 0;
   text-align: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .contact-hero h1 {
   font-size: 42px;
   font-weight: 700;
   margin-bottom: 16px;
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 20px;
 }
 
 .contact-hero p {
@@ -32,7 +38,7 @@
 
 /* MAIN CONTAINER */
 .contact-container {
-  max-width: 1100px;
+  width: min(1100px, 100%);
   margin: 60px auto;
   padding: 0 20px;
   display: grid;

@@ -7,10 +7,11 @@
   backdrop-filter: blur(2px);
   z-index: 1000;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding-top: 100px;
+  padding: 20px;
   animation: fadeIn 0.2s ease-in;
+  overflow-y: auto;
 }
 
 @keyframes fadeIn {
@@ -31,6 +32,10 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
   position: relative;
   animation: slideUp 0.3s ease-out;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
 }
 
 @keyframes slideUp {
@@ -183,6 +188,36 @@
   color: #999999;
 }
 
+.map-wrapper {
+  width: 100%;
+  height: 220px;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.map-wrapper iframe {
+  width: 100% !important;
+  height: 100% !important;
+  border: 0;
+  display: block;
+  position: relative;
+  left: 0 !important;
+}
+
+.modal-container {
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-body {
+  overflow-y: auto;
+  flex: 1;
+}
+
 /* Search Results */
 .blinkit-search-results {
   max-height: 360px;
@@ -285,7 +320,7 @@
 }
 
 /* Responsive */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .blinkit-location-backdrop {
     align-items: flex-end;
     padding-top: 0;
@@ -309,5 +344,22 @@
 
   .blinkit-location-title {
     font-size: 22px;
+  }
+
+  .map-wrapper {
+    height: 180px;
+  }
+}
+
+@media (max-height: 640px) {
+  .blinkit-location-backdrop {
+    align-items: flex-start;
+    padding-top: 40px;
+    overflow-y: auto;
+  }
+
+  .blinkit-location-modal {
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
   }
 }
