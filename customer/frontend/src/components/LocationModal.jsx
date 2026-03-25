@@ -20,6 +20,15 @@ export default function LocationModal({
     setIsDetectingLocal(isDetecting);
   }, [isDetecting]);
 
+  useEffect(() => {
+    document.body.classList.add("modal-open");
+    return () => {
+      if (!document.querySelector(".modal-backdrop") && !document.querySelector(".map-modal")) {
+        document.body.classList.remove("modal-open");
+      }
+    };
+  }, []);
+
   const handleDetectLocation = () => {
     setIsDetectingLocal(true);
     if (onSearch) {

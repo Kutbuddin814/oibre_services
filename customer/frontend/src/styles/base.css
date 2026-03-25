@@ -3,6 +3,10 @@
    Built on design system
 ======================= */
 
+* {
+  box-sizing: border-box;
+}
+
 /* Remove duplicate resets - design system handles this */
 
 :root {

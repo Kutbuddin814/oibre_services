@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import api from "../config/axios";
 import "../styles/search.css";
+import "../styles/search-page-layout.css";
 
 const TIME_SLOTS = [
   "6:00 AM - 9:00 AM",
@@ -363,176 +364,169 @@ export default function SearchResults() {
       {typeof document !== "undefined" ? createPortal(backButton, document.body) : backButton}
       <div className="search-page">
 
-      {/* SEARCH BAR */}
-      <div className="search-header">
-        <div className="search-wrapper">
-          <input
-            className="search-input"
-            placeholder="Search service (Plumber, Electrician...)"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSearchSubmit();
-              }
-            }}
-          />
-          <button className="search-button" onClick={handleSearchSubmit}>
-            Search
-          </button>
-        </div>
-      </div>
-
-      <h2 className="results-header">
-        Results for <span>"{query}"</span>
-      </h2>
-
-      {/* 🆕 SERVICE RECOMMENDATIONS SECTION */}
-      {recommendations.length > 0 && !recommendationsLoading && (
-        <div className="recommendations-section">
-          <h3 className="recommendations-title">📌 Related Services</h3>
-          <div className="recommendations-list">
-            {recommendations.map((service) => (
-              <button
-                key={service._id}
-                className="recommendation-chip"
-                onClick={() => {
-                  setSearchText(service.name);
-                  navigate(`/search?query=${encodeURIComponent(service.name)}`);
-                }}
-                title={service.description}
-              >
-                {service.iconImage ? (
-                  <img
-                    src={service.iconImage}
-                    alt=""
-                    className="recommendation-icon-image"
-                    loading="lazy"
-                  />
-                ) : (
-                  <span className="recommendation-icon">{normalizeServiceIcon(service.icon, service.name)}</span>
-                )}
-                <span className="recommendation-name">{service.name}</span>
-              </button>
-            ))}
+        {/* SEARCH BAR */}
+        <div className="search-header">
+          <div className="search-wrapper">
+            <input
+              className="search-input"
+              placeholder="Search service (Plumber, Electrician...)"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSearchSubmit();
+                }
+              }}
+            />
+            <button className="search-button" onClick={handleSearchSubmit}>
+              Search
+            </button>
           </div>
         </div>
-      )}
 
-      <div className="mobile-filter-row">
-        <button
-          type="button"
-          className="mobile-filter-btn"
-          onClick={() => setMobileFiltersOpen((prev) => !prev)}
-        >
-          {mobileFiltersOpen ? "Hide Filters" : "Show Filters"}
-        </button>
-      </div>
+        <h2 className="results-header">
+          Results for <span>"{query}"</span>
+        </h2>
 
-      <div className="search-layout grid grid-cols-1 lg:grid-cols-4 lg:gap-6 p-4 sm:p-6">
-        {/* FILTERS */}
-        <aside className={`filters ${mobileFiltersOpen ? "mobile-open" : ""}`}>
-          <h3>Filters</h3>
+        {/* 🆕 SERVICE RECOMMENDATIONS SECTION */}
+        {recommendations.length > 0 && !recommendationsLoading && (
+          <div className="recommendations-section">
+            <h3 className="recommendations-title">📌 Related Services</h3>
+            <div className="recommendations-list">
+              {recommendations.map((service) => (
+                <button
+                  key={service._id}
+                  className="recommendation-chip"
+                  onClick={() => {
+                    setSearchText(service.name);
+                    navigate(`/search?query=${encodeURIComponent(service.name)}`);
+                  }}
+                  title={service.description}
+                >
+                  {service.iconImage ? (
+                    <img
+                      src={service.iconImage}
+                      alt=""
+                      className="recommendation-icon-image"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <span className="recommendation-icon">{normalizeServiceIcon(service.icon, service.name)}</span>
+                  )}
+                  <span className="recommendation-name">{service.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
-          {/* RATING FILTER */}
-          <label>Minimum Rating</label>
-          <select value={rating} onChange={(e) => setRating(e.target.value)} className="filter-select">
-            <option value="">Any</option>
-            <option value="3">⭐ 3.0+</option>
-            <option value="3.5">⭐ 3.5+</option>
-            <option value="4">⭐ 4.0+</option>
-            <option value="4.5">⭐ 4.5+</option>
-          </select>
-
-          {/* PRICE FILTER */}
-          <label>Price Range (₹)</label>
-          <select value={priceRange} onChange={(e) => setPriceRange(e.target.value)} className="filter-select">
-            <option value="">Any</option>
-            <option value="100-300">₹100 - ₹300</option>
-            <option value="300-500">₹300 - ₹500</option>
-            <option value="500-1000">₹500 - ₹1000</option>
-            <option value="1000+">₹1000+</option>
-          </select>
-
-          {/* DISTANCE FILTER */}
-          <label>Maximum Distance (km)</label>
-          <select value={distance} onChange={(e) => setDistance(e.target.value)} className="filter-select">
-            <option value="">Any</option>
-            <option value="1">Up to 1 km</option>
-            <option value="3">Up to 3 km</option>
-            <option value="5">Up to 5 km</option>
-            <option value="10">Up to 10 km</option>
-            <option value="25">Up to 25 km</option>
-            <option value="30">Up to 30 km</option>
-            <option value="35">Up to 35 km</option>
-          </select>
-
-          {/* TIME SLOT FILTER */}
-          <label>Available Time Slot</label>
-          <select value={timeSlot} onChange={(e) => setTimeSlot(e.target.value)} className="filter-select">
-            <option value="">Any Time</option>
-            {TIME_SLOTS.map((slot) => (
-              <option key={slot} value={slot}>
-                {slot}
-              </option>
-            ))}
-          </select>
-
-          {/* CLEAR FILTERS */}
-          <button 
-            className="clear-filters-btn"
-            onClick={() => {
-              setRating("");
-              setPriceRange("");
-              setDistance("");
-              setTimeSlot("");
-            }}
+        <div className="mobile-filter-row">
+          <button
+            type="button"
+            className="mobile-filter-btn"
+            onClick={() => setMobileFiltersOpen((prev) => !prev)}
           >
-            Clear Filters
+            {mobileFiltersOpen ? "Hide Filters" : "Show Filters"}
           </button>
-        </aside>
+        </div>
 
-        {/* RESULTS */}
-        <section className="results">
-            <div className="results-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-            {loading && <p>Loading...</p>}
-
+        <div className="search-layout">
+          {/* FILTERS */}
+          <aside className={`filters${mobileFiltersOpen ? " mobile-open" : ""}`}>
+            <h3>Filters</h3>
+            {/* RATING FILTER */}
+            <label>Minimum Rating</label>
+            <select value={rating} onChange={(e) => setRating(e.target.value)} className="filter-select">
+              <option value="">Any</option>
+              <option value="3">⭐ 3.0+</option>
+              <option value="3.5">⭐ 3.5+</option>
+              <option value="4">⭐ 4.0+</option>
+              <option value="4.5">⭐ 4.5+</option>
+            </select>
+            {/* PRICE FILTER */}
+            <label>Price Range (₹)</label>
+            <select value={priceRange} onChange={(e) => setPriceRange(e.target.value)} className="filter-select">
+              <option value="">Any</option>
+              <option value="100-300">₹100 - ₹300</option>
+              <option value="300-500">₹300 - ₹500</option>
+              <option value="500-1000">₹500 - ₹1000</option>
+              <option value="1000+">₹1000+</option>
+            </select>
+            {/* DISTANCE FILTER */}
+            <label>Maximum Distance (km)</label>
+            <select value={distance} onChange={(e) => setDistance(e.target.value)} className="filter-select">
+              <option value="">Any</option>
+              <option value="1">Up to 1 km</option>
+              <option value="3">Up to 3 km</option>
+              <option value="5">Up to 5 km</option>
+              <option value="10">Up to 10 km</option>
+              <option value="25">Up to 25 km</option>
+              <option value="30">Up to 30 km</option>
+              <option value="35">Up to 35 km</option>
+            </select>
+            {/* TIME SLOT FILTER */}
+            <label>Available Time Slot</label>
+            <select value={timeSlot} onChange={(e) => setTimeSlot(e.target.value)} className="filter-select">
+              <option value="">Any Time</option>
+              {TIME_SLOTS.map((slot) => (
+                <option key={slot} value={slot}>
+                  {slot}
+                </option>
+              ))}
+            </select>
+            {/* CLEAR FILTERS */}
+            <button 
+              className="clear-filters-btn"
+              onClick={() => {
+                setRating("");
+                setPriceRange("");
+                setDistance("");
+                setTimeSlot("");
+              }}
+            >
+              Clear Filters
+            </button>
+          </aside>
+          {/* RESULTS */}
+          <section className="results">
+            {loading && (
+              <div className="results-grid">
+                {[...Array(6)].map((_, i) => (
+                  <div className="service-card skeleton" key={i}></div>
+                ))}
+              </div>
+            )}
             {!loading && filtered.length === 0 && (
               <p>No professionals found.</p>
             )}
-
-            {filtered.map((p) => (
-              <div className="result-card" key={p._id}>
-                <div className="avatar">
-                  {p.name ? p.name[0].toUpperCase() : "?"}
-                </div>
-
-                <h3>{p.name}</h3>
-                <p className="role">{p.displayService || p.serviceCategory}</p>
-
-                <p className="address">{p.address}</p>
-
-                {p.availableTime && (
-                  <p className="time-slot">🕐 {p.availableTime}</p>
-                )}
-
-                {p.distanceKm !== undefined && (
-                  <p className="distance">{p.distanceKm} km away</p>
-                )}
-
-                <p className="rating">⭐ {getProviderRating(p).toFixed(1)}</p>
-
-                <p className="price">Starting from ₹{p.finalPrice}</p>
-
-                {/* 🔥 VIEW PROFILE INSTEAD OF BOOK */}
-                <button className="profile-btn" onClick={() => openProfile(p._id)}>
-                  View Profile
-                </button>
+            {!loading && (
+              <div className="results-grid">
+                {filtered.map((p) => (
+                  <div className="service-card result-card" key={p._id}>
+                    <div className="avatar">
+                      {p.name ? p.name[0].toUpperCase() : "?"}
+                    </div>
+                    <h3>{p.name}</h3>
+                    <p className="role">{p.displayService || p.serviceCategory}</p>
+                    <p className="address">{p.address}</p>
+                    {p.availableTime && (
+                      <p className="time-slot">🕐 {p.availableTime}</p>
+                    )}
+                    {p.distanceKm !== undefined && (
+                      <p className="distance">{p.distanceKm} km away</p>
+                    )}
+                    <p className="rating">⭐ {getProviderRating(p).toFixed(1)}</p>
+                    <p className="price">Starting from ₹{p.finalPrice}</p>
+                    {/* 🔥 VIEW PROFILE INSTEAD OF BOOK */}
+                    <button className="profile-btn" onClick={() => openProfile(p._id)}>
+                      View Profile
+                    </button>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </section>
-      </div>
+            )}
+          </section>
+        </div>
       </div>
     </>
   );

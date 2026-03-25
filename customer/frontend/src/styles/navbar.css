@@ -708,7 +708,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
+  z-index: 100000;
 }
 .map-backdrop {
   position: absolute;
@@ -720,10 +720,12 @@
   background: #fff;
   padding: 20px;
   border-radius: 16px;
-  width: min(900px, 95%);
+  width: min(620px, 95vw);
   max-height: 90vh;
   overflow: auto;
   box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+  max-width: 100%;
+  box-sizing: border-box;
 }
 .map-header {
   display: flex;

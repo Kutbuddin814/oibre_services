@@ -1,19 +1,19 @@
 /* Blinkit Style Location Modal */
 
-.modal-backdrop,
-.blinkit-location-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(17, 24, 39, 0.45);
-  backdrop-filter: blur(2px);
-  z-index: 1000;
+ .modal-backdrop,
+ .blinkit-location-backdrop {
+   position: fixed;
+   inset: 0;
+   background: rgba(17, 24, 39, 0.45);
+   backdrop-filter: blur(2px);
+   z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 0;
   animation: fadeIn 0.2s ease-in;
-  overflow-y: auto;
-}
+  overflow: hidden;
+ }
 
 @keyframes fadeIn {
   from {
@@ -26,8 +26,8 @@
 
 .modal-container,
 .blinkit-location-modal {
-  width: 100%;
-  max-width: 600px;
+  width: 600px;
+  height: 400px;
   background: #ffffff;
   border-radius: 18px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
@@ -36,7 +36,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  max-height: 90vh;
+  margin: 0;
 }
 
 @keyframes slideUp {
@@ -189,33 +189,58 @@
   color: #999999;
 }
 
-.map-wrapper {
-  width: 100%;
+.map-wrapper,
+.map-wrapper iframe {
+  width: 100% !important;
+  max-width: 100%;
   border-radius: 12px;
+  max-height: 250px;
+  min-height: 140px;
+  overflow: hidden;
+}
+
+.leaflet-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 220px !important;
+  max-height: 250px !important;
+  min-height: 140px !important;
+  border-radius: 12px !important;
+}
+
+.leaflet-pane,
+.leaflet-map-pane {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.map-wrapper {
   overflow: hidden;
   position: relative;
   margin-bottom: 16px;
 }
 
 .map-wrapper iframe {
-  width: 100% !important;
-  height: 100% !important;
   border: 0;
   display: block;
   position: relative;
   left: 0 !important;
 }
 
-.modal-container {
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
 
 .modal-body {
   overflow-y: auto;
-  flex: 1;
+  overflow-x: hidden;
+  width: 100%;
+  height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
   padding: 16px 20px;
+  box-sizing: border-box;
+}
+
+.modal-body > * {
+  max-width: 100%;
 }
 
 .modal-header,
@@ -230,6 +255,14 @@
 
 .modal-lg {
   max-width: 700px;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+body.modal-open .navbar {
+  z-index: 1;
 }
 
 /* Search Results */
@@ -339,17 +372,5 @@
 }
 
 @media (max-width: 768px) {
-  .modal-backdrop {
-    align-items: center;
-    padding: 16px;
-  }
-
-  .modal-container {
-    max-height: 90vh;
-    width: min(90vw, 600px);
-  }
-
-  .map-wrapper {
-    min-height: 140px;
-  }
+  /* Responsive rules removed for fixed modal size */
 }

@@ -17,6 +17,15 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
   const [detecting, setDetecting] = useState(false);
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
+  useEffect(() => {
+    document.body.classList.add("modal-open");
+    return () => {
+      if (!document.querySelector(".modal-backdrop") && !document.querySelector(".map-modal")) {
+        document.body.classList.remove("modal-open");
+      }
+    };
+  }, []);
+
   // Load Google Maps if apiKey present, otherwise set loaded so fallback runs
   useEffect(() => {
     if (!apiKey) {
@@ -195,7 +204,7 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
       };
     }
 
-    // LEAFLET FALLBACK (no API key)
+  // LEAFLET FALLBACK (no API key)
     (async () => {
       // load CSS
       if (!document.getElementById("leaflet-css")) {
@@ -223,6 +232,9 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
 
       // initialize map
       const map = window.L.map(mapRef.current).setView([markerPos.lat, markerPos.lng], 14);
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 100);
       window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
         attribution: '© OpenStreetMap'
@@ -255,6 +267,14 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
       };
     })();
 
+  }, [loaded]);
+
+  useEffect(() => {
+    if (!loaded) return;
+    const timer = setTimeout(() => {
+      mapInstanceRef.current?.invalidateSize?.();
+    }, 200);
+    return () => clearTimeout(timer);
   }, [loaded]);
 
   // Ensure we have a readable label when editing is closed
@@ -476,7 +496,17 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
             </div>
           )}
         </div>
-        <div ref={mapRef} id="map" style={{ width: "100%", height: "400px", borderRadius: 8 }} />
+        <div
+          ref={mapRef}
+          id="map"
+          style={{
+            width: "100%",
+            height: "300px",
+            maxWidth: "100%",
+            borderRadius: 12,
+            overflow: "hidden"
+          }}
+        />
 
         {!apiKey && (
           <p style={{ fontSize: 12, color: "#666" }}>
