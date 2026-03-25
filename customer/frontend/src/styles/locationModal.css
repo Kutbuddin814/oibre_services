@@ -1,19 +1,17 @@
 /* Blinkit Style Location Modal */
 
- .modal-backdrop,
- .blinkit-location-backdrop {
-   position: fixed;
-   inset: 0;
-   background: rgba(17, 24, 39, 0.45);
-   backdrop-filter: blur(2px);
-   z-index: 9999;
+.location-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 12000;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
-  animation: fadeIn 0.2s ease-in;
-  overflow: hidden;
- }
+  padding: 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
 
 @keyframes fadeIn {
   from {
@@ -24,19 +22,50 @@
   }
 }
 
-.modal-container,
-.blinkit-location-modal {
-  width: 600px;
-  height: 400px;
-  background: #ffffff;
-  border-radius: 18px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-  position: relative;
-  animation: slideUp 0.3s ease-out;
-  overflow: hidden;
+.location-modal-container {
+  width: 100%;
+  max-width: 600px;
+  max-height: 85vh;
+  background: #fff;
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
-  margin: 0;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 1.5px 6px rgba(0,0,0,0.10);
+  z-index: 12010;
+  animation: fadeIn 0.2s cubic-bezier(.4,0,.2,1);
+}
+
+/* Only keep one .modal-body definition, with correct padding and min-height */
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+  padding: 16px 20px;
+}
+
+.modal-header {
+  flex-shrink: 0;
+}
+
+.modal-footer {
+  flex-shrink: 0;
+}
+
+body.modal-open {
+  overflow: hidden !important;
+  overscroll-behavior: contain;
+}
+
+.leaflet-container {
+  width: 100% !important;
+  max-width: 100%;
+  height: 250px;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 @keyframes slideUp {
@@ -220,37 +249,19 @@
   margin-bottom: 16px;
 }
 
+/* Clean, valid version of map-wrapper iframe and modal-lg, body.modal-open */
 .map-wrapper iframe {
   border: 0;
   display: block;
   position: relative;
   left: 0 !important;
-}
-
-
-.modal-body {
-  overflow-y: auto;
-  overflow-x: hidden;
-  width: 100%;
-  height: 100%;
-  flex: 1 1 auto;
-  min-height: 0;
-  padding: 16px 20px;
-  box-sizing: border-box;
-}
-
-.modal-body > * {
+  width: 100% !important;
   max-width: 100%;
-}
-
-.modal-header,
-.modal-footer {
-  flex-shrink: 0;
-}
-
-.modal-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid #e5e7eb;
+  border-radius: 12px;
+  height: 100% !important;
+  min-height: 140px;
+  max-height: 220px;
+  overflow: hidden;
 }
 
 .modal-lg {
@@ -258,13 +269,12 @@
 }
 
 body.modal-open {
-  overflow: hidden;
+  height: 100% !important;
 }
 
 body.modal-open .navbar {
   z-index: 1;
 }
-
 /* Search Results */
 .blinkit-search-results {
   max-height: 360px;

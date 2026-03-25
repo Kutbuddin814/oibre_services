@@ -1,0 +1,149 @@
+.map-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.5);
+  z-index: 99999;
+}
+
+.map-backdrop {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  z-index: 0;
+}
+
+.map-content {
+  position: relative;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 1.5px 6px rgba(0,0,0,0.10);
+  max-width: 480px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  z-index: 1;
+  padding: 24px 20px 20px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.map-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.map-close {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  font-size: 22px;
+  color: #111827;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.map-close:hover {
+  transform: scale(1.15);
+}
+
+.map-label {
+  font-size: 15px;
+  color: #222;
+  font-weight: 500;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.map-label-input {
+  font-size: 15px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  flex: 1;
+}
+
+.map-search {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.map-search input {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  font-size: 14px;
+}
+
+.map-searching {
+  font-size: 13px;
+  color: #888;
+}
+
+.map-results {
+  margin-bottom: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.map-result-item {
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #222;
+  transition: background 0.18s;
+}
+
+.map-result-item:last-child {
+  border-bottom: none;
+}
+
+.map-result-item:hover {
+  background: #f8fafc;
+}
+
+.map-result-title {
+  font-weight: 500;
+}
+
+.map-result-subtitle {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.map-info {
+  margin-bottom: 10px;
+}
+
+.map-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}

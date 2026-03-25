@@ -1,4 +1,6 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+
+import React, { useRef, useState, useEffect, useCallback } from "react";
+import "./MapPicker.css";
 
 // MapPicker: loads Google Maps JS API if VITE_GOOGLE_MAPS_API_KEY is set.
 // Falls back to simple coordinate picker if API key missing.

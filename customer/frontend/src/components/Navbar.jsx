@@ -8,7 +8,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const locationPath = useLocation();
   const [location, setLocation] = useState({ label: "Select location", lat: null, lng: null });
-  const [isConfirmed, setIsConfirmed] = useState(false);
+  // Removed isConfirmed state for location modal trigger
   const [userLocationSet, setUserLocationSet] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [customer, setCustomer] = useState(null);
@@ -195,7 +195,7 @@ export default function Navbar() {
         };
 
         setLocation({ label: loc.label, lat: loc.lat, lng: loc.lng });
-        setIsConfirmed(false);
+
 
         try {
           localStorage.setItem("userLocation", JSON.stringify(loc));
@@ -459,39 +459,12 @@ export default function Navbar() {
             </div>
             <button
               className="change-location-btn"
-              onClick={() => setIsConfirmed(true)}
+              onClick={() => {
+                window.dispatchEvent(new Event("openMapPicker"));
+              }}
             >
               Change
             </button>
-            {isConfirmed && (
-              <MapPicker
-                initialLat={location.lat}
-                initialLng={location.lng}
-                onClose={() => setIsConfirmed(false)}
-                onConfirm={(lat, lng, fullAddress, locality, displayLabel) => {
-                  const loc = {
-                    lat,
-                    lng,
-                    label: displayLabel || locality || "Pinned location",
-                    address: fullAddress || "Pinned location",
-                    locality: locality || displayLabel || "Pinned location",
-                    type: "manual"
-                  };
-                  setLocation(loc);
-                  // persist so other pages (SearchResults, ProviderProfile) use it
-                  try {
-                    localStorage.setItem("userLocation", JSON.stringify(loc));
-                  } catch (e) {
-                    console.warn("Could not save userLocation", e);
-                  }
-                  persistLocationToServer(loc);
-                  // notify other parts of the app
-                  window.dispatchEvent(new Event("userLocationChanged"));
-                  setUserLocationSet(true);
-                  setIsConfirmed(false);
-                }}
-              />
-            )}
           </div>
 
           {isLoggedIn ? (

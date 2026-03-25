@@ -56,7 +56,8 @@
 .results-grid {
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 300px)); /* 🔥 FIX */
+  justify-content: start; /* prevents stretching */
   gap: 24px;
 }
 
@@ -72,6 +73,7 @@
   border: 1px solid #eee;
   border-radius: 12px;
   transition: all 0.25s ease;
+  max-width: 300px;
 }
 
 .service-card:hover {
