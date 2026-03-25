@@ -1,9 +1,41 @@
 /* Main layout */
 .search-page {
-  display: flex;
-  gap: 24px;
-  align-items: flex-start;
+  display: block;
   padding: 20px;
+}
+
+.search-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.search-header {
+  margin-bottom: 20px;
+}
+
+.results-header {
+  margin: 0 0 16px;
+  text-align: left;
+}
+
+.recommendations-section {
+  margin-bottom: 20px;
+}
+
+.search-wrapper {
+  max-width: 600px;
+}
+
+.search-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 24px;
+}
+
+.search-header {
+  max-width: 1200px;
+  margin: 0 auto 20px;
 }
 
 /* Filters */
