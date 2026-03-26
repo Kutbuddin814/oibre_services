@@ -4,7 +4,6 @@ import "../styles/unified-modal.css";
 import "../styles/unified-forms.css";
 import "../styles/unified-buttons.css";
 
-
 export default function LocationModal({ 
   onLocationSelect, 
   onClose, 
@@ -17,32 +16,15 @@ export default function LocationModal({
   const [searchQuery, setSearchQuery] = useState("");
   const [isDetectingLocal, setIsDetectingLocal] = useState(isDetecting);
 
-  // Debug log
-  console.log("isDetectingLocal:", isDetectingLocal);
-
-  // Always reset detection state when modal opens
   useEffect(() => {
-    setIsDetectingLocal(false);
-  }, []);
-
-  useEffect(() => {
-    document.body.classList.add("modal-open");
-    return () => {
-      if (!document.querySelector(".modal-backdrop") && !document.querySelector(".map-modal")) {
-        document.body.classList.remove("modal-open");
-      }
-    };
-  }, []);
+    setIsDetectingLocal(isDetecting);
+  }, [isDetecting]);
 
   const handleDetectLocation = () => {
     setIsDetectingLocal(true);
     if (onSearch) {
       onSearch({ type: 'detect' });
     }
-    // Reset after detection (simulate async)
-    setTimeout(() => {
-      setIsDetectingLocal(false);
-    }, 2000);
   };
 
   const handleSearchChange = (e) => {
@@ -62,14 +44,14 @@ export default function LocationModal({
   };
 
   return (
-    <div className="location-modal-backdrop" onClick={onClose}>
-      <div className="location-modal-container modal-lg" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal-container modal-lg" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <div className="modal-header-content">
             <h2 className="modal-title">
-              {isDetectingLocal ? "Welcome to Oibre" : "Change Location"}
+              {isDetecting ? "Welcome to Oibre" : "Change Location"}
             </h2>
-            {!isDetectingLocal && (
+            {!isDetecting && (
               <p className="modal-subtitle">
                 Choose your service area to see providers near you.
               </p>
@@ -81,7 +63,7 @@ export default function LocationModal({
         </div>
 
         <div className="modal-body">
-          {isDetectingLocal ? (
+          {isDetecting ? (
             <div style={{
               display: 'flex',
               flexDirection: 'column',
@@ -132,28 +114,28 @@ export default function LocationModal({
                 📍 Detect my location
               </button>
 
-
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
                 margin: '12px 0'
               }}>
-                <div style={{ flex: 1, height: '1px', background: '#e5e7eb' }}></div>
-                <span style={{ fontSize: '13px', color: '#9ca3b8', fontWeight: '500' }}>OR</span>
-                <div style={{ flex: 1, height: '1px', background: '#e5e7eb' }}></div>
+                <div style={{
+                  flex: 1,
+                  height: '1px',
+                  background: '#e5e7eb'
+                }}></div>
+                <span style={{
+                  fontSize: '13px',
+                  color: '#9ca3b8',
+                  fontWeight: '500'
+                }}>OR</span>
+                <div style={{
+                  flex: 1,
+                  height: '1px',
+                  background: '#e5e7eb'
+                }}></div>
               </div>
-
-              <button
-                className="btn btn-secondary"
-                style={{ width: '100%', marginBottom: '10px' }}
-                onClick={() => {
-                  window.dispatchEvent(new Event('openMapPicker'));
-                  if (onClose) onClose();
-                }}
-              >
-                🗺️ Pick on Map
-              </button>
 
               <div className="modal-field">
                 <label className="modal-field-label">Search Location</label>

@@ -11,9 +11,9 @@
 ======================= */
 .hero {
   text-align: center;
-  width: 100%;
-  padding: 80px 0;
-  box-sizing: border-box;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
 .hero h1 {
@@ -21,20 +21,12 @@
   font-weight: 700;
   color: #111827;
   line-height: 1.15;
-  max-width: 1100px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0 20px;
 }
 
 .hero p {
   margin-top: 10px;
   font-size: 16px;
   color: #6B7280;
-  max-width: 780px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0 20px;
 }
 
 /* =======================
@@ -173,11 +165,9 @@
   justify-content: center;
   align-items: flex-start;
   gap: 24px;
+  max-width: 900px;
   margin: 46px auto 0;
   flex-wrap: wrap;
-  width: min(960px, 100%);
-  padding: 0 20px;
-  box-sizing: border-box;
 }
 
 .service-item {
@@ -948,19 +938,14 @@
    JOIN OIBRE
 ======================= */
 .join-oibre {
-  width: 100%;
-  margin: 48px 0 0;
-  padding: 60px 0;
+  max-width: 1100px;
+  margin: 48px auto 0;
+  padding: 0 20px;
 }
 
 .join-oibre-head {
   text-align: center;
   margin-bottom: 20px;
-  width: min(1100px, 100%);
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0 20px;
-  box-sizing: border-box;
 }
 
 .join-oibre-head h2 {
@@ -980,10 +965,6 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
-  width: min(1100px, 100%);
-  margin: 0 auto;
-  padding: 0 20px;
-  box-sizing: border-box;
 }
 
 .join-card {

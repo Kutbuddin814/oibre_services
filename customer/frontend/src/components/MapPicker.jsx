@@ -1,6 +1,4 @@
-
-import React, { useRef, useState, useEffect, useCallback } from "react";
-import "./MapPicker.css";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 // MapPicker: loads Google Maps JS API if VITE_GOOGLE_MAPS_API_KEY is set.
 // Falls back to simple coordinate picker if API key missing.
@@ -18,15 +16,6 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
   const [searching, setSearching] = useState(false);
   const [detecting, setDetecting] = useState(false);
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-
-  useEffect(() => {
-    document.body.classList.add("modal-open");
-    return () => {
-      if (!document.querySelector(".modal-backdrop") && !document.querySelector(".map-modal")) {
-        document.body.classList.remove("modal-open");
-      }
-    };
-  }, []);
 
   // Load Google Maps if apiKey present, otherwise set loaded so fallback runs
   useEffect(() => {
@@ -149,31 +138,9 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
     if (addressData) {
       // Display the formatted label in the UI
       setLabelText(addressData.displayLabel);
-      // Store in localStorage: always save the latest, most human-readable label
-      localStorage.setItem(
-        "userLocation",
-        JSON.stringify({
-          lat,
-          lng,
-          label: addressData.displayLabel,
-          fullAddress: addressData.fullAddress,
-          locality: addressData.locality
-        })
-      );
       return addressData;
     }
     setLabelText("Selected location");
-    // Store fallback in localStorage
-    localStorage.setItem(
-      "userLocation",
-      JSON.stringify({
-        lat,
-        lng,
-        label: "Selected location",
-        fullAddress: "",
-        locality: ""
-      })
-    );
     return null;
   }, [getAddressDetails]);
 
@@ -228,7 +195,7 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
       };
     }
 
-  // LEAFLET FALLBACK (no API key)
+    // LEAFLET FALLBACK (no API key)
     (async () => {
       // load CSS
       if (!document.getElementById("leaflet-css")) {
@@ -256,9 +223,6 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
 
       // initialize map
       const map = window.L.map(mapRef.current).setView([markerPos.lat, markerPos.lng], 14);
-      setTimeout(() => {
-        map.invalidateSize();
-      }, 100);
       window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
         attribution: '© OpenStreetMap'
@@ -291,14 +255,6 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
       };
     })();
 
-  }, [loaded]);
-
-  useEffect(() => {
-    if (!loaded) return;
-    const timer = setTimeout(() => {
-      mapInstanceRef.current?.invalidateSize?.();
-    }, 200);
-    return () => clearTimeout(timer);
   }, [loaded]);
 
   // Ensure we have a readable label when editing is closed
@@ -370,18 +326,6 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
     setSearchQuery("");
     setSearchResults([]);
 
-    // Store in localStorage immediately
-    localStorage.setItem(
-      "userLocation",
-      JSON.stringify({
-        lat: item.lat,
-        lng: item.lng,
-        label: item.address || "Selected location",
-        fullAddress: item.address || "",
-        locality: item.title || ""
-      })
-    );
-
     if (markerInstanceRef.current) {
       if (markerInstanceRef.current.setPosition) {
         markerInstanceRef.current.setPosition({ lat: item.lat, lng: item.lng });
@@ -410,35 +354,10 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
       async (position) => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
-
+        
         setMarkerPos({ lat, lng });
-        const addressData = await resolveAndSetLabel(lat, lng);
-
-        // Store in localStorage immediately
-        if (addressData) {
-          localStorage.setItem(
-            "userLocation",
-            JSON.stringify({
-              lat,
-              lng,
-              label: addressData.displayLabel,
-              fullAddress: addressData.fullAddress,
-              locality: addressData.locality
-            })
-          );
-        } else {
-          localStorage.setItem(
-            "userLocation",
-            JSON.stringify({
-              lat,
-              lng,
-              label: "Selected location",
-              fullAddress: "",
-              locality: ""
-            })
-          );
-        }
-
+        await resolveAndSetLabel(lat, lng);
+        
         // Update marker position
         if (markerInstanceRef.current) {
           if (markerInstanceRef.current.setPosition) {
@@ -557,17 +476,7 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
             </div>
           )}
         </div>
-        <div
-          ref={mapRef}
-          id="map"
-          style={{
-            width: "100%",
-            height: "300px",
-            maxWidth: "100%",
-            borderRadius: 12,
-            overflow: "hidden"
-          }}
-        />
+        <div ref={mapRef} id="map" style={{ width: "100%", height: "400px", borderRadius: 8 }} />
 
         {!apiKey && (
           <p style={{ fontSize: 12, color: "#666" }}>
@@ -583,7 +492,7 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
                 let fullAddress = "";
                 let locality = "";
                 let displayLabel = labelText;
-
+                
                 // Fetch fresh address details
                 const addressData = await getAddressDetails(markerPos.lat, markerPos.lng);
                 if (addressData) {
@@ -597,19 +506,7 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
                   locality = coordStr;
                   displayLabel = coordStr;
                 }
-
-                // Store in localStorage on confirm as well
-                localStorage.setItem(
-                  "userLocation",
-                  JSON.stringify({
-                    lat: markerPos.lat,
-                    lng: markerPos.lng,
-                    label: displayLabel,
-                    fullAddress: fullAddress,
-                    locality: locality
-                  })
-                );
-
+                
                 // Pass all address components to parent
                 onConfirm(markerPos.lat, markerPos.lng, fullAddress, locality, displayLabel);
               };

@@ -1,22 +1,12 @@
-
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import api from "../config/axios";
 import "../styles/home.css";
 import EmployeesOfMonth from "../components/EmployeesOfMonth";
-// import LocationModal from "../components/LocationModal";
-import MapPicker from "../components/MapPicker";
+import LocationModal from "../components/LocationModal";
 import { detectUserLocation } from "../utils/locationDetection";
 
 export default function Home() {
-  // Listen for openMapPicker event only
-  useEffect(() => {
-    const handleOpenMapPicker = () => setShowMapPicker(true);
-    window.addEventListener("openMapPicker", handleOpenMapPicker);
-    return () => {
-      window.removeEventListener("openMapPicker", handleOpenMapPicker);
-    };
-  }, []);
   const navigate = useNavigate();
 
   const [searchText, setSearchText] = useState("");
@@ -27,10 +17,9 @@ export default function Home() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-  // Removed showLocationModal state
+  const [showLocationModal, setShowLocationModal] = useState(false);
   const [customerData, setCustomerData] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
-  const [showMapPicker, setShowMapPicker] = useState(false);
 
   const [locationQuery, setLocationQuery] = useState("");
   const [locationResults, setLocationResults] = useState([]);
@@ -190,7 +179,7 @@ export default function Home() {
   const checkLocationModal = () => {
     const hasShownLocationModal = localStorage.getItem("locationModalShown");
     if (!hasShownLocationModal) {
-      // Removed setShowLocationModal(true);
+      setShowLocationModal(true);
     }
   };
 
@@ -226,7 +215,7 @@ export default function Home() {
     setSelectedLocation(locationData);
     localStorage.setItem("userLocation", JSON.stringify(locationData));
     localStorage.setItem("locationModalShown", "true");
-    // Removed setShowLocationModal(false);
+    setShowLocationModal(false);
     await persistLocationToServer(locationData);
     window.dispatchEvent(new Event("userLocationChanged"));
   };
@@ -284,7 +273,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    // Removed check for showLocationModal
+    if (!showLocationModal) return;
 
     if (!locationQuery.trim() || locationQuery.trim().length < 2) {
       setLocationResults([]);
@@ -344,7 +333,7 @@ export default function Home() {
     }, 350);
 
     return () => clearTimeout(t);
-  }, [locationQuery]);
+  }, [locationQuery, showLocationModal]);
 
   /* ================= FETCH NOTIFICATIONS ================= */
   useEffect(() => {
@@ -449,6 +438,7 @@ export default function Home() {
 
     const keyHandler = (e) => {
       if (e.key === "Escape") {
+        setShowLocationModal(false);
         setShowMenu(false);
         setShowNotifications(false);
       }
@@ -667,34 +657,24 @@ export default function Home() {
         </div>
       </section>
 
-
-
-      {showMapPicker && (
-        (() => {
-          let initialLat = 15.4909;
-          let initialLng = 73.8278;
-          try {
-            const stored = localStorage.getItem("userLocation");
-            if (stored) {
-              const parsed = JSON.parse(stored);
-              if (parsed?.lat && parsed?.lng) {
-                initialLat = parsed.lat;
-                initialLng = parsed.lng;
-              }
+      {/* ================= LOCATION MODAL ================= */}
+      {showLocationModal && (
+        <LocationModal
+          onClose={() => setShowLocationModal(false)}
+          onLocationSelect={handleSelectSearchResult}
+          onSearch={(query) => {
+            if (typeof query === 'object' && query.type === 'detect') {
+              handleUseCurrentLocation();
+            } else {
+              setLocationQuery(query);
             }
-          } catch {}
-          return (
-            <MapPicker
-              initialLat={initialLat}
-              initialLng={initialLng}
-              onClose={() => setShowMapPicker(false)}
-              onConfirm={async (lat, lng, address, locality, label) => {
-                setShowMapPicker(false);
-                await saveUserLocation({ lat, lng, address, locality, label });
-              }}
-            />
-          );
-        })()
+          }}
+          isDetecting={detectingLocation}
+          searchResults={locationResults}
+          isSearching={searchingLocations}
+          locationError={locationError}
+          registeredLocation={customerData?.locality}
+        />
       )}
     </div>
   );

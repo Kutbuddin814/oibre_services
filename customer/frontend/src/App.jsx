@@ -22,7 +22,7 @@ export default function App() {
     <>
       <ScrollToTop />
       <Navbar />
-      <div className="flex min-h-[calc(100vh-80px)] flex-col bg-gray-50 w-full">
+      <div className="flex min-h-[calc(100vh-80px)] flex-col bg-gray-50 px-2 sm:px-4 md:px-6 lg:px-8 mx-auto max-w-screen-2xl">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/search" element={<SearchResults />} />
@@ -44,3 +44,4 @@ export default function App() {
     </>
   );
 }
+
