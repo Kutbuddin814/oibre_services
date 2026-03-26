@@ -149,9 +149,31 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
     if (addressData) {
       // Display the formatted label in the UI
       setLabelText(addressData.displayLabel);
+      // Store in localStorage: always save the latest, most human-readable label
+      localStorage.setItem(
+        "userLocation",
+        JSON.stringify({
+          lat,
+          lng,
+          label: addressData.displayLabel,
+          fullAddress: addressData.fullAddress,
+          locality: addressData.locality
+        })
+      );
       return addressData;
     }
     setLabelText("Selected location");
+    // Store fallback in localStorage
+    localStorage.setItem(
+      "userLocation",
+      JSON.stringify({
+        lat,
+        lng,
+        label: "Selected location",
+        fullAddress: "",
+        locality: ""
+      })
+    );
     return null;
   }, [getAddressDetails]);
 
@@ -348,6 +370,18 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
     setSearchQuery("");
     setSearchResults([]);
 
+    // Store in localStorage immediately
+    localStorage.setItem(
+      "userLocation",
+      JSON.stringify({
+        lat: item.lat,
+        lng: item.lng,
+        label: item.address || "Selected location",
+        fullAddress: item.address || "",
+        locality: item.title || ""
+      })
+    );
+
     if (markerInstanceRef.current) {
       if (markerInstanceRef.current.setPosition) {
         markerInstanceRef.current.setPosition({ lat: item.lat, lng: item.lng });
@@ -376,10 +410,35 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
       async (position) => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
-        
+
         setMarkerPos({ lat, lng });
-        await resolveAndSetLabel(lat, lng);
-        
+        const addressData = await resolveAndSetLabel(lat, lng);
+
+        // Store in localStorage immediately
+        if (addressData) {
+          localStorage.setItem(
+            "userLocation",
+            JSON.stringify({
+              lat,
+              lng,
+              label: addressData.displayLabel,
+              fullAddress: addressData.fullAddress,
+              locality: addressData.locality
+            })
+          );
+        } else {
+          localStorage.setItem(
+            "userLocation",
+            JSON.stringify({
+              lat,
+              lng,
+              label: "Selected location",
+              fullAddress: "",
+              locality: ""
+            })
+          );
+        }
+
         // Update marker position
         if (markerInstanceRef.current) {
           if (markerInstanceRef.current.setPosition) {
@@ -524,7 +583,7 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
                 let fullAddress = "";
                 let locality = "";
                 let displayLabel = labelText;
-                
+
                 // Fetch fresh address details
                 const addressData = await getAddressDetails(markerPos.lat, markerPos.lng);
                 if (addressData) {
@@ -538,7 +597,19 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
                   locality = coordStr;
                   displayLabel = coordStr;
                 }
-                
+
+                // Store in localStorage on confirm as well
+                localStorage.setItem(
+                  "userLocation",
+                  JSON.stringify({
+                    lat: markerPos.lat,
+                    lng: markerPos.lng,
+                    label: displayLabel,
+                    fullAddress: fullAddress,
+                    locality: locality
+                  })
+                );
+
                 // Pass all address components to parent
                 onConfirm(markerPos.lat, markerPos.lng, fullAddress, locality, displayLabel);
               };
