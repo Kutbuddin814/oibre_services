@@ -15,13 +15,14 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Cookies from "./pages/Cookies";
 import Navbar from "./components/Navbar";
-import api from "./components/config/axios";
+import api from "./config/axios";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import MapPicker from "./components/MapPicker";
 import { useEffect, useState } from "react";
 
 
+export default function App() {
   const [showMapPicker, setShowMapPicker] = useState(false);
   const [initialLat, setInitialLat] = useState(null);
   const [initialLng, setInitialLng] = useState(null);

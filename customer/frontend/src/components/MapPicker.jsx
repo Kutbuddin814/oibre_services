@@ -162,17 +162,14 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
     if (addressData) {
       fullAddress = addressData.fullAddress;
       locality = addressData.locality;
-      // CORRECT PRIORITY LOGIC
-      if (locality) {
+      // NEW PRIORITY: displayLabel (shortened), then locality, then fullAddress, then fallback
+      if (addressData.displayLabel) {
+        label = addressData.displayLabel.split(",").slice(0, 2).join(",").trim();
+      } else if (locality) {
         label = locality;
-      } 
-      else if (addressData.displayLabel && !/^\d/.test(addressData.displayLabel)) {
-        label = addressData.displayLabel;
-      } 
-      else if (fullAddress && !/^\d/.test(fullAddress)) {
+      } else if (fullAddress) {
         label = fullAddress;
-      } 
-      else {
+      } else {
         label = "Selected location";
       }
       setLabelText(label);
@@ -181,9 +178,9 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
         JSON.stringify({
           lat,
           lng,
-          label,
-          fullAddress,
-          locality
+          label,         // detailed (for modal)
+          locality,      // short (for navbar)
+          fullAddress    // full
         })
       );
       return addressData;
