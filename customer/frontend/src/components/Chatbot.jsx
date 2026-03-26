@@ -14,7 +14,6 @@ const Chatbot = () => {
   const [selectedService, setSelectedService] = useState(null);
     const [_selectedLocation, _setSelectedLocation] = useState(null);
     const [_selectedUrgency, _setSelectedUrgency] = useState(null);
-    const [_providers, _setProviders] = useState([]);
   const [categories, setCategories] = useState([]);
   const [problems, setProblems] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
@@ -289,23 +288,24 @@ const Chatbot = () => {
     setStep("urgency");
   };
 
+
+  // Urgency mapping for backend
+  const urgencyMap = {
+    emergency: "emergency",
+    today: "today",
+    later: "later"
+  };
+
   const handleUrgencySelect = (urgency) => {
     _setSelectedUrgency(urgency);
     addMessage({ type: "user", text: urgency });
 
-    if (urgency === "emergency") {
-      addMessage({
-        type: "bot",
-        text: "⚡ Finding available providers for emergency service..."
-      });
-    } else {
-      addMessage({
-        type: "bot",
-        text: "Searching for best providers near you..."
-      });
-    }
+    addMessage({
+      type: "bot",
+      text: "🔍 Finding best providers for you..."
+    });
 
-    loadProviders(urgency);
+    loadProviders(urgencyMap[urgency] || urgency);
   };
 
   const handleOptionSelect = (value) => {
@@ -347,21 +347,47 @@ const Chatbot = () => {
   };
 
   const loadProviders = async (urgency) => {
+    if (!userLocation) {
+      addMessage({ type: "bot", text: "📍 Getting your location..." });
+      requestUserLocation();
+      setTimeout(() => {
+        if (userLocation) {
+          loadProviders(urgency);
+        }
+      }, 2000);
+      return;
+    }
     setLoading(true);
     try {
       const searchData = {
         serviceType: selectedService,
-        category: selectedService,
         urgency,
-        ...(userLocation || {}),
+        lat: userLocation?.lat,
+        lng: userLocation?.lng,
         sortBy: "rating"
       };
 
       const res = await api.post("/chatbot/providers/search", searchData);
       if (res.data.success) {
-        _setProviders(res.data);
         setStep("providers");
-        displayProviderOptions(res.data);
+        // Show fallback only if ALL groups are empty
+        if (
+          (!res.data.topRated || res.data.topRated.length === 0) &&
+          (!res.data.nearest || res.data.nearest.length === 0) &&
+          (!res.data.budget || res.data.budget.length === 0)
+        ) {
+          addMessage({
+            type: "bot",
+            text: res.data.message || "❌ No providers found near you",
+            options: res.data.options || [
+              { label: "Change location", value: "change-location" },
+              { label: "Try different service", value: "try-different-service" },
+              { label: "Request callback", value: "callback" }
+            ]
+          });
+        } else {
+          displayProviderOptions(res.data);
+        }
       }
     } catch (err) {
       console.error("Error loading providers:", err?.message);
@@ -397,12 +423,13 @@ const Chatbot = () => {
       }
     ];
 
-    recommendations.forEach((rec) => {
+    recommendations.forEach((rec, idx) => {
       if (rec.providers && rec.providers.length > 0) {
         addMessage({
           type: "bot",
           text: rec.message,
-          providers: rec.providers
+          providers: rec.providers,
+          animation: idx === 0 ? "fade-in" : "slide-up"
         });
       }
     });
@@ -425,13 +452,42 @@ const Chatbot = () => {
     });
   };
 
-  const handleAction = (action, providerId) => {
+
+  const handleAction = async (action, providerId) => {
     if (action === "chat") {
+      addMessage({ type: "bot", text: "Opening chat..." });
       window.location.href = `/chat/${providerId}`;
     } else if (action === "book") {
-      window.location.href = `/provider/${providerId}`;
+      try {
+        addMessage({ type: "bot", text: "Booking your service..." });
+        const token = localStorage.getItem("token");
+        // Use urgency argument directly for booking
+        await api.post(
+          "/booking/create",
+          {
+            providerId,
+            serviceType: selectedService,
+            urgency: urgencyMap[_selectedUrgency] || _selectedUrgency,
+            location: userLocation
+          },
+          token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+        );
+        addMessage({ type: "bot", text: "✅ Booking request sent! Provider will contact you soon." });
+      } catch (err) {
+        addMessage({ type: "bot", text: "❌ Could not book at this time. Please try again later." });
+      }
     } else if (action === "save") {
-      saveFavorite(providerId);
+      try {
+        const token = localStorage.getItem("token");
+        await api.post(
+          "/chatbot/favorites/save",
+          { providerId },
+          token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+        );
+        addMessage({ type: "bot", text: "❤️ Saved to favorites!" });
+      } catch (err) {
+        addMessage({ type: "bot", text: "❌ Could not save favorite. Please try again." });
+      }
     }
   };
 
@@ -524,12 +580,16 @@ const Chatbot = () => {
                 )}
 
                 {msg.providers && (
-                  <div className="chatbot-providers">
+                  <div className={`chatbot-providers${msg.animation ? ` chatbot-anim-${msg.animation}` : ''}`}>
                     {msg.providers.map((p, i) => (
                       <div
                         key={i}
-                        className="chatbot-provider-card"
+                        className="chatbot-provider-card chatbot-provider-anim"
                         onClick={() => handleProviderSelect(p)}
+                        tabIndex={0}
+                        role="button"
+                        aria-label={`Select provider ${p.name}`}
+                        style={{ transitionDelay: `${i * 60}ms` }}
                       >
                         <div className="chatbot-provider-header">
                           <strong>{p.name}</strong>

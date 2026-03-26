@@ -62,45 +62,37 @@ router.get("/services/problems/:category", async (req, res) => {
 // ==================== SMART PROVIDER FILTERING ====================
 router.post("/providers/search", async (req, res) => {
   try {
-    const { 
-      serviceType, 
+    const {
+      serviceType,
       category,
-      location, 
-      lat, 
-      lng, 
-      urgency = "regular", 
+      location,
+      lat,
+      lng,
+      urgency = "regular",
       sortBy = "rating",
-      limit = 5 
+      limit = 5
     } = req.body;
 
-    // Build query
+    // Build query (case-insensitive, urgency, location)
     let query = {
-      serviceCategory: category || serviceType,
+      serviceCategory: { $regex: new RegExp(`^${serviceType}$`, "i") },
       isActive: true
-      // isVerified removed for broader matching
     };
-
-    // Location filtering
+    if (urgency === "emergency") query.emergencyAvailable = true;
+    if (urgency === "today") query.availableToday = true;
+    // 'later' = no extra filter
     if (lat && lng) {
-      const radius = urgency === "emergency" ? 5 : 15; // 5km for emergency, 15km regular
       query.location = {
         $near: {
           $geometry: {
             type: "Point",
             coordinates: [lng, lat]
           },
-          $maxDistance: radius * 1000 // Convert km to meters
+          $maxDistance: 10000 // 10km
         }
       };
     } else if (location) {
       query.location = { $regex: location, $options: "i" };
-    }
-
-    // Availability filtering
-    if (urgency === "emergency") {
-      query.emergencyAvailable = true;
-    } else if (urgency === "today") {
-      query.availableToday = true;
     }
 
     let providers = await ServiceProvider.find(query)
@@ -110,7 +102,6 @@ router.post("/providers/search", async (req, res) => {
     // Calculate distances if coordinates provided
     if (lat && lng) {
       providers = providers.map(p => {
-        // Defensive: fallback if location/coordinates missing
         let plat, plng;
         if (p.location && Array.isArray(p.location.coordinates) && p.location.coordinates.length === 2) {
           [plng, plat] = p.location.coordinates;
@@ -119,7 +110,7 @@ router.post("/providers/search", async (req, res) => {
         }
         const dx = plat - lat;
         const dy = plng - lng;
-        const distance = Math.sqrt(dx * dx + dy * dy) * 111; // Rough km conversion
+        const distance = Math.sqrt(dx * dx + dy * dy) * 111;
         return { ...p, distance: Math.round(distance * 10) / 10 };
       });
     }
@@ -136,7 +127,7 @@ router.post("/providers/search", async (req, res) => {
       sortedProviders.sort((a, b) => (a.responseTime || 9999) - (b.responseTime || 9999));
     }
 
-    // Group providers by sort type for recommended sections (avoid mutating original array)
+    // Group providers by sort type for recommended sections
     const topRated = [...providers]
       .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0))
       .slice(0, 3);
@@ -146,6 +137,24 @@ router.post("/providers/search", async (req, res) => {
     const budget = [...providers]
       .sort((a, b) => (a.basePrice || 0) - (b.basePrice || 0))
       .slice(0, 3);
+
+    // Fallback if no providers found
+    if (providers.length === 0) {
+      return res.json({
+        success: true,
+        message: "❌ No providers found near you",
+        options: [
+          { label: "Change location", value: "change-location" },
+          { label: "Try different service", value: "try-different-service" },
+          { label: "Request callback", value: "callback" }
+        ],
+        all: [],
+        topRated: [],
+        nearest: [],
+        budget: [],
+        total: 0
+      });
+    }
 
     res.json({
       success: true,
@@ -235,6 +244,7 @@ router.get("/favorites", customerAuth, async (req, res) => {
   }
 });
 
+// Route is already correct: /chatbot/favorites/save
 router.post("/favorites/save", customerAuth, async (req, res) => {
   try {
     const { customerId } = req;
