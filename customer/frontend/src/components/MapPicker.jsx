@@ -600,19 +600,21 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
               try {
                 const token = localStorage.getItem("customerToken");
                 if (token) {
-                  await fetch(`${import.meta.env.VITE_API_URL}/api/customer/location`, {
-                    method: "PUT",
-                    headers: {
-                      "Content-Type": "application/json",
-                      "Authorization": `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
+                  // Use axios instance (api) for consistency and correct URL
+                  await (await import("../config/axios")).default.put(
+                    "/customer/location",
+                    {
                       lat: markerPos.lat,
                       lng: markerPos.lng,
                       address: fullAddress,
                       locality: locality,
-                    }),
-                  });
+                    },
+                    {
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
+                    }
+                  );
                 }
               } catch (err) {
                 console.error("Location update failed:", err);

@@ -192,6 +192,9 @@ export default function SearchResults() {
 
       const location = await resolveLocation();
 
+      // Format query to match DB case (capitalize first letter, rest lowercase)
+      const formattedQuery = query.charAt(0).toUpperCase() + query.slice(1).toLowerCase();
+
       if (location && location.lat && location.lng) {
         // Use stored location
         const res = await api.get(
@@ -200,7 +203,7 @@ export default function SearchResults() {
             params: {
               lat: location.lat,
               lng: location.lng,
-              serviceCategory: query
+              serviceCategory: formattedQuery
             }
           }
         );
@@ -214,7 +217,7 @@ export default function SearchResults() {
             const res = await api.get(
               "/providers",
               {
-                params: { serviceCategory: query }
+                params: { serviceCategory: formattedQuery }
               }
             );
 
@@ -245,7 +248,7 @@ export default function SearchResults() {
                   params: {
                     lat,
                     lng,
-                    serviceCategory: query
+                    serviceCategory: formattedQuery
                   }
                 }
               );
@@ -261,7 +264,7 @@ export default function SearchResults() {
               const res = await api.get(
                 "/providers",
                 {
-                  params: { serviceCategory: query }
+                  params: { serviceCategory: formattedQuery }
                 }
               );
 
