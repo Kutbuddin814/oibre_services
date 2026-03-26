@@ -15,16 +15,41 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Cookies from "./pages/Cookies";
 import Navbar from "./components/Navbar";
+import api from "./components/config/axios";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import MapPicker from "./components/MapPicker";
 import { useEffect, useState } from "react";
 
 
-export default function App() {
   const [showMapPicker, setShowMapPicker] = useState(false);
   const [initialLat, setInitialLat] = useState(null);
   const [initialLng, setInitialLng] = useState(null);
+
+  // Save location to backend DB
+  const persistLocationToServer = async (locationData) => {
+    const token = localStorage.getItem("customerToken");
+    if (!token) return;
+    if (!Number.isFinite(Number(locationData?.lat)) || !Number.isFinite(Number(locationData?.lng))) return;
+    try {
+      const payload = {
+        lat: locationData.lat,
+        lng: locationData.lng,
+        address: locationData.fullAddress || locationData.label || "",
+        locality: locationData.locality || locationData.label || "Unknown"
+      };
+      const res = await api.put(
+        "/customers/location",
+        payload,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (res?.data?.customer) {
+        localStorage.setItem("customerData", JSON.stringify(res.data.customer));
+      }
+    } catch (err) {
+      console.error("Failed to save location in DB", err);
+    }
+  };
 
   // Listen for openMapPicker event globally
   useEffect(() => {
@@ -53,16 +78,15 @@ export default function App() {
   // Handler for confirming location from MapPicker
   const handleMapPickerConfirm = (lat, lng, fullAddress, locality, displayLabel) => {
     // Save to localStorage (MapPicker already does this, but ensure event fires)
-    localStorage.setItem(
-      "userLocation",
-      JSON.stringify({
-        lat,
-        lng,
-        label: displayLabel,
-        fullAddress,
-        locality
-      })
-    );
+    const locationObj = {
+      lat,
+      lng,
+      label: displayLabel,
+      fullAddress,
+      locality
+    };
+    localStorage.setItem("userLocation", JSON.stringify(locationObj));
+    persistLocationToServer(locationObj); // <-- Save to DB as well
     setShowMapPicker(false);
     window.dispatchEvent(new Event("userLocationChanged"));
   };

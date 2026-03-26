@@ -629,6 +629,28 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
                 })
               );
 
+              // 🔥 Call backend API to update location in DB
+              try {
+                const token = localStorage.getItem("token");
+                if (token) {
+                  await fetch(`${import.meta.env.VITE_API_URL}/api/customer/location`, {
+                    method: "PUT",
+                    headers: {
+                      "Content-Type": "application/json",
+                      "Authorization": `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                      lat: markerPos.lat,
+                      lng: markerPos.lng,
+                      address: fullAddress,
+                      locality: locality,
+                    }),
+                  });
+                }
+              } catch (err) {
+                console.error("Location update failed:", err);
+              }
+
               setConfirming(false);
               // Pass all address components to parent
               onConfirm(markerPos.lat, markerPos.lng, fullAddress, locality, displayLabel);
