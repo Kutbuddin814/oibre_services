@@ -412,7 +412,7 @@ const Chatbot = () => {
     addMessage({ type: "user", text: `Selected: ${provider.name}` });
     addMessage({
       type: "bot",
-      text: `Perfect! ${provider.name} - ⭐ ${provider.rating} | ₹${provider.price} | ${provider.distance}km away`
+      text: `Perfect! ${provider.name} - ⭐ ${provider.averageRating ?? "N/A"} | ₹${provider.basePrice ?? "N/A"} | ${provider.distance ?? "N/A"}km away`
     });
 
     setStep("action");
@@ -534,12 +534,12 @@ const Chatbot = () => {
                         <div className="chatbot-provider-header">
                           <strong>{p.name}</strong>
                           <span className="chatbot-rating">
-                            ⭐ {p.rating || 4.5}
+                            ⭐ {p.averageRating ?? "N/A"}
                           </span>
                         </div>
                         <div className="chatbot-provider-info">
-                          <span>₹{p.price || 300}</span>
-                          <span>📍 {p.distance || "N/A"}km</span>
+                          <span>₹{p.basePrice ?? "N/A"}</span>
+                          <span>📍 {p.distance ?? "N/A"}km</span>
                         </div>
                         {p.responseTime && (
                           <div className="chatbot-response-time">

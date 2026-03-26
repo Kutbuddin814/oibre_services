@@ -104,7 +104,7 @@ router.post("/providers/search", async (req, res) => {
     }
 
     let providers = await ServiceProvider.find(query)
-      .select("name serviceCategory rating totalReviews price distance profileImage emergencyAvailable availableToday responseTime")
+      .select("name serviceCategory averageRating reviewCount basePrice distance profilePhoto emergencyAvailable availableToday responseTime location")
       .lean();
 
     // Calculate distances if coordinates provided
@@ -125,24 +125,31 @@ router.post("/providers/search", async (req, res) => {
     }
 
     // Smart sorting
+    let sortedProviders = [...providers];
     if (sortBy === "rating") {
-      providers.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      sortedProviders.sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
     } else if (sortBy === "distance") {
-      providers.sort((a, b) => (a.distance || 0) - (b.distance || 0));
+      sortedProviders.sort((a, b) => (a.distance || 0) - (b.distance || 0));
     } else if (sortBy === "price") {
-      providers.sort((a, b) => (a.price || 0) - (b.price || 0));
+      sortedProviders.sort((a, b) => (a.basePrice || 0) - (b.basePrice || 0));
     } else if (sortBy === "response") {
-      providers.sort((a, b) => (a.responseTime || 9999) - (b.responseTime || 9999));
+      sortedProviders.sort((a, b) => (a.responseTime || 9999) - (b.responseTime || 9999));
     }
 
-    // Group providers by sort type for recommended sections
-    const topRated = providers.sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 3);
-    const nearest = providers.sort((a, b) => (a.distance || 0) - (b.distance || 0)).slice(0, 3);
-    const budget = providers.sort((a, b) => (a.price || 0) - (b.price || 0)).slice(0, 3);
+    // Group providers by sort type for recommended sections (avoid mutating original array)
+    const topRated = [...providers]
+      .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0))
+      .slice(0, 3);
+    const nearest = [...providers]
+      .sort((a, b) => (a.distance || 0) - (b.distance || 0))
+      .slice(0, 3);
+    const budget = [...providers]
+      .sort((a, b) => (a.basePrice || 0) - (b.basePrice || 0))
+      .slice(0, 3);
 
     res.json({
       success: true,
-      all: providers.slice(0, limit),
+      all: sortedProviders.slice(0, limit),
       topRated,
       nearest,
       budget,

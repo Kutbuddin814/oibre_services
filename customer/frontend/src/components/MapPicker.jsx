@@ -173,31 +173,9 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
         label = "Selected location";
       }
       setLabelText(label);
-      localStorage.setItem(
-        "userLocation",
-        JSON.stringify({
-          lat,
-          lng,
-          label,         // detailed (for modal)
-          locality,      // short (for navbar)
-          fullAddress    // full
-        })
-      );
-      window.dispatchEvent(new Event("userLocationChanged"));
       return addressData;
     }
     setLabelText(label);
-    localStorage.setItem(
-      "userLocation",
-      JSON.stringify({
-        lat,
-        lng,
-        label,
-        fullAddress,
-        locality
-      })
-    );
-    window.dispatchEvent(new Event("userLocationChanged"));
     return null;
   }, [getAddressDetails]);
 
@@ -327,17 +305,11 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
 
   // Ensure we have a readable label when editing is closed
   useEffect(() => {
-    if (!editing && !labelText) {
+    if (!editing && !labelText && loaded) {
       resolveAndSetLabel(markerPos.lat, markerPos.lng);
     }
-  }, [markerPos, editing, labelText, resolveAndSetLabel]);
+  }, [markerPos, editing, labelText, loaded, resolveAndSetLabel]);
 
-  // Update label and storage when markerPos changes (DRY)
-  useEffect(() => {
-    if (loaded && !editing) {
-      resolveAndSetLabel(markerPos.lat, markerPos.lng);
-    }
-  }, [loaded, markerPos, editing, resolveAndSetLabel]);
 
   useEffect(() => {
     if (!searchQuery.trim() || searchQuery.trim().length < 2) {
