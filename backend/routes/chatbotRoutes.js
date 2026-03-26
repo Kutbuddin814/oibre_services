@@ -76,8 +76,8 @@ router.post("/providers/search", async (req, res) => {
     // Build query
     let query = {
       serviceCategory: category || serviceType,
-      isActive: true,
-      isVerified: true
+      isActive: true
+      // isVerified removed for broader matching
     };
 
     // Location filtering
@@ -110,8 +110,15 @@ router.post("/providers/search", async (req, res) => {
     // Calculate distances if coordinates provided
     if (lat && lng) {
       providers = providers.map(p => {
-        const dx = p.lat - lat;
-        const dy = p.lng - lng;
+        // Defensive: fallback if location/coordinates missing
+        let plat, plng;
+        if (p.location && Array.isArray(p.location.coordinates) && p.location.coordinates.length === 2) {
+          [plng, plat] = p.location.coordinates;
+        } else {
+          plat = p.lat; plng = p.lng;
+        }
+        const dx = plat - lat;
+        const dy = plng - lng;
         const distance = Math.sqrt(dx * dx + dy * dy) * 111; // Rough km conversion
         return { ...p, distance: Math.round(distance * 10) / 10 };
       });

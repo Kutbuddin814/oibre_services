@@ -183,6 +183,7 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
           fullAddress    // full
         })
       );
+      window.dispatchEvent(new Event("userLocationChanged"));
       return addressData;
     }
     setLabelText(label);
@@ -196,6 +197,7 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
         locality
       })
     );
+    window.dispatchEvent(new Event("userLocationChanged"));
     return null;
   }, [getAddressDetails]);
 
@@ -330,6 +332,13 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
     }
   }, [markerPos, editing, labelText, resolveAndSetLabel]);
 
+  // Update label and storage when markerPos changes (DRY)
+  useEffect(() => {
+    if (loaded && !editing) {
+      resolveAndSetLabel(markerPos.lat, markerPos.lng);
+    }
+  }, [loaded, markerPos, editing, resolveAndSetLabel]);
+
   useEffect(() => {
     if (!searchQuery.trim() || searchQuery.trim().length < 2) {
       setSearchResults([]);
@@ -392,17 +401,7 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
     setSearchQuery("");
     setSearchResults([]);
 
-    // Store in localStorage immediately
-    localStorage.setItem(
-      "userLocation",
-      JSON.stringify({
-        lat: item.lat,
-        lng: item.lng,
-        label: item.address || "Selected location",
-        fullAddress: item.address || "",
-        locality: item.title || ""
-      })
-    );
+    // Do NOT write to localStorage here; resolveAndSetLabel will handle it after markerPos updates
 
     if (markerInstanceRef.current) {
       if (markerInstanceRef.current.setPosition) {
@@ -434,9 +433,7 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
         const lng = position.coords.longitude;
 
         setMarkerPos({ lat, lng });
-        const addressData = await resolveAndSetLabel(lat, lng);
-
-        // No need to store in localStorage here; resolveAndSetLabel already does it
+        await resolveAndSetLabel(lat, lng); // handles localStorage and event
 
         // Update marker position
         if (markerInstanceRef.current) {
@@ -625,10 +622,11 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
                   locality: locality
                 })
               );
+              window.dispatchEvent(new Event("userLocationChanged"));
 
               // 🔥 Call backend API to update location in DB
               try {
-                const token = localStorage.getItem("token");
+                const token = localStorage.getItem("customerToken");
                 if (token) {
                   await fetch(`${import.meta.env.VITE_API_URL}/api/customer/location`, {
                     method: "PUT",
