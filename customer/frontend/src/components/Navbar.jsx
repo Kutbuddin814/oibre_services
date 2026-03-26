@@ -465,9 +465,9 @@ export default function Navbar() {
         <div className="nav-actions flex items-center gap-2 sm:gap-3">
           <div className="location-wrapper">
             <div className="location-pill" title={
-              location.label || "Detecting..."
+              location.locality || location.label || location.fullAddress || "Select Location"
             }>
-              📍 {location.label || "Detecting..."}
+              📍 {location.locality || location.label || location.fullAddress || "Select Location"}
             </div>
             <button
               className="change-location-btn"

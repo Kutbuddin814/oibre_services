@@ -1,3 +1,4 @@
+
 import Chatbot from "./components/Chatbot";
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
@@ -16,8 +17,56 @@ import Cookies from "./pages/Cookies";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
+import MapPicker from "./components/MapPicker";
+import { useEffect, useState } from "react";
+
 
 export default function App() {
+  const [showMapPicker, setShowMapPicker] = useState(false);
+  const [initialLat, setInitialLat] = useState(null);
+  const [initialLng, setInitialLng] = useState(null);
+
+  // Listen for openMapPicker event globally
+  useEffect(() => {
+    const handleOpenMapPicker = () => {
+      // Try to use last location as initial
+      try {
+        const stored = localStorage.getItem("userLocation");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          setInitialLat(parsed.lat || null);
+          setInitialLng(parsed.lng || null);
+        } else {
+          setInitialLat(null);
+          setInitialLng(null);
+        }
+      } catch {
+        setInitialLat(null);
+        setInitialLng(null);
+      }
+      setShowMapPicker(true);
+    };
+    window.addEventListener("openMapPicker", handleOpenMapPicker);
+    return () => window.removeEventListener("openMapPicker", handleOpenMapPicker);
+  }, []);
+
+  // Handler for confirming location from MapPicker
+  const handleMapPickerConfirm = (lat, lng, fullAddress, locality, displayLabel) => {
+    // Save to localStorage (MapPicker already does this, but ensure event fires)
+    localStorage.setItem(
+      "userLocation",
+      JSON.stringify({
+        lat,
+        lng,
+        label: displayLabel,
+        fullAddress,
+        locality
+      })
+    );
+    setShowMapPicker(false);
+    window.dispatchEvent(new Event("userLocationChanged"));
+  };
+
   return (
     <>
       <ScrollToTop />
@@ -41,6 +90,14 @@ export default function App() {
         <Footer />
       </div>
       <Chatbot />
+      {showMapPicker && (
+        <MapPicker
+          initialLat={initialLat}
+          initialLng={initialLng}
+          onClose={() => setShowMapPicker(false)}
+          onConfirm={handleMapPickerConfirm}
+        />
+      )}
     </>
   );
 }

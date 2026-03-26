@@ -20,6 +20,7 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
   const [confirming, setConfirming] = useState(false);
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
+  const [localityPreference, setLocalityPreference] = useState("");
   useEffect(() => {
     document.body.classList.add("modal-open");
     return () => {
@@ -66,7 +67,7 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
               // Extract components for better formatting
               let route = "", locality = "", adminArea = "", state = "", country = "";
               
-              results[0].address_components.forEach((c) => {
+              results[0].address_components.forEach((c) => { 
                 if (c.types.includes("route")) route = c.long_name;
                 if (c.types.includes("locality")) locality = c.long_name;
                 if (c.types.includes("sublocality")) locality = locality || c.long_name;
@@ -79,7 +80,7 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
               const displayParts = [route, locality, state].filter(Boolean);
               const displayLabel = displayParts.length > 0 ? displayParts.join(", ") : formatted;
               
-              return resolve({
+              return resolve({ 
                 fullAddress: formatted,
                 locality: locality || adminArea || "",
                 displayLabel: displayLabel
@@ -98,13 +99,21 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
     // Fallback: Nominatim reverse geocode - return full display_name
     try {
       const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`);
-      if (!res.ok) return null;
+      if (!res.ok) return null; 
       const data = await res.json();
       if (data) {
         const a = data.address || {};
         
         // Get locality for short display
-        const prefer = ["hamlet", "village", "suburb", "neighbourhood", "town", "city_district", "city"];
+          const prefer = [
+            "neighbourhood",
+            "suburb",
+            "city_district",
+            "village",
+            "town",
+            "city",
+            "county"
+          ];
         let locality = "";
         for (const key of prefer) {
           if (a[key]) {
@@ -151,14 +160,20 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
     let fullAddress = "";
     let locality = "";
     if (addressData) {
-      label = addressData.displayLabel;
       fullAddress = addressData.fullAddress;
       locality = addressData.locality;
-      // If label is just coordinates, try to use locality or fullAddress
-      const isCoords = /^-?\d+\.\d{3,},\s*-?\d+\.\d{3,}$/.test(label.trim());
-      if (isCoords) {
-        if (locality && locality !== label) label = locality;
-        else if (fullAddress && fullAddress !== label) label = fullAddress;
+      // CORRECT PRIORITY LOGIC
+      if (locality) {
+        label = locality;
+      } 
+      else if (addressData.displayLabel && !/^\d/.test(addressData.displayLabel)) {
+        label = addressData.displayLabel;
+      } 
+      else if (fullAddress && !/^\d/.test(fullAddress)) {
+        label = fullAddress;
+      } 
+      else {
+        label = "Selected location";
       }
       setLabelText(label);
       localStorage.setItem(
@@ -424,30 +439,7 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
         setMarkerPos({ lat, lng });
         const addressData = await resolveAndSetLabel(lat, lng);
 
-        // Store in localStorage immediately
-        if (addressData) {
-          localStorage.setItem(
-            "userLocation",
-            JSON.stringify({
-              lat,
-              lng,
-              label: addressData.displayLabel,
-              fullAddress: addressData.fullAddress,
-              locality: addressData.locality
-            })
-          );
-        } else {
-          localStorage.setItem(
-            "userLocation",
-            JSON.stringify({
-              lat,
-              lng,
-              label: "Selected location",
-              fullAddress: "",
-              locality: ""
-            })
-          );
-        }
+        // No need to store in localStorage here; resolveAndSetLabel already does it
 
         // Update marker position
         if (markerInstanceRef.current) {
@@ -606,7 +598,11 @@ export default function MapPicker({ initialLat, initialLng, onClose, onConfirm }
               if (addressData) {
                 fullAddress = addressData.fullAddress;
                 locality = addressData.locality;
-                displayLabel = addressData.displayLabel;
+                displayLabel =
+                  addressData.locality ||
+                  addressData.displayLabel ||
+                  addressData.fullAddress ||
+                  "Selected location";
               } else {
                 // Fallback to coordinates
                 const coordStr = `${markerPos.lat.toFixed(4)}, ${markerPos.lng.toFixed(4)}`;

@@ -5,18 +5,11 @@ import api from "../config/axios";
 import "../styles/home.css";
 import EmployeesOfMonth from "../components/EmployeesOfMonth";
 // import LocationModal from "../components/LocationModal";
-import MapPicker from "../components/MapPicker";
+// import MapPicker from "../components/MapPicker";
 import { detectUserLocation } from "../utils/locationDetection";
 
 export default function Home() {
-  // Listen for openMapPicker event only
-  useEffect(() => {
-    const handleOpenMapPicker = () => setShowMapPicker(true);
-    window.addEventListener("openMapPicker", handleOpenMapPicker);
-    return () => {
-      window.removeEventListener("openMapPicker", handleOpenMapPicker);
-    };
-  }, []);
+  // MapPicker modal logic moved to App.jsx for global handling
   const navigate = useNavigate();
 
   const [searchText, setSearchText] = useState("");
@@ -26,21 +19,9 @@ export default function Home() {
   const [slide, setSlide] = useState(0);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
-  // Removed showLocationModal state
+  // Removed: showMenu, selectedLocation, locationQuery, locationResults, searchingLocations, detectingLocation, locationError, showNotifications (all unused)
   const [customerData, setCustomerData] = useState(null);
-  const [selectedLocation, setSelectedLocation] = useState(null);
-  const [showMapPicker, setShowMapPicker] = useState(false);
-
-  const [locationQuery, setLocationQuery] = useState("");
-  const [locationResults, setLocationResults] = useState([]);
-  const [searchingLocations, setSearchingLocations] = useState(false);
-  const [detectingLocation, setDetectingLocation] = useState(false);
-  const [locationError, setLocationError] = useState("");
-
-  /* NOTIFICATIONS */
   const [notifications, setNotifications] = useState([]);
-  const [showNotifications, setShowNotifications] = useState(false);
 
   const menuRef = useRef();
   const notificationRef = useRef();
@@ -283,68 +264,7 @@ export default function Home() {
     });
   };
 
-  useEffect(() => {
-    // Removed check for showLocationModal
-
-    if (!locationQuery.trim() || locationQuery.trim().length < 2) {
-      setLocationResults([]);
-      return;
-    }
-
-    const t = setTimeout(async () => {
-      try {
-        setSearchingLocations(true);
-        setLocationError("");
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&q=${encodeURIComponent(
-            locationQuery.trim()
-          )}`
-        );
-
-        if (!res.ok) {
-          setLocationResults([]);
-          return;
-        }
-
-        const data = await res.json();
-        const mapped = (data || []).map((item) => {
-          const a = item.address || {};
-          const primary =
-            a.suburb ||
-            a.neighbourhood ||
-            a.village ||
-            a.town ||
-            a.city ||
-            item.name ||
-            (item.display_name ? item.display_name.split(",")[0] : "Location");
-
-          const secondaryParts = [
-            a.city || a.town || a.village || a.county || "",
-            a.state || "",
-            a.country || ""
-          ].filter(Boolean);
-
-          return {
-            address: item.display_name,
-            locality: primary,
-            title: primary,
-            subtitle: secondaryParts.join(", "),
-            lat: Number(item.lat),
-            lng: Number(item.lon)
-          };
-        });
-
-        setLocationResults(mapped);
-      } catch (e) {
-        console.error("Location search failed", e);
-        setLocationResults([]);
-      } finally {
-        setSearchingLocations(false);
-      }
-    }, 350);
-
-    return () => clearTimeout(t);
-  }, [locationQuery]);
+  // Removed: locationQuery search effect (now handled in MapPicker)
 
   /* ================= FETCH NOTIFICATIONS ================= */
   useEffect(() => {
@@ -669,33 +589,7 @@ export default function Home() {
 
 
 
-      {showMapPicker && (
-        (() => {
-          let initialLat = 15.4909;
-          let initialLng = 73.8278;
-          try {
-            const stored = localStorage.getItem("userLocation");
-            if (stored) {
-              const parsed = JSON.parse(stored);
-              if (parsed?.lat && parsed?.lng) {
-                initialLat = parsed.lat;
-                initialLng = parsed.lng;
-              }
-            }
-          } catch {}
-          return (
-            <MapPicker
-              initialLat={initialLat}
-              initialLng={initialLng}
-              onClose={() => setShowMapPicker(false)}
-              onConfirm={async (lat, lng, address, locality, label) => {
-                setShowMapPicker(false);
-                await saveUserLocation({ lat, lng, address, locality, label });
-              }}
-            />
-          );
-        })()
-      )}
+      {/* MapPicker modal is now handled globally in App.jsx */}
     </div>
   );
 }
