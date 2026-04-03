@@ -59,11 +59,6 @@ export default function CustomerAuth() {
       setOtpMessage("");
       setResendTimer(0);
     }
-    // Fix: Clear address error if address is set programmatically (e.g., after auto-detect)
-    if (e.target.name === "address" && e.target.value) {
-      const addressError = document.getElementById("customerAddressError");
-      if (addressError) addressError.style.display = "none";
-    }
   };
 
   /* ================= GOOGLE AUTH ================= */
