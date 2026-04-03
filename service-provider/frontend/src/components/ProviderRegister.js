@@ -339,6 +339,9 @@ const ProviderRegister = ({ onSuccess }) => {
         const readable = await getReadableLocation(lat, lng);
         const address = readable?.address || `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
         setFormData((prev) => ({ ...prev, address }));
+
+        // ✅ FIX: clear error
+        setFieldErrors((prev) => ({ ...prev, address: "" }));
         setLocationQuery(address);
         setLocationError("");
         setDetectingLocation(false);
@@ -351,10 +354,13 @@ const ProviderRegister = ({ onSuccess }) => {
     );
   };
 
-  const handleSelectSearchResult = (item) => {
-    setFormData((prev) => ({ ...prev, address: item.address }));
-    setLocationQuery(item.address);
-    setLocationResults([]);
+ const handleSelectSearchResult = (item) => {
+      setFormData((prev) => ({ ...prev, address: item.address }));
+      setLocationQuery(item.address);
+      setLocationResults([]);
+
+      // ✅ FIX: clear address error
+      setFieldErrors((prev) => ({ ...prev, address: "" }));
   };
 
   useEffect(() => {
@@ -583,6 +589,20 @@ const ProviderRegister = ({ onSuccess }) => {
   return (
     <div className="register-container">
       <form className="register-form" onSubmit={handleSubmit}>
+
+        {/* ✅ Show ONLY on Step 2 */}
+        {currentStep === 2 && (
+          <div className="top-back">
+            <button
+              type="button"
+              className="btn-back-top"
+              onClick={handlePreviousStep}
+            >
+              ← Back
+            </button>
+          </div>
+        )}
+
         <h2>Register as Service Provider</h2>
         <p>Offer your services in your locality</p>
 
@@ -605,7 +625,7 @@ const ProviderRegister = ({ onSuccess }) => {
 
         {/* STEP 1: Personal Information & Email Verification */}
         {currentStep === 1 && (
-        <div className="form-section">
+        <div className="form-section step-animate">
           <h3>Personal Information</h3>
           <label className="form-field-label" htmlFor="provider-name">Full Name</label>
           <input
@@ -902,7 +922,7 @@ const ProviderRegister = ({ onSuccess }) => {
         {/* STEP 2: Service Information & Documents */}
         {currentStep === 2 && (
         <>
-        <div className="form-section">
+        <div className="form-section step-animate">
           <h3>Service Information</h3>
           {loadingServices ? (
             <p style={{ color: "#999", textAlign: "center" }}>Loading services...</p>
