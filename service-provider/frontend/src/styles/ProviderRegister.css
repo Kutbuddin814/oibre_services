@@ -17,8 +17,9 @@
   width: 100%;
   max-width: 600px;
   padding: 40px;
+  padding-bottom: 56px; /* Extra bottom padding for button */
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: visible; /* Allow button to show if it overflows */
 }
 
 .register-form h2 {
@@ -284,7 +285,8 @@
   }
 }
 
-.register-form button {
+.register-form button,
+.register-form .btn-submit {
   width: 100%;
   padding: 14px;
   background: #2563eb;
@@ -296,6 +298,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   margin-top: 10px;
+  box-sizing: border-box;
 }
 
 .register-form button:hover:not(:disabled) {
