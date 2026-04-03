@@ -731,3 +731,45 @@
     transform: translateY(0) scale(1);
   }
 }
+/* Header with back button */
+.form-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px; /* increased spacing */
+}
+
+/* Push title slightly right */
+.form-header h2 {
+  margin: 0;
+}
+
+.form-header p {
+  margin: 2px 0 0 0;
+}
+
+/* Back button (clean style) */
+.btn-back-header {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  background: #f1f5f9;
+  border: none;
+  border-radius: 8px;
+  color: #2563eb;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+}
+
+/* ✅ Apply movement ONLY on hover */
+.btn-back-header:hover {
+  transform: translateY(-1px);
+  background: #e2e8f0;
+}
+.btn-back-header:active {
+  transform: scale(0.95);
+}

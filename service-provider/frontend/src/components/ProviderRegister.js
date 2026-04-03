@@ -590,21 +590,24 @@ const ProviderRegister = ({ onSuccess }) => {
     <div className="register-container">
       <form className="register-form" onSubmit={handleSubmit}>
 
-        {/* ✅ Show ONLY on Step 2 */}
-        {currentStep === 2 && (
-          <div className="top-back">
+        <div className="form-header">
+
+          {currentStep === 2 && (
             <button
               type="button"
-              className="btn-back-top"
+              className="btn-back-header"
               onClick={handlePreviousStep}
             >
               ← Back
             </button>
-          </div>
-        )}
+          )}
 
-        <h2>Register as Service Provider</h2>
-        <p>Offer your services in your locality</p>
+          <div>
+            <h2>Register as Service Provider</h2>
+            <p>Offer your services in your locality</p>
+          </div>
+
+        </div>
 
         {/* Progress Stepper */}
         <div className="stepper-container">
