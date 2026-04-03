@@ -581,38 +581,8 @@ const ProviderRegister = ({ onSuccess }) => {
   };
 
   return (
-    <div className="register-container" style={{ position: 'relative' }}>
-      {/* Fixed Back Button at Top Left */}
-      <button
-        type="button"
-        className="provider-back-button"
-        style={{
-          position: 'fixed',
-          top: 32,
-          left: 32,
-          zIndex: 1000,
-          background: '#fff',
-          color: '#2563eb',
-          border: '2px solid #2563eb',
-          borderRadius: 8,
-          padding: '10px 18px',
-          fontWeight: 700,
-          fontSize: 16,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-          cursor: 'pointer',
-          transition: 'background 0.2s, border-color 0.2s',
-        }}
-        onClick={() => {
-          if (currentStep === 1) {
-            window.history.back();
-          } else {
-            setCurrentStep(1);
-          }
-        }}
-      >
-        ← Back
-      </button>
-      <form className="register-form" onSubmit={handleSubmit} style={{ paddingTop: 24 }}>
+    <div className="register-container">
+      <form className="register-form" onSubmit={handleSubmit}>
         <h2>Register as Service Provider</h2>
         <p>Offer your services in your locality</p>
 
@@ -1099,6 +1069,7 @@ const ProviderRegister = ({ onSuccess }) => {
               Continue to Service Details →
             </button>
           )}
+
           {currentStep === 2 && (
             <button
               type="submit"
