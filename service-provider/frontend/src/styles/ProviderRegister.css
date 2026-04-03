@@ -651,28 +651,7 @@
   width: auto;
 }
 
-/* =========================
-   TOP BACK BUTTON
-========================= */
-.top-back {
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 10px;
-}
 
-.btn-back-top {
-  padding: 8px 14px;
-  background: transparent;
-  border: none;
-  color: #2563eb;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.btn-back-top:hover {
-  text-decoration: underline;
-}
 
 /* =========================
    FORM ACTION BUTTONS
@@ -748,28 +727,47 @@
   margin: 2px 0 0 0;
 }
 
-/* Back button (clean style) */
-.btn-back-header {
+/* New stepper header */
+.stepper-header {
+  position: relative;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Back button left */
+.btn-back-stepper {
+  position: absolute;
+  left: 0;
+  top: 0;
   width: 36px;
   height: 36px;
+  border-radius: 8px;
+  border: none;
+  background: #f1f5f9;
+  color: #2563eb;
+  font-size: 18px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  background: #f1f5f9;
-  border: none;
-  border-radius: 8px;
-  color: #2563eb;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   transition: all 0.2s ease;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-/* ✅ Apply movement ONLY on hover */
-.btn-back-header:hover {
-  transform: translateY(-1px);
+.btn-back-stepper:hover {
   background: #e2e8f0;
+  transform: translateY(-1px);
 }
-.btn-back-header:active {
+
+.btn-back-stepper:active {
   transform: scale(0.95);
+}
+
+/* Keep stepper centered */
+.stepper-header .stepper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

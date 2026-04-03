@@ -592,15 +592,6 @@ const ProviderRegister = ({ onSuccess }) => {
 
         <div className="form-header">
 
-          {currentStep === 2 && (
-            <button
-              type="button"
-              className="btn-back-header"
-              onClick={handlePreviousStep}
-            >
-              ← Back
-            </button>
-          )}
 
           <div>
             <h2>Register as Service Provider</h2>
@@ -610,21 +601,37 @@ const ProviderRegister = ({ onSuccess }) => {
         </div>
 
         {/* Progress Stepper */}
-        <div className="stepper-container">
-          <div className="stepper">
-            <div className={`step ${currentStep >= 1 ? 'active' : ''} ${currentStep > 1 ? 'completed' : ''}`}>
-              <div className="step-circle">
-                {currentStep > 1 ? '✓' : '1'}
+        <div className="stepper-header">
+
+            {/* 🔙 Back button (only on step 2) */}
+            {currentStep === 2 && (
+              <button
+                type="button"
+                className="btn-back-stepper"
+                onClick={handlePreviousStep}
+              >
+                ←
+              </button>
+            )}
+
+            {/* Stepper */}
+            <div className="stepper">
+              <div className={`step ${currentStep >= 1 ? 'active' : ''} ${currentStep > 1 ? 'completed' : ''}`}>
+                <div className="step-circle">
+                  {currentStep > 1 ? '✓' : '1'}
+                </div>
+                <div className="step-label">Personal Info</div>
               </div>
-              <div className="step-label">Personal Info</div>
+
+              <div className={`step-line ${currentStep > 1 ? 'completed' : ''}`}></div>
+
+              <div className={`step ${currentStep >= 2 ? 'active' : ''}`}>
+                <div className="step-circle">2</div>
+                <div className="step-label">Service Details</div>
+              </div>
             </div>
-            <div className={`step-line ${currentStep > 1 ? 'completed' : ''}`}></div>
-            <div className={`step ${currentStep >= 2 ? 'active' : ''}`}>
-              <div className="step-circle">2</div>
-              <div className="step-label">Service Details</div>
-            </div>
+
           </div>
-        </div>
 
         {/* STEP 1: Personal Information & Email Verification */}
         {currentStep === 1 && (
