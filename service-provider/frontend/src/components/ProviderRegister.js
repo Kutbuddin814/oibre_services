@@ -581,8 +581,38 @@ const ProviderRegister = ({ onSuccess }) => {
   };
 
   return (
-    <div className="register-container">
-      <form className="register-form" onSubmit={handleSubmit}>
+    <div className="register-container" style={{ position: 'relative' }}>
+      {/* Fixed Back Button at Top Left */}
+      <button
+        type="button"
+        className="provider-back-button"
+        style={{
+          position: 'fixed',
+          top: 32,
+          left: 32,
+          zIndex: 1000,
+          background: '#fff',
+          color: '#2563eb',
+          border: '2px solid #2563eb',
+          borderRadius: 8,
+          padding: '10px 18px',
+          fontWeight: 700,
+          fontSize: 16,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+          cursor: 'pointer',
+          transition: 'background 0.2s, border-color 0.2s',
+        }}
+        onClick={() => {
+          if (currentStep === 1) {
+            window.history.back();
+          } else {
+            setCurrentStep(1);
+          }
+        }}
+      >
+        ← Back
+      </button>
+      <form className="register-form" onSubmit={handleSubmit} style={{ paddingTop: 24 }}>
         <h2>Register as Service Provider</h2>
         <p>Offer your services in your locality</p>
 
@@ -1063,26 +1093,21 @@ const ProviderRegister = ({ onSuccess }) => {
         {error && <div className="error-message">{error}</div>}
 
         {/* Step Navigation Buttons */}
-        <div className="step-navigation">
+        <div className="step-navigation" style={{ marginTop: 40 }}>
           {currentStep === 1 && (
             <button type="button" className="btn-next" onClick={handleNextStep}>
               Continue to Service Details →
             </button>
           )}
-
           {currentStep === 2 && (
-            <>
-              <button type="button" className="btn-back" onClick={handlePreviousStep}>
-                ← Back
-              </button>
-              <button
-                type="submit"
-                className={`btn-submit ${loading ? "is-loading" : ""}`}
-                disabled={loading || loadingServices}
-              >
-                {loading ? "⏳ Uploading & Submitting..." : "Submit for Approval"}
-              </button>
-            </>
+            <button
+              type="submit"
+              className={`btn-submit ${loading ? "is-loading" : ""}`}
+              style={{ width: '100%', padding: '16px', fontSize: 18, fontWeight: 700, borderRadius: 8, marginTop: 10 }}
+              disabled={loading || loadingServices}
+            >
+              {loading ? "⏳ Uploading & Submitting..." : "Submit for Approval"}
+            </button>
           )}
         </div>
       </form>
