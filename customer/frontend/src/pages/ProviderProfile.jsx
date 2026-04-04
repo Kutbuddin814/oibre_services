@@ -564,13 +564,17 @@ export default function ProviderProfile() {
   return (
     <div className="provider-profile-page">
 
-      {/* ================= BACK BUTTON ================= */}
-      <div className="details-header">
-        <button className="search-back-button">← Back</button>
-      </div>
+      
 
       {/* ================= HEADER ================= */}
       <div className="profile-header card">
+          {/* ================= BACK BUTTON ================= */}
+        <button 
+          className="search-back-button"
+          onClick={() => navigate(-1)}
+        >
+          ← Back
+        </button>
         <div className="profile-photo-wrapper">
           {profilePhotoUrl ? (
             <img
