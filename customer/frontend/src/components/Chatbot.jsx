@@ -327,6 +327,20 @@ const Chatbot = () => {
       requestCallback();
       return;
     }
+    if (value === "try-different-service") {
+      addMessage({ type: "user", text: "Try different service" });
+
+      setStep("greeting");
+      setSelectedService(null);
+      setProblems([]);
+
+      addMessage({
+        type: "bot",
+        text: "No problem 👍 Choose another service:"
+      });
+
+      return;
+    }
 
     if (value === "change-location") {
       addMessage({ type: "user", text: "Try different location" });
@@ -368,29 +382,34 @@ const Chatbot = () => {
         lng: userLocation?.lng,
         sortBy: "rating"
       };
-
-      const res = await api.post("/chatbot/providers/search", searchData);
-      if (res.data.success) {
-        setStep("providers");
-        // Show fallback only if ALL groups are empty
-        if (
-          (!res.data.topRated || res.data.topRated.length === 0) &&
-          (!res.data.nearest || res.data.nearest.length === 0) &&
-          (!res.data.budget || res.data.budget.length === 0)
-        ) {
-          addMessage({
-            type: "bot",
-            text: res.data.message || "❌ No providers found near you",
-            options: res.data.options || [
-              { label: "Change location", value: "change-location" },
-              { label: "Try different service", value: "try-different-service" },
-              { label: "Request callback", value: "callback" }
-            ]
-          });
-        } else {
-          displayProviderOptions(res.data);
+      const formattedService = selectedService;
+      const res = await api.get("/providers", {
+        params: {
+          lat: userLocation?.lat,
+          lng: userLocation?.lng,
+          serviceCategory: formattedService
         }
-      }
+      });
+     if (res.data && res.data.length > 0) {
+      setStep("providers");
+
+      displayProviderOptions({
+        topRated: res.data.slice(0, 3),
+        nearest: res.data.slice(3, 6),
+        budget: res.data.slice(6, 9)
+      });
+
+    } else {
+      addMessage({
+        type: "bot",
+        text: "❌ No providers found near you",
+        options: [
+          { label: "Change location", value: "change-location" },
+          { label: "Try different service", value: "try-different-service" },
+          { label: "Request callback", value: "callback" }
+        ]
+      });
+    }
     } catch (err) {
       console.error("Error loading providers:", err?.message);
       addMessage({
@@ -434,6 +453,14 @@ const Chatbot = () => {
           animation: idx === 0 ? "fade-in" : "slide-up"
         });
       }
+    });
+    addMessage({
+      type: "bot",
+      text: "Need anything else?",
+      options: [
+        { label: "🔁 Try another service", value: "try-different-service" },
+        { label: "📞 Request callback", value: "callback" }
+      ]
     });
   };
 
