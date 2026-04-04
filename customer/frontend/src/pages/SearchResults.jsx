@@ -364,11 +364,18 @@ export default function SearchResults() {
 
   return (
     <>
-      {typeof document !== "undefined" ? createPortal(backButton, document.body) : backButton}
+      
       <div className="search-page">
         <div className="search-container">
           {/* SEARCH BAR */}
           <div className="search-header">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="search-back-button"
+            >
+              ← Back
+            </button>
             <div className="search-wrapper">
               <input
                 className="search-input"

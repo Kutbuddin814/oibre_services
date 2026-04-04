@@ -1096,7 +1096,9 @@
   }
 
   .nav-actions {
-    width: auto;
+    flex-wrap: wrap !important;
+    width: 100%;
+    flex-wrap: wrap;
     justify-content: flex-end;
   }
 
@@ -1129,85 +1131,62 @@
 }
 
 @media (max-width: 640px) {
-  .navbar {
-    height: auto;
-    min-height: 82px;
-    max-height: none;
-    padding: 8px 12px;
+
+  /* ===== GLOBAL FIX ===== */
+  body {
+    margin: 0;
+    padding: 0;
+    background: #0f172a;
   }
 
-  .logo {
-    font-size: 24px;
-  }
-
-  .nav-actions {
-    gap: 8px;
-  }
-
-  .change-location-btn,
-  .login-btn,
-  .profile-btn {
-    padding: 8px 10px;
-    font-size: 12px;
-  }
-
-  .location-pill {
-    font-size: 11px;
-    padding: 6px 10px;
-    max-width: 100%;
-  }
-
-  .notification-btn,
-  .profile-btn-circle {
-    width: 36px;
-    height: 36px;
-  }
-
-  .map-content {
+  .home,
+  .about,
+  .services,
+  .contact {
     width: 100%;
-    border-radius: 12px;
-    padding: 14px;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
-  .map-search {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-  }
-
-  .map-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
+  /* ===== NAVBAR ===== */
   .navbar {
+    display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    padding-bottom: 12px;
-    padding-top: 12px;
+    padding: 10px 12px;
+    min-height: 82px;
     border-radius: 0 0 18px 18px;
     position: sticky;
     top: 0;
-    left: 0;
-    right: 0;
+    z-index: 1000;
     background: linear-gradient(90deg, #050505 0%, #111827 52%, #0f172a 100%);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   }
 
+  /* ===== LEFT (LOGO + MENU) ===== */
   .nav-left {
     width: 100%;
+    display: flex;
     justify-content: space-between;
-    gap: 12px;
-    order: 1;
+    align-items: center;
   }
 
+  .logo {
+    font-size: 20px;
+  }
+
+  .logo-image {
+    width: 80px;
+    height: 80px;
+  }
+
+  /* ===== RIGHT ACTIONS ===== */
   .nav-actions {
-    width: auto;
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
     justify-content: flex-end;
     gap: 8px;
-    
     order: 1;
-    position: relative;
     z-index: 1100;
   }
 
@@ -1216,24 +1195,104 @@
     min-width: 0;
   }
 
-  .nav-actions .login-btn {
-    order: 0;
-    margin-right: 6px;
-  }
-
-  .nav-actions .mobile-menu-toggle {
+  .login-btn {
     order: 1;
-  }
-
-  .location-wrapper {
-    order: 2;
-    width: 100%;
-    max-width: none;
-    z-index: 1000;
+    margin-left: auto;
+    padding: 8px 10px;
+    font-size: 12px;
   }
 
   .mobile-menu-toggle {
     display: inline-flex;
+    order: 2;
+  }
+
+  /* ===== LOCATION ===== */
+  .location-wrapper {
+    display: flex;
+    width: 100%;
+    gap: 6px;
+    order: 2;
+  }
+
+  .location-pill {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .change-location-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+
+  /* ===== BUTTONS ===== */
+  .change-location-btn,
+  .profile-btn {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .notification-btn,
+  .profile-btn-circle {
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
+  }
+
+  /* ===== DROPDOWNS ===== */
+  .notifications-dropdown {
+    position: fixed;
+    top: 70px;
+    right: 10px;
+    width: min(92vw, 360px);
+    max-height: 70vh;
+    overflow-y: auto;
+    z-index: 3000;
+    border-radius: 16px;
+    animation: dropdownFade 0.2s ease;
+  }
+
+  .notifications-dropdown,
+  .profile-dropdown-new {
+    border-radius: 18px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .notification-item {
+    border-radius: 10px;
+    padding: 12px;
+  }
+
+  .profile-header {
+    padding: 20px;
+  }
+
+  /* ===== MAP MODAL ===== */
+  .map-content {
+    width: 100%;
+    border-radius: 12px;
+    padding: 14px;
+  }
+
+  .map-search {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .map-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
 }
 
@@ -1251,137 +1310,4 @@
     justify-content: flex-start;
   }
 }
-@media (max-width: 640px) {
-  .location-wrapper {
-    width: 100%;
-    order: 2;
-  }
 
-  .location-pill {
-    flex: 1;
-    font-size: 11px;
-    max-width: 100%;
-    padding: 6px 10px;
-  }
-
-  .change-location-btn {
-    font-size: 11px;
-    padding: 6px 8px;
-  }
-}
-@media (max-width: 640px) {
-  .navbar {
-    display: flex;
-    flex-wrap: wrap;
-    padding: 8px 12px;
-  }
-
-  .nav-left {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-  }
-}
-@media (max-width: 640px) {
-  .notification-btn,
-  .profile-btn-circle {
-    width: 34px;
-    height: 34px;
-    font-size: 14px;
-  }
-}
-@media (max-width: 640px) {
-  .logo-image {
-    width: 100px;
-    height: 100px;
-  }
-}
-@media (max-width: 640px) {
-  .location-wrapper {
-    display: flex;
-    gap: 6px;
-  }
-
-  .location-pill {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 11px;
-    padding: 6px 10px;
-  }
-
-  .change-location-btn {
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
-}
-.back-btn {
-  position: relative; /* NOT absolute */
-  margin-bottom: 10px;
-}
-
-@media (max-width: 640px) {
-  .location-wrapper {
-    display: flex;
-    width: 100%;
-    gap: 6px;
-  }
-
-  .location-pill {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    padding: 6px 10px;
-    font-size: 11px;
-  }
-
-  .change-location-btn {
-    display: inline-flex !important; /* 🔥 FORCE SHOW */
-    flex-shrink: 0;
-  }
-}
-@media (max-width: 640px) {
-
-  .location-wrapper {
-    order: 2;
-    width: 100%;
-  }
-
-  .login-btn {
-    order: 1;
-     margin-left: auto;
-  }
-}
-@media (max-width: 640px) {
-  .location-wrapper {
-    width: 100%;
-    order: 2;
-  }
-
-  .login-btn {
-    order: 1;
-     margin-left: auto;
-  }
-
-
-}
-@media (max-width: 1024px) {
-  .nav-actions {
-    flex-wrap: wrap !important;
-    width: 100%;
-    flex-wrap: wrap;
-    justify-content: space-between;
-  }
-}
-@media (max-width: 640px) {
-  .nav-actions {
-    display: flex;
-    width: 100%;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 6px;
-  }
-}

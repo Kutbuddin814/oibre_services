@@ -43,6 +43,8 @@ const Chatbot = () => {
     };
   }, []);
 
+  
+
   const requestUserLocation = useCallback(() => {
     if (!navigator.geolocation) {
       setLocationStatus("denied");

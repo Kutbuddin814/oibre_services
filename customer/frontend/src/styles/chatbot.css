@@ -1,7 +1,7 @@
 /* ==================== CHATBOT FLOATING BUTTON ==================== */
 .chatbot-floating-btn {
   position: fixed;
-  bottom: 30px;
+  bottom: 24px;
   right: 24px;
   z-index: 9999;
   width: 64px;
@@ -37,7 +37,7 @@
 /* ==================== CHATBOT WINDOW ==================== */
 .chatbot-window {
   position: fixed;
-  bottom: 104px;
+  bottom: 90px;
   right: 24px;
   z-index: 9999;
   width: 420px;
@@ -435,7 +435,7 @@
   }
 
   .chatbot-floating-btn {
-    bottom: 16px;
+    bottom: 24px;
     right: 16px;
   }
 
@@ -474,7 +474,7 @@
   }
 
   .chatbot-floating-btn {
-    bottom: 120px;
+    bottom: 24px;
     right: 16px;
   }
 
