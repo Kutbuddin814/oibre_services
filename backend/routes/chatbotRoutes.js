@@ -378,7 +378,8 @@ router.post("/check/availability", async (req, res) => {
 
     const query = {
       serviceCategory: serviceType,
-      isActive: true
+      status: "approved",
+      verified: true
     };
 
     if (urgency === "emergency") {
