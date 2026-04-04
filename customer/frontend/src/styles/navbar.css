@@ -11,11 +11,12 @@
   color: #FFFFFF;
   padding: 0;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  padding: 10px 20px;
   align-items: center;
-  height: 82px;
-  min-height: 82px;
-  max-height: 82px;
+  min-height: 70px;
+  height: auto;
+  padding: 10px 12px;
   margin: 0;
   transition: none;
   box-sizing: border-box;
@@ -101,10 +102,9 @@
 .nav-actions {
   display: flex;
   align-items: center;
+  justify-content: flex-end; /* 🔥 pushes everything right */
   gap: 12px;
-  position: relative;
-  z-index: 100;
-  min-width: 0;
+  margin-left: auto; /* 🔥 KEY LINE */
 }
 
 /* NOTIFICATION BELL */
@@ -459,6 +459,7 @@
   gap: 8px;
   min-width: 0;
   max-width: min(52vw, 620px);
+  
 }
 
 .location-pill {
@@ -546,6 +547,7 @@
   justify-content: center;
   white-space: nowrap;
   margin: 0;
+  margin-left: 8px;
 }
 
 .login-btn:hover {
@@ -1029,12 +1031,11 @@
 
 @media (max-width: 1024px) {
   .navbar {
-    padding: 0 14px;
-    flex-wrap: nowrap;
-    gap: 10px;
-    height: 82px;
-    min-height: 82px;
-    max-height: 82px;
+    padding: 10px 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+    height: auto;
+    min-height: 70px;
   }
 
   .nav-left {
@@ -1070,6 +1071,18 @@
 
   .nav-links.mobile-open {
     display: flex;
+    flex-direction: column;
+
+    position: fixed; /* 🔥 IMPORTANT */
+    top: 70px;
+    left: 0;
+    right: 0;
+
+    background: #1f2937;
+    padding: 16px;
+    gap: 12px;
+
+    z-index: 2000; /* 🔥 IMPORTANT */
   }
 
   .nav-links a {
@@ -1085,7 +1098,6 @@
   .nav-actions {
     width: auto;
     justify-content: flex-end;
-    flex-wrap: nowrap;
   }
 
   .location-wrapper {
@@ -1118,10 +1130,10 @@
 
 @media (max-width: 640px) {
   .navbar {
-    padding: 0 10px;
     height: auto;
     min-height: 82px;
     max-height: none;
+    padding: 8px 12px;
   }
 
   .logo {
@@ -1140,8 +1152,8 @@
   }
 
   .location-pill {
-    font-size: 12px;
-    padding: 8px 10px;
+    font-size: 11px;
+    padding: 6px 10px;
     max-width: 100%;
   }
 
@@ -1193,7 +1205,7 @@
     width: auto;
     justify-content: flex-end;
     gap: 8px;
-    flex-wrap: nowrap;
+    
     order: 1;
     position: relative;
     z-index: 1100;
@@ -1220,11 +1232,6 @@
     z-index: 1000;
   }
 
-  .location-pill {
-    width: calc(100% - 80px);
-    white-space: normal;
-  }
-
   .mobile-menu-toggle {
     display: inline-flex;
   }
@@ -1242,5 +1249,139 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
+  }
+}
+@media (max-width: 640px) {
+  .location-wrapper {
+    width: 100%;
+    order: 2;
+  }
+
+  .location-pill {
+    flex: 1;
+    font-size: 11px;
+    max-width: 100%;
+    padding: 6px 10px;
+  }
+
+  .change-location-btn {
+    font-size: 11px;
+    padding: 6px 8px;
+  }
+}
+@media (max-width: 640px) {
+  .navbar {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 8px 12px;
+  }
+
+  .nav-left {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+}
+@media (max-width: 640px) {
+  .notification-btn,
+  .profile-btn-circle {
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
+  }
+}
+@media (max-width: 640px) {
+  .logo-image {
+    width: 100px;
+    height: 100px;
+  }
+}
+@media (max-width: 640px) {
+  .location-wrapper {
+    display: flex;
+    gap: 6px;
+  }
+
+  .location-pill {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .change-location-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+}
+.back-btn {
+  position: relative; /* NOT absolute */
+  margin-bottom: 10px;
+}
+
+@media (max-width: 640px) {
+  .location-wrapper {
+    display: flex;
+    width: 100%;
+    gap: 6px;
+  }
+
+  .location-pill {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .change-location-btn {
+    display: inline-flex !important; /* 🔥 FORCE SHOW */
+    flex-shrink: 0;
+  }
+}
+@media (max-width: 640px) {
+
+  .location-wrapper {
+    order: 2;
+    width: 100%;
+  }
+
+  .login-btn {
+    order: 1;
+     margin-left: auto;
+  }
+}
+@media (max-width: 640px) {
+  .location-wrapper {
+    width: 100%;
+    order: 2;
+  }
+
+  .login-btn {
+    order: 1;
+     margin-left: auto;
+  }
+
+
+}
+@media (max-width: 1024px) {
+  .nav-actions {
+    flex-wrap: wrap !important;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+}
+@media (max-width: 640px) {
+  .nav-actions {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
   }
 }

@@ -77,13 +77,13 @@ table {
 }
 
 /* Mobile: Navbar adjustments */
-.navbar {
+/* .navbar {
   padding: 0 var(--space-lg);
   height: 70px;
   min-height: 70px;
   max-height: 70px;
   gap: 8px;
-}
+} */
 
 .nav-links {
   display: none;
