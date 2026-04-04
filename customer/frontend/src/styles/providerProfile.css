@@ -40,7 +40,7 @@
   z-index: -1;
 }
 
-.back-button {
+/* .back-button {
   position: fixed;
   top: 96px;
   left: 16px;
@@ -67,19 +67,23 @@
   color: #0a4ece;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+} */
+.details-header {
+  max-width: 1200px;
+  margin: 20px auto 10px;
+  padding: 0 20px;
 }
-
-.back-button:active {
+/* .back-button:active {
   transform: translateY(0);
-}
+} */
 
 @media (max-width: 768px) {
-  .back-button {
+  /* .back-button {
     top: 88px;
     left: 12px;
     padding: 6px 12px;
     font-size: 13px;
-  }
+  } */
 }
 
 .card {

@@ -565,13 +565,9 @@ export default function ProviderProfile() {
     <div className="provider-profile-page">
 
       {/* ================= BACK BUTTON ================= */}
-      <button 
-        onClick={() => navigate(-1)} 
-        className="back-button"
-        title="Go back"
-      >
-        ← Back
-      </button>
+      <div className="details-header">
+        <button className="search-back-button">← Back</button>
+      </div>
 
       {/* ================= HEADER ================= */}
       <div className="profile-header card">

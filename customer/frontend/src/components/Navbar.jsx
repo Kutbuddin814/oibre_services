@@ -505,16 +505,26 @@ export default function Navbar() {
                         <span className="notifications-title">Notifications</span>
                         <span className="notifications-subtitle">Service and booking updates</span>
                       </div>
-                      {notifications.length > 0 && (
+
+                      <div style={{ display: "flex", gap: "6px" }}>
+                        {notifications.length > 0 && (
+                          <button
+                            className="clear-notifications-btn"
+                            onClick={clearNotifications}
+                          >
+                            Clear
+                          </button>
+                        )}
+
+                        {/* 🔥 CLOSE BUTTON */}
                         <button
-                          type="button"
-                          className="clear-notifications-btn"
-                          onClick={clearNotifications}
+                          className="close-notifications-btn"
+                          onClick={() => setNotificationsOpen(false)}
                         >
-                          Clear all
+                          ✕
                         </button>
-                      )}
-                    </div>
+                      </div>
+                  </div>
                     {notifications.length === 0 ? (
                       <div className="no-notifications">
                         <div className="no-notifications-icon">N</div>

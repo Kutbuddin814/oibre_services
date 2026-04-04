@@ -69,6 +69,9 @@
   margin: 0 auto;
   display: flex;
   gap: 0;
+  overflow: hidden;
+  border-radius: 14px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
 }
 
 .search-input {
@@ -559,12 +562,13 @@
     min-height: 46px;
     padding-top: 12px;
     padding-bottom: 12px;
-    border-radius: 10px;
+    border-radius: 12px 0 0 12px;
   }
 
   .search-button {
     padding-left: 18px;
     padding-right: 18px;
+    border-radius: 0 12px 12px 0;
   }
 
   .result-card {
@@ -583,6 +587,12 @@
     font-size: 13px;
     width: fit-content;
      flex-shrink: 0;
+  }
+  .search-wrapper {
+    display: flex;
+    overflow: hidden; /* 🔥 IMPORTANT */
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
   }
 }
 
