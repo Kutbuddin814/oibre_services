@@ -33,7 +33,7 @@ router.get("/services/categories", async (req, res) => {
 router.get("/services/problems/:category", async (req, res) => {
   try {
     const { category } = req.params;
-
+    
     // Search by exact category or by name (for fallback)
     const problems = await Service.find({
       $or: [
@@ -64,6 +64,7 @@ router.post("/providers/search", async (req, res) => {
   try {
     const {
       serviceType,
+      category,
       location,
       lat,
       lng,
@@ -72,14 +73,14 @@ router.post("/providers/search", async (req, res) => {
       limit = 5
     } = req.body;
 
+    // Build query (case-insensitive, urgency, location)
     let query = {
       serviceCategory: { $regex: new RegExp(`^${serviceType}$`, "i") },
       isActive: true
     };
-
     if (urgency === "emergency") query.emergencyAvailable = true;
     if (urgency === "today") query.availableToday = true;
-
+    // 'later' = no extra filter
     if (lat && lng) {
       query.location = {
         $near: {
@@ -87,7 +88,7 @@ router.post("/providers/search", async (req, res) => {
             type: "Point",
             coordinates: [lng, lat]
           },
-          $maxDistance: 10000
+          $maxDistance: 10000 // 10km
         }
       };
     } else if (location) {
@@ -95,66 +96,49 @@ router.post("/providers/search", async (req, res) => {
     }
 
     let providers = await ServiceProvider.find(query)
-      .select("name serviceCategory averageRating reviewCount basePrice pricePerKm profilePhoto emergencyAvailable availableToday responseTime location")
+      .select("name serviceCategory averageRating reviewCount basePrice distance profilePhoto emergencyAvailable availableToday responseTime location")
       .lean();
 
-    // ✅ CALCULATE DISTANCE + PRICE
+    // Calculate distances if coordinates provided
     if (lat && lng) {
       providers = providers.map(p => {
         let plat, plng;
-
-        if (p.location && Array.isArray(p.location.coordinates)) {
+        if (p.location && Array.isArray(p.location.coordinates) && p.location.coordinates.length === 2) {
           [plng, plat] = p.location.coordinates;
         } else {
-          plat = p.lat;
-          plng = p.lng;
+          plat = p.lat; plng = p.lng;
         }
-
         const dx = plat - lat;
         const dy = plng - lng;
         const distance = Math.sqrt(dx * dx + dy * dy) * 111;
-
-        const finalDistance = Math.round(distance * 10) / 10;
-
-        const totalPrice =
-          p.basePrice && p.pricePerKm
-            ? Math.round(p.basePrice + finalDistance * p.pricePerKm)
-            : p.basePrice;
-
-        return {
-          ...p,
-          distance: finalDistance,
-          totalPrice
-        };
+        return { ...p, distance: Math.round(distance * 10) / 10 };
       });
-    } // ✅ CLOSE IF HERE
+    }
 
-    // ✅ SORTING
+    // Smart sorting
     let sortedProviders = [...providers];
     if (sortBy === "rating") {
       sortedProviders.sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
     } else if (sortBy === "distance") {
       sortedProviders.sort((a, b) => (a.distance || 0) - (b.distance || 0));
     } else if (sortBy === "price") {
-      sortedProviders.sort((a, b) => (a.totalPrice || a.basePrice || 0) - (b.totalPrice || b.basePrice || 0));
+      sortedProviders.sort((a, b) => (a.basePrice || 0) - (b.basePrice || 0));
     } else if (sortBy === "response") {
       sortedProviders.sort((a, b) => (a.responseTime || 9999) - (b.responseTime || 9999));
     }
 
-    // ✅ GROUPING
+    // Group providers by sort type for recommended sections
     const topRated = [...providers]
       .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0))
       .slice(0, 3);
-
     const nearest = [...providers]
       .sort((a, b) => (a.distance || 0) - (b.distance || 0))
       .slice(0, 3);
-
     const budget = [...providers]
-      .sort((a, b) => (a.totalPrice || a.basePrice || 0) - (b.totalPrice || b.basePrice || 0))
+      .sort((a, b) => (a.basePrice || 0) - (b.basePrice || 0))
       .slice(0, 3);
 
-    // ✅ EMPTY CASE
+    // Fallback if no providers found
     if (providers.length === 0) {
       return res.json({
         success: true,
@@ -172,7 +156,6 @@ router.post("/providers/search", async (req, res) => {
       });
     }
 
-    // ✅ RESPONSE
     res.json({
       success: true,
       all: sortedProviders.slice(0, limit),
@@ -181,8 +164,7 @@ router.post("/providers/search", async (req, res) => {
       budget,
       total: providers.length
     });
-
-  } catch (err) {   // ✅ NOW CORRECT
+  } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: err.message });
   }
@@ -378,8 +360,7 @@ router.post("/check/availability", async (req, res) => {
 
     const query = {
       serviceCategory: serviceType,
-      status: "approved",
-      verified: true
+      isActive: true
     };
 
     if (urgency === "emergency") {
