@@ -87,7 +87,7 @@ router.post("/providers/search", async (req, res) => {
             type: "Point",
             coordinates: [lng, lat]
           },
-          $maxDistance: 30000
+          $maxDistance: 10000
         }
       };
     } else if (location) {
