@@ -350,17 +350,17 @@ export default function SearchResults() {
     navigate(`/search?query=${encodeURIComponent(trimmed)}`);
   };
 
-  const backButton = (
-    <button
-      type="button"
-      onClick={() => navigate(-1)}
-      className="search-back-button"
-      title="Go back"
-      aria-label="Go back"
-    >
-      ← Back
-    </button>
-  );
+  // const backButton = (
+  //   <button
+  //     type="button"
+  //     onClick={() => navigate(-1)}
+  //     className="search-back-button"
+  //     title="Go back"
+  //     aria-label="Go back"
+  //   >
+  //     ← Back
+  //   </button>
+  // );
 
   return (
     <>
@@ -372,7 +372,7 @@ export default function SearchResults() {
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="search-back-button"
+              className="search-page-back-button"
             >
               ← Back
             </button>

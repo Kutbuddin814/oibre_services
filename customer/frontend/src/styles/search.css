@@ -7,7 +7,7 @@
   --search-floating-gap: 10px;
 }
 
-.search-back-button {
+.search-page-back-button {
   position: static;  
   background: #FFFFFF;
   color: #000000;
@@ -580,7 +580,7 @@
     min-height: 42px;
   }
 
-  .search-back-button {
+  .search-page-back-button{
     top: 80px;
     left: 12px;
     padding: 8px 14px;

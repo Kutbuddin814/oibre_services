@@ -45,8 +45,9 @@
   border: 1px solid #e5e7eb;
   border-radius: 10px;
 
-  width: 40px;
-  height: 40px;
+  padding: 8px 12px;   /* 🔥 use padding instead of fixed size */
+  width: auto;         /* 🔥 IMPORTANT */
+  height: auto;        /* 🔥 IMPORTANT */
 
   display: flex;
   align-items: center;
@@ -1196,5 +1197,8 @@
     width: 36px;
     height: 36px;
     font-size: 16px;
+    padding: 8px 12px;   /* 🔥 use padding instead of fixed size */
+    width: auto;         /* 🔥 IMPORTANT */
+    height: auto;        /* 🔥 IMPORTANT */
   }
 }
