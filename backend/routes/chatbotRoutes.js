@@ -33,7 +33,7 @@ router.get("/services/categories", async (req, res) => {
 router.get("/services/problems/:category", async (req, res) => {
   try {
     const { category } = req.params;
-    
+
     // Search by exact category or by name (for fallback)
     const problems = await Service.find({
       $or: [
@@ -64,7 +64,6 @@ router.post("/providers/search", async (req, res) => {
   try {
     const {
       serviceType,
-      category,
       location,
       lat,
       lng,
@@ -73,14 +72,14 @@ router.post("/providers/search", async (req, res) => {
       limit = 5
     } = req.body;
 
-    // Build query (case-insensitive, urgency, location)
     let query = {
       serviceCategory: { $regex: new RegExp(`^${serviceType}$`, "i") },
       isActive: true
     };
+
     if (urgency === "emergency") query.emergencyAvailable = true;
     if (urgency === "today") query.availableToday = true;
-    // 'later' = no extra filter
+
     if (lat && lng) {
       query.location = {
         $near: {
@@ -88,7 +87,7 @@ router.post("/providers/search", async (req, res) => {
             type: "Point",
             coordinates: [lng, lat]
           },
-          $maxDistance: 30000 // 10km
+          $maxDistance: 30000
         }
       };
     } else if (location) {
@@ -99,9 +98,9 @@ router.post("/providers/search", async (req, res) => {
       .select("name serviceCategory averageRating reviewCount basePrice pricePerKm profilePhoto emergencyAvailable availableToday responseTime location")
       .lean();
 
-    // Calculate distances if coordinates provided
+    // ✅ CALCULATE DISTANCE + PRICE
     if (lat && lng) {
-     providers = providers.map(p => {
+      providers = providers.map(p => {
         let plat, plng;
 
         if (p.location && Array.isArray(p.location.coordinates)) {
@@ -117,7 +116,6 @@ router.post("/providers/search", async (req, res) => {
 
         const finalDistance = Math.round(distance * 10) / 10;
 
-        // 🔥 CALCULATED PRICE
         const totalPrice =
           p.basePrice && p.pricePerKm
             ? Math.round(p.basePrice + finalDistance * p.pricePerKm)
@@ -129,8 +127,9 @@ router.post("/providers/search", async (req, res) => {
           totalPrice
         };
       });
+    } // ✅ CLOSE IF HERE
 
-    // Smart sorting
+    // ✅ SORTING
     let sortedProviders = [...providers];
     if (sortBy === "rating") {
       sortedProviders.sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
@@ -142,18 +141,20 @@ router.post("/providers/search", async (req, res) => {
       sortedProviders.sort((a, b) => (a.responseTime || 9999) - (b.responseTime || 9999));
     }
 
-    // Group providers by sort type for recommended sections
+    // ✅ GROUPING
     const topRated = [...providers]
       .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0))
       .slice(0, 3);
+
     const nearest = [...providers]
       .sort((a, b) => (a.distance || 0) - (b.distance || 0))
       .slice(0, 3);
+
     const budget = [...providers]
       .sort((a, b) => (a.totalPrice || a.basePrice || 0) - (b.totalPrice || b.basePrice || 0))
       .slice(0, 3);
 
-    // Fallback if no providers found
+    // ✅ EMPTY CASE
     if (providers.length === 0) {
       return res.json({
         success: true,
@@ -171,6 +172,7 @@ router.post("/providers/search", async (req, res) => {
       });
     }
 
+    // ✅ RESPONSE
     res.json({
       success: true,
       all: sortedProviders.slice(0, limit),
@@ -179,7 +181,8 @@ router.post("/providers/search", async (req, res) => {
       budget,
       total: providers.length
     });
-  } catch (err) {
+
+  } catch (err) {   // ✅ NOW CORRECT
     console.error(err);
     res.status(500).json({ success: false, message: err.message });
   }
