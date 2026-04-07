@@ -118,15 +118,16 @@ router.post("/providers/search", async (req, res) => {
         const distance = Math.sqrt(dx * dx + dy * dy) * 111;
         const finalDistance = Math.round(distance * 10) / 10;
 
-        const totalPrice =
-          p.basePrice && p.pricePerKm
-            ? Math.round(p.basePrice + finalDistance * p.pricePerKm)
-            : p.basePrice;
+        const distanceCharge = Math.round(finalDistance * 10);
+
+        const totalPrice = p.basePrice + distanceCharge;
 
         return {
           ...p,
           distance: finalDistance,
-          totalPrice
+          finalPrice: totalPrice,
+          basePrice: p.basePrice,
+          distanceCharge   // 🔥 ADD THIS
         };
       }).filter(Boolean);;
     }
@@ -138,7 +139,7 @@ router.post("/providers/search", async (req, res) => {
     } else if (sortBy === "distance") {
       sortedProviders.sort((a, b) => (a.distance || 0) - (b.distance || 0));
     } else if (sortBy === "price") {
-      sortedProviders.sort((a, b) => (a.totalPrice || a.basePrice || 0) - (b.totalPrice || b.basePrice || 0));
+      sortedProviders.sort((a, b) => (a.finalPrice || a.basePrice) - (b.finalPrice || b.basePrice));
     } else if (sortBy === "response") {
       sortedProviders.sort((a, b) => (a.responseTime || 9999) - (b.responseTime || 9999));
     }
@@ -151,7 +152,7 @@ router.post("/providers/search", async (req, res) => {
       .sort((a, b) => (a.distance || 0) - (b.distance || 0))
       .slice(0, 3);
     const budget = [...providers]
-      .sort((a, b) => (a.totalPrice || a.basePrice || 0) - (b.totalPrice || b.basePrice || 0))
+      .sort((a, b) => (a.finalPrice || a.basePrice) - (b.finalPrice || b.basePrice))
       .slice(0, 3);
 
     // Fallback if no providers found

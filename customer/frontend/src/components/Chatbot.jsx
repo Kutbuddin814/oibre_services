@@ -471,7 +471,8 @@ const formattedService = selectedService
     addMessage({ type: "user", text: `Selected: ${provider.name}` });
     addMessage({
       type: "bot",
-      text: `Perfect! ${provider.name} - ⭐ ${provider.averageRating ?? "N/A"} | ₹${provider.totalPrice ?? provider.basePrice ?? "N/A"} | ${provider.distance ?? "N/A"}km away`
+      text: `Perfect! ${provider.name} - ⭐ ${provider.averageRating ?? "N/A"} |₹${provider.finalPrice ?? provider.basePrice ?? "N/A"}
+              (${provider.basePrice} + ${provider.distanceCharge})   | ${provider.distance ?? "N/A"}km away`
     });
 
     setStep("action");
@@ -631,7 +632,22 @@ const formattedService = selectedService
                           </span>
                         </div>
                         <div className="chatbot-provider-info">
-                          <span>₹{p.totalPrice ?? p.basePrice ?? "N/A"}</span>
+                          <div>
+                          <div>
+                          <strong>₹{p.finalPrice ?? p.basePrice ?? "N/A"}</strong>
+
+                          {p.distanceCharge !== undefined && (
+                            <div style={{ fontSize: "12px", color: "#666" }}>
+                              (₹{p.basePrice} + ₹{p.distanceCharge})
+                            </div>
+                          )}
+                        </div>
+                          {p.distanceCharge !== undefined && (
+                            <div style={{ fontSize: "12px", color: "#666" }}>
+                              (₹{p.basePrice} + ₹{p.distanceCharge})
+                            </div>
+                          )}
+                        </div>
                           <span>📍 {p.distance ?? "N/A"}km</span>
                         </div>
                         {p.responseTime && (
