@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import api from "../config/axios";
 import MapPicker from "./MapPicker";
 import "../styles/chatbot.css";
-
+import { useNavigate } from "react-router-dom";
 const DEFAULT_CATEGORY_OPTIONS = ["Electrician", "Plumber", "Carpenter", "AC Repair"];
 
 const Chatbot = () => {
@@ -23,7 +23,11 @@ const Chatbot = () => {
   const [showMapPicker, setShowMapPicker] = useState(false);
   const chatEndRef = useRef(null);
   const [portalContainer, setPortalContainer] = useState(null);
-
+  const navigate = useNavigate();
+const formattedService = selectedService
+  ? selectedService.charAt(0).toUpperCase() +
+    selectedService.slice(1).toLowerCase()
+  : "";
   const addMessage = useCallback((msg) => {
     setMessages((prev) => [...prev, msg]);
   }, []);
@@ -107,7 +111,8 @@ const Chatbot = () => {
       const res = await api.post(
         "/chatbot/request-callback",
         {
-          serviceType: selectedService || "General",
+          
+          serviceType: formattedService || "General",
           location: locationText,
           preferredTime: "as soon as possible"
         },
@@ -265,7 +270,7 @@ const Chatbot = () => {
     // Get price estimate
     try {
       const res = await api.get("/chatbot/estimate/price", {
-        params: { serviceType: selectedService, problem: problem.name }
+        params: { serviceType: formattedService, problem: problem.name }
       });
       if (res.data.success && res.data.estimate) {
         addMessage({
@@ -374,43 +379,41 @@ const Chatbot = () => {
       return;
     }
     setLoading(true);
+      
     try {
-      const searchData = {
-        serviceType: selectedService,
-        urgency,
+      const res = await api.post("/chatbot/providers/search", {
+        serviceType: formattedService,
         lat: userLocation?.lat,
         lng: userLocation?.lng,
+        urgency,
         sortBy: "rating"
-      };
-      const formattedService = selectedService;
-      const res = await api.get("/providers", {
-        params: {
-          lat: userLocation?.lat,
-          lng: userLocation?.lng,
-          serviceCategory: formattedService
+      });
+
+      if (res.data.success) {
+        const { topRated, nearest, budget } = res.data;
+
+        setStep("providers");
+
+        if (
+          (!topRated || topRated.length === 0) &&
+          (!nearest || nearest.length === 0) &&
+          (!budget || budget.length === 0)
+        ) {
+          addMessage({
+            type: "bot",
+            text: res.data.message || "❌ No providers found near you",
+            options: res.data.options || [
+              { label: "Change location", value: "change-location" },
+              { label: "Try different service", value: "try-different-service" },
+              { label: "Request callback", value: "callback" }
+            ]
+          });
+        } else {
+          displayProviderOptions({ topRated, nearest, budget });
         }
-      });
-     if (res.data && res.data.length > 0) {
-      setStep("providers");
+      }
 
-      displayProviderOptions({
-        topRated: res.data.slice(0, 3),
-        nearest: res.data.slice(3, 6),
-        budget: res.data.slice(6, 9)
-      });
-
-    } else {
-      addMessage({
-        type: "bot",
-        text: "❌ No providers found near you",
-        options: [
-          { label: "Change location", value: "change-location" },
-          { label: "Try different service", value: "try-different-service" },
-          { label: "Request callback", value: "callback" }
-        ]
-      });
-    }
-    } catch (err) {
+    } catch (err) {   // ✅ NOW CORRECT
       console.error("Error loading providers:", err?.message);
       addMessage({
         type: "bot",
@@ -468,7 +471,7 @@ const Chatbot = () => {
     addMessage({ type: "user", text: `Selected: ${provider.name}` });
     addMessage({
       type: "bot",
-      text: `Perfect! ${provider.name} - ⭐ ${provider.averageRating ?? "N/A"} | ₹${provider.basePrice ?? "N/A"} | ${provider.distance ?? "N/A"}km away`
+      text: `Perfect! ${provider.name} - ⭐ ${provider.averageRating ?? "N/A"} | ₹${provider.totalPrice ?? provider.basePrice ?? "N/A"} | ${provider.distance ?? "N/A"}km away`
     });
 
     setStep("action");
@@ -477,15 +480,16 @@ const Chatbot = () => {
       text: "What would you like to do?",
       providerActions: true,
       providerId: provider._id,
-      providerName: provider.name
+      provider: provider   // 🔥 ADD THIS
     });
   };
 
 
-  const handleAction = async (action, providerId) => {
+  const handleAction = async (action, providerId, provider) => {
     if (action === "chat") {
       addMessage({ type: "bot", text: "Opening chat..." });
-      window.location.href = `/chat/${providerId}`;
+      
+      navigate(`/chat/${providerId}`, { state: { provider } });
     } else if (action === "book") {
       try {
         addMessage({ type: "bot", text: "Booking your service..." });
@@ -495,7 +499,7 @@ const Chatbot = () => {
           "/booking/create",
           {
             providerId,
-            serviceType: selectedService,
+            serviceType: formattedService,
             urgency: urgencyMap[_selectedUrgency] || _selectedUrgency,
             location: userLocation
           },
@@ -627,7 +631,7 @@ const Chatbot = () => {
                           </span>
                         </div>
                         <div className="chatbot-provider-info">
-                          <span>₹{p.basePrice ?? "N/A"}</span>
+                          <span>₹{p.totalPrice ?? p.basePrice ?? "N/A"}</span>
                           <span>📍 {p.distance ?? "N/A"}km</span>
                         </div>
                         {p.responseTime && (
@@ -645,7 +649,7 @@ const Chatbot = () => {
                     <button
                       className="chatbot-action-btn primary"
                       onClick={() =>
-                        handleAction("chat", msg.providerId, msg.providerName)
+                        handleAction("chat", msg.providerId, msg.provider)
                       }
                     >
                       💬 Chat
@@ -653,7 +657,7 @@ const Chatbot = () => {
                     <button
                       className="chatbot-action-btn success"
                       onClick={() =>
-                        handleAction("book", msg.providerId, msg.providerName)
+                        handleAction("book", msg.providerId, msg.provider)
                       }
                     >
                       📅 Book
@@ -661,7 +665,7 @@ const Chatbot = () => {
                     <button
                       className="chatbot-action-btn secondary"
                       onClick={() =>
-                        handleAction("save", msg.providerId, msg.providerName)
+                        handleAction("save", msg.providerId, msg.provider)
                       }
                     >
                       ❤️ Save

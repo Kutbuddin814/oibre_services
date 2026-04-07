@@ -75,8 +75,9 @@ router.post("/providers/search", async (req, res) => {
 
     // Build query (case-insensitive, urgency, location)
     let query = {
-      serviceCategory: { $regex: new RegExp(`^${serviceType}$`, "i") },
-      isActive: true
+      serviceCategory: { $regex: serviceType, $options: "i" },
+      status: "approved",
+      verified: true
     };
     if (urgency === "emergency") query.emergencyAvailable = true;
     if (urgency === "today") query.availableToday = true;
@@ -88,7 +89,7 @@ router.post("/providers/search", async (req, res) => {
             type: "Point",
             coordinates: [lng, lat]
           },
-          $maxDistance: 10000 // 10km
+          $maxDistance: 30000 // 30km
         }
       };
     } else if (location) {
@@ -96,23 +97,38 @@ router.post("/providers/search", async (req, res) => {
     }
 
     let providers = await ServiceProvider.find(query)
-      .select("name serviceCategory averageRating reviewCount basePrice distance profilePhoto emergencyAvailable availableToday responseTime location")
+      .select("name serviceCategory averageRating reviewCount basePrice pricePerKm profilePhoto emergencyAvailable availableToday responseTime location")
       .lean();
 
     // Calculate distances if coordinates provided
     if (lat && lng) {
       providers = providers.map(p => {
         let plat, plng;
-        if (p.location && Array.isArray(p.location.coordinates) && p.location.coordinates.length === 2) {
+        if (
+          p.location &&
+          Array.isArray(p.location.coordinates) &&
+          p.location.coordinates.length === 2
+        ) {
           [plng, plat] = p.location.coordinates;
         } else {
-          plat = p.lat; plng = p.lng;
+          return null; // skip invalid provider
         }
         const dx = plat - lat;
         const dy = plng - lng;
         const distance = Math.sqrt(dx * dx + dy * dy) * 111;
-        return { ...p, distance: Math.round(distance * 10) / 10 };
-      });
+        const finalDistance = Math.round(distance * 10) / 10;
+
+        const totalPrice =
+          p.basePrice && p.pricePerKm
+            ? Math.round(p.basePrice + finalDistance * p.pricePerKm)
+            : p.basePrice;
+
+        return {
+          ...p,
+          distance: finalDistance,
+          totalPrice
+        };
+      }).filter(Boolean);;
     }
 
     // Smart sorting
@@ -122,7 +138,7 @@ router.post("/providers/search", async (req, res) => {
     } else if (sortBy === "distance") {
       sortedProviders.sort((a, b) => (a.distance || 0) - (b.distance || 0));
     } else if (sortBy === "price") {
-      sortedProviders.sort((a, b) => (a.basePrice || 0) - (b.basePrice || 0));
+      sortedProviders.sort((a, b) => (a.totalPrice || a.basePrice || 0) - (b.totalPrice || b.basePrice || 0));
     } else if (sortBy === "response") {
       sortedProviders.sort((a, b) => (a.responseTime || 9999) - (b.responseTime || 9999));
     }
@@ -135,7 +151,7 @@ router.post("/providers/search", async (req, res) => {
       .sort((a, b) => (a.distance || 0) - (b.distance || 0))
       .slice(0, 3);
     const budget = [...providers]
-      .sort((a, b) => (a.basePrice || 0) - (b.basePrice || 0))
+      .sort((a, b) => (a.totalPrice || a.basePrice || 0) - (b.totalPrice || b.basePrice || 0))
       .slice(0, 3);
 
     // Fallback if no providers found
@@ -359,8 +375,9 @@ router.post("/check/availability", async (req, res) => {
     const { serviceType, location, urgency } = req.body;
 
     const query = {
-      serviceCategory: serviceType,
-      isActive: true
+      serviceCategory: { $regex: serviceType, $options: "i" },
+      status: "approved",
+      verified: true
     };
 
     if (urgency === "emergency") {
