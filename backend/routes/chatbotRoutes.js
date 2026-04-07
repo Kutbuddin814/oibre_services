@@ -252,7 +252,7 @@ router.get("/favorites", customerAuth, async (req, res) => {
     const favorites = await ServiceProvider.find({
       _id: { $in: customer.favoriteProviders }
     })
-      .select("name profileImage rating price distance")
+      .select("name profileImage averageRating basePrice distance")
       .lean();
 
     res.json({ success: true, favorites });

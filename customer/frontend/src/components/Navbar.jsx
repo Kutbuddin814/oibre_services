@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import api from "../config/axios";
 import MapPicker from "./MapPicker";
 import { detectUserLocation } from "../utils/locationDetection";
+import { Heart } from "lucide-react";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -482,10 +483,21 @@ export default function Navbar() {
           {isLoggedIn ? (
             /* WHEN LOGGED IN - NOTIFICATION + PROFILE */
             <>
-            <Link to="/favorites" className="favorites-link">
-              <span className="hidden sm:inline">❤️ Favorites</span>
-              <span className="sm:hidden">❤️</span>
-            </Link>
+            {/* Favorites Link */}
+                <Link
+                  to="/favorites"
+                  className="relative flex items-center justify-center w-10 h-10 rounded-full 
+                            bg-white/5 hover:bg-white/10 
+                            text-slate-300 hover:text-rose-400 
+                            transition-all duration-200 group"
+                >
+                  <Heart className="w-5 h-5 transition-transform group-hover:scale-110" />
+
+                  {/* Tooltip (desktop only) */}
+                  <span className="absolute -bottom-8 text-xs bg-black text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition hidden sm:block">
+                    Favorites
+                  </span>
+                </Link>
               {/* NOTIFICATION BELL */}
               <div className="notification-wrapper" ref={notificationRef}>
                 <button
