@@ -55,13 +55,13 @@ export default function ProviderProfile() {
   const [chatProviderContact, setChatProviderContact] = useState(null);
   const chatEndRef = useRef(null);
   const location = useLocation();
-  useEffect(() => {
-    if (location.state?.openChat) {
-      handleOpenChat();
+ useEffect(() => {
+  if (location.state?.openChat && provider?._id) {
+    handleOpenChat();
 
-      window.history.replaceState({}, document.title);
-    }
-  }, []);
+    window.history.replaceState({}, document.title);
+  }
+}, [provider]);
 
   const getTodayIsoLocal = () => {
     const now = new Date();

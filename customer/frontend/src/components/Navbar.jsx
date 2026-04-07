@@ -482,6 +482,10 @@ export default function Navbar() {
           {isLoggedIn ? (
             /* WHEN LOGGED IN - NOTIFICATION + PROFILE */
             <>
+            <Link to="/favorites" className="favorites-link">
+              <span className="hidden sm:inline">❤️ Favorites</span>
+              <span className="sm:hidden">❤️</span>
+            </Link>
               {/* NOTIFICATION BELL */}
               <div className="notification-wrapper" ref={notificationRef}>
                 <button
