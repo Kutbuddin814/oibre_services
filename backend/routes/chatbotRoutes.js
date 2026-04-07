@@ -147,13 +147,13 @@ router.post("/providers/search", async (req, res) => {
     // Group providers by sort type for recommended sections
     const topRated = [...providers]
       .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0))
-      .slice(0, 5);
+      .slice(0, 4);
     const nearest = [...providers]
       .sort((a, b) => (a.distance || 0) - (b.distance || 0))
-      .slice(0, 5);
+      .slice(0, 4);
     const budget = [...providers]
       .sort((a, b) => (a.finalPrice || a.basePrice) - (b.finalPrice || b.basePrice))
-      .slice(0, 5);
+      .slice(0, 4);
 
     // Fallback if no providers found
     if (providers.length === 0) {
