@@ -114,7 +114,7 @@ export default function Favorites() {
                   </div>
 
                   <div className="mt-6 flex items-baseline gap-1">
-                    <span className="text-2xl font-black text-slate-900">₹{p.basePrice || "0"}</span>
+                    <span className="text-2xl font-black text-slate-900">₹{p.finalPrice ?? p.basePrice ?? "0"}</span>
                     <span className="text-slate-400 text-xs font-medium">/ service</span>
                   </div>
                 </div>

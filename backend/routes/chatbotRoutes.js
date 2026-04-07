@@ -241,6 +241,7 @@ router.get("/provider/:providerId/chat-preview", async (req, res) => {
 router.get("/favorites", customerAuth, async (req, res) => {
   try {
     const { customerId } = req;
+
     const customer = await Customer.findById(customerId)
       .select("favoriteProviders")
       .lean();
@@ -249,13 +250,32 @@ router.get("/favorites", customerAuth, async (req, res) => {
       return res.json({ success: true, favorites: [] });
     }
 
-    const favorites = await ServiceProvider.find({
+    const favoritesRaw = await ServiceProvider.find({
       _id: { $in: customer.favoriteProviders }
     })
-      .select("name profileImage averageRating basePrice distance")
+      .select("name profileImage averageRating basePrice pricePerKm location")
       .lean();
 
+    const favorites = favoritesRaw.map((p) => {
+      // 🔥 TEMP distance (same for all)
+      const distance = 5;
+
+      // 🔥 Calculate distance charge
+      const distanceCharge = Math.round(distance * (p.pricePerKm || 10));
+
+      // 🔥 Final price (same as chatbot)
+      const finalPrice = p.basePrice + distanceCharge;
+
+      return {
+        ...p,
+        distance,
+        distanceCharge,
+        finalPrice
+      };
+    });
+
     res.json({ success: true, favorites });
+
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
