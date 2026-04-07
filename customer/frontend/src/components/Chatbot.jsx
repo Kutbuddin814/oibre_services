@@ -3,7 +3,6 @@ import ReactDOM from "react-dom";
 import api from "../config/axios";
 import MapPicker from "./MapPicker";
 import "../styles/chatbot.css";
-import { useNavigate } from "react-router-dom";
 
 const DEFAULT_CATEGORY_OPTIONS = ["Electrician", "Plumber", "Carpenter", "AC Repair"];
 
@@ -11,17 +10,6 @@ const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState("greeting"); // greeting, category, location, urgency, providers
   const [messages, setMessages] = useState([]);
-    useEffect(() => {
-    const saved = localStorage.getItem("chatMessages");
-    if (saved) {
-      setMessages(JSON.parse(saved));
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("chatMessages", JSON.stringify(messages));
-  }, [messages]);
-
   const [loading, setLoading] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
     const [_selectedLocation, _setSelectedLocation] = useState(null);
@@ -35,7 +23,6 @@ const Chatbot = () => {
   const [showMapPicker, setShowMapPicker] = useState(false);
   const chatEndRef = useRef(null);
   const [portalContainer, setPortalContainer] = useState(null);
-  const navigate = useNavigate();
 
   const addMessage = useCallback((msg) => {
     setMessages((prev) => [...prev, msg]);
@@ -388,44 +375,31 @@ const Chatbot = () => {
     }
     setLoading(true);
     try {
-      // const searchData = {
-      //   serviceType: selectedService,
-      //   urgency,
-      //   lat: userLocation?.lat,
-      //   lng: userLocation?.lng,
-      //   sortBy: "rating"
-      // };
-      const formattedService = selectedService;
-      const res = await api.post("/chatbot/providers/search", {
-        serviceType: formattedService,
+      const searchData = {
+        serviceType: selectedService,
+        urgency,
         lat: userLocation?.lat,
         lng: userLocation?.lng,
-        urgency,
         sortBy: "rating"
-      });
-     if (res.data.success) {
-        const { topRated, nearest, budget } = res.data;
-
-        setStep("providers");
-
-        if (
-          (!topRated || topRated.length === 0) &&
-          (!nearest || nearest.length === 0) &&
-          (!budget || budget.length === 0)
-        ) {
-          addMessage({
-            type: "bot",
-            text: res.data.message || "❌ No providers found near you",
-            options: res.data.options || [
-              { label: "Change location", value: "change-location" },
-              { label: "Try different service", value: "try-different-service" },
-              { label: "Request callback", value: "callback" }
-            ]
-          });
-        } else {
-          displayProviderOptions({ topRated, nearest, budget });
+      };
+      const formattedService = selectedService;
+      const res = await api.get("/providers", {
+        params: {
+          lat: userLocation?.lat,
+          lng: userLocation?.lng,
+          serviceCategory: formattedService
         }
-      } else {
+      });
+     if (res.data && res.data.length > 0) {
+      setStep("providers");
+
+      displayProviderOptions({
+        topRated: res.data.slice(0, 3),
+        nearest: res.data.slice(3, 6),
+        budget: res.data.slice(6, 9)
+      });
+
+    } else {
       addMessage({
         type: "bot",
         text: "❌ No providers found near you",
@@ -494,7 +468,7 @@ const Chatbot = () => {
     addMessage({ type: "user", text: `Selected: ${provider.name}` });
     addMessage({
       type: "bot",
-      text: `Perfect! ${provider.name} - ⭐ ${provider.averageRating ?? "N/A"} | ₹${provider.totalPrice ?? provider.basePrice ?? "N/A"} | ${provider.distance ?? "N/A"}km away`
+      text: `Perfect! ${provider.name} - ⭐ ${provider.averageRating ?? "N/A"} | ₹${provider.basePrice ?? "N/A"} | ${provider.distance ?? "N/A"}km away`
     });
 
     setStep("action");
@@ -511,7 +485,7 @@ const Chatbot = () => {
   const handleAction = async (action, providerId) => {
     if (action === "chat") {
       addMessage({ type: "bot", text: "Opening chat..." });
-      navigate(`/chat/${providerId}`);
+      window.location.href = `/chat/${providerId}`;
     } else if (action === "book") {
       try {
         addMessage({ type: "bot", text: "Booking your service..." });
@@ -653,9 +627,7 @@ const Chatbot = () => {
                           </span>
                         </div>
                         <div className="chatbot-provider-info">
-                          <span>
-                            ₹{p.totalPrice ?? p.basePrice ?? "N/A"}
-                          </span>
+                          <span>₹{p.basePrice ?? "N/A"}</span>
                           <span>📍 {p.distance ?? "N/A"}km</span>
                         </div>
                         {p.responseTime && (
