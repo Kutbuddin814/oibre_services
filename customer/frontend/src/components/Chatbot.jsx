@@ -642,11 +642,6 @@ const formattedService = selectedService
                             </div>
                           )}
                         </div>
-                          {p.distanceCharge !== undefined && (
-                            <div style={{ fontSize: "12px", color: "#666" }}>
-                              (₹{p.basePrice} + ₹{p.distanceCharge})
-                            </div>
-                          )}
                         </div>
                           <span>📍 {p.distance ?? "N/A"}km</span>
                         </div>
