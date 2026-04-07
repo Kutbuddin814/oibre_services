@@ -91,7 +91,7 @@ const formattedService = selectedService
   }, [addMessage]);
 
   const requestCallback = async () => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("customerToken");
 
     if (!token) {
       addMessage({
@@ -472,7 +472,7 @@ const formattedService = selectedService
     addMessage({
       type: "bot",
       text: `Perfect! ${provider.name} - ⭐ ${provider.averageRating ?? "N/A"} |₹${provider.finalPrice ?? provider.basePrice ?? "N/A"}
-              (${provider.basePrice} + ${provider.distanceCharge})   | ${provider.distance ?? "N/A"}km away`
+              ${provider.distanceCharge ? `(${provider.basePrice} + ${provider.distanceCharge})` : ""}  | ${provider.distance ?? "N/A"}km away`
     });
 
     setStep("action");
@@ -490,66 +490,109 @@ const formattedService = selectedService
     if (action === "chat") {
       addMessage({ type: "bot", text: "Opening chat..." });
       
-      navigate(`/chat/${providerId}`, { state: { provider } });
+      navigate(`/provider/${provider._id}`, {
+        state: { openChat: true }
+      });
     } else if (action === "book") {
+      addMessage({ type: "bot", text: "Checking availability..." });
+
       try {
+        const check = await api.post("/chatbot/check/availability", {
+          serviceType: formattedService,
+          urgency: urgencyMap[_selectedUrgency]
+        });
+
+        if (!check.data.hasProviders) {
+          addMessage({
+            type: "bot",
+            text: check.data.message || "❌ No providers available right now",
+            options: [
+              { label: "Request callback", value: "callback" },
+              { label: "Try different service", value: "try-different-service" }
+            ]
+          });
+          return; // ❌ STOP BOOKING
+        }
+
+        // ✅ IF AVAILABLE → CONTINUE BOOKING
         addMessage({ type: "bot", text: "Booking your service..." });
-        const token = localStorage.getItem("token");
-        // Use urgency argument directly for booking
+
+        const token = localStorage.getItem("customerToken");
+
         await api.post(
           "/booking/create",
           {
             providerId,
             serviceType: formattedService,
-            urgency: urgencyMap[_selectedUrgency] || _selectedUrgency,
+            urgency: urgencyMap[_selectedUrgency],
             location: userLocation
           },
           token ? { headers: { Authorization: `Bearer ${token}` } } : {}
         );
-        addMessage({ type: "bot", text: "✅ Booking request sent! Provider will contact you soon." });
+
+        addMessage({
+          type: "bot",
+          text: "✅ Booking request sent! Provider will contact you soon."
+        });
+
       } catch (err) {
-        addMessage({ type: "bot", text: "❌ Could not book at this time. Please try again later." });
+        console.error(err);
+        addMessage({
+          type: "bot",
+          text: "❌ Could not book at this time. Please try again later."
+        });
       }
-    } else if (action === "save") {
+    }else if (action === "save") {
       try {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("customerToken");
+
+        if (!token) {
+          addMessage({
+            type: "bot",
+            text: "Please login to save favorites"
+          });
+          return;
+        }
+
         await api.post(
           "/chatbot/favorites/save",
           { providerId },
-          token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+          { headers: { Authorization: `Bearer ${token}` } }
         );
+
         addMessage({ type: "bot", text: "❤️ Saved to favorites!" });
+
       } catch (err) {
         addMessage({ type: "bot", text: "❌ Could not save favorite. Please try again." });
       }
     }
-  };
+  }
 
-  const saveFavorite = async (providerId) => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        addMessage({
-          type: "bot",
-          text: "Please login to save favorites"
-        });
-        return;
-      }
+  // const saveFavorite = async (providerId) => {
+  //   try {
+  //     const token = localStorage.getItem("customerToken");
+  //     if (!token) {
+  //       addMessage({
+  //         type: "bot",
+  //         text: "Please login to save favorites"
+  //       });
+  //       return;
+  //     }
 
-      await api.post(
-        "/chatbot/favorites/save",
-        { providerId },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+  //     await api.post(
+  //       "/chatbot/favorites/save",
+  //       { providerId },
+  //       { headers: { Authorization: `Bearer ${token}` } }
+  //     );
 
-      addMessage({
-        type: "bot",
-        text: "❤️ Added to favorites!"
-      });
-    } catch (err) {
-      console.error(err?.message || "Error saving favorite");
-    }
-  };
+  //     addMessage({
+  //       type: "bot",
+  //       text: "❤️ Added to favorites!"
+  //     });
+  //   } catch (err) {
+  //     console.error(err?.message || "Error saving favorite");
+  //   }
+  // };
 
   const toggleChatbot = () => {
     setIsOpen(!isOpen);

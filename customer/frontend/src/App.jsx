@@ -20,7 +20,7 @@ import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import MapPicker from "./components/MapPicker";
 import { useEffect, useState } from "react";
-
+import Favorites from "./pages/Favorites";
 
 export default function App() {
   const [showMapPicker, setShowMapPicker] = useState(false);
@@ -111,6 +111,7 @@ export default function App() {
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/cookies" element={<Cookies />} />
+          <Route path="/favorites" element={<Favorites />} />
         </Routes>
         <Footer />
       </div>

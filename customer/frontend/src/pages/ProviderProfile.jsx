@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import api from "../config/axios";
 import { BACKEND_BASE_URL } from "../config/api";
 import "../styles/providerProfile.css";
+import { useLocation } from "react-router-dom";
 
 // Helper function to resolve image URLs (handles both Cloudinary and local paths)
 const resolveImageUrl = (imagePath) => {
@@ -53,6 +54,14 @@ export default function ProviderProfile() {
   const [chatContactUnlocked, setChatContactUnlocked] = useState(false);
   const [chatProviderContact, setChatProviderContact] = useState(null);
   const chatEndRef = useRef(null);
+  const location = useLocation();
+  useEffect(() => {
+    if (location.state?.openChat) {
+      handleOpenChat();
+
+      window.history.replaceState({}, document.title);
+    }
+  }, []);
 
   const getTodayIsoLocal = () => {
     const now = new Date();
