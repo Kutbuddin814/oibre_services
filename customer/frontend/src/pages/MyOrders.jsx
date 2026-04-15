@@ -7,6 +7,7 @@ import "../styles/MyOrders.css";
 import "../styles/unified-modal.css";
 import "../styles/unified-forms.css";
 import "../styles/unified-buttons.css";
+import Loader from "../components/Loader";
 
 export default function MyOrders() {
   const navigate = useNavigate();
@@ -25,20 +26,23 @@ export default function MyOrders() {
   const [comment, setComment] = useState("");
   const [feedbackImage, setFeedbackImage] = useState(null);
   const [feedbackPreview, setFeedbackPreview] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem("customerToken");
-
+  
   const fetchOrders = async () => {
     try {
-      const res = await api.get(
-        "/customer/requests/my-requests",
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      setLoading(true);
+
+      const res = await api.get("/customer/requests/my-requests", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
       setOrders(res.data);
     } catch (err) {
       console.error("Fetch orders error", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -220,6 +224,11 @@ export default function MyOrders() {
     }
   };
 
+  {loading && (
+    <div className="overlay-loader">
+      <Loader text="Loading your bookings..." />
+    </div>
+  )}
   return (
     <div className="orders-page">
       <button
@@ -233,7 +242,7 @@ export default function MyOrders() {
       <h1 className="orders-title">My Orders</h1>
       <p className="orders-subtitle">Track and manage your service bookings</p>
 
-      {orders.length === 0 && (
+      {!loading && orders.length === 0 && (
         <div className="orders-empty-state">
           <h3>No bookings yet</h3>
           <p>Your confirmed and completed bookings will appear here.</p>
