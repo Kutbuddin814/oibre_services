@@ -90,7 +90,11 @@ export default function Services() {
 
       <section className="services-grid">
         <div className="services-container">
-          {loading && <Loader text="Loading services..." />}
+          {loading && (
+            <div className="services-loader">
+              <Loader text="Loading services..." />
+            </div>
+          )}
           {!loading && error && <p className="services-message services-error">{error}</p>}
           {!loading && !error && visibleServices.length === 0 && (
             <p className="services-message">No services found.</p>

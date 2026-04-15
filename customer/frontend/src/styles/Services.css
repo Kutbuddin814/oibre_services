@@ -51,6 +51,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-2xl, 32px);
+  justify-items: center;
 }
 
 .services-message {
@@ -361,7 +362,7 @@
   }
 }
 .services-loader {
-  grid-column: 1 / -1;   /* 🔥 FULL WIDTH */
+  grid-column: 1 / -1;   /* FULL WIDTH */
   display: flex;
   justify-content: center;
   align-items: center;
