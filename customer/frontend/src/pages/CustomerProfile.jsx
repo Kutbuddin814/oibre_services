@@ -5,6 +5,7 @@ import "../styles/CustomerProfile.css";
 import "../styles/unified-modal.css";
 import "../styles/unified-forms.css";
 import "../styles/unified-buttons.css";
+import Loader from "../components/Loader";
 
 export default function CustomerProfile() {
   const navigate = useNavigate();
@@ -47,7 +48,7 @@ export default function CustomerProfile() {
       });
   }, [navigate]);
 
-  if (!customer) return null;
+  if (!customer) return <Loader text="Loading your profile..." />;
 
 
 

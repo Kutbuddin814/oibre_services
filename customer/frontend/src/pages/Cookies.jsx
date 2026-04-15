@@ -1,5 +1,4 @@
 import "../styles/legal-pages.css";
-
 const cookieSections = [
   {
     title: "1. What Are Cookies",

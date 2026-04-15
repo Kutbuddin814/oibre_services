@@ -3,59 +3,59 @@ import api from "../config/axios";
 import { useNavigate } from "react-router-dom";
 import { Heart, Star, MapPin, ExternalLink, Bookmark } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion"; // Added Framer Motion
+import Loader from "../components/Loader";
 
 // --- New Atmospheric Portal Component ---
-const PortalLoader = () => {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] overflow-hidden">
-      <div className="relative w-64 h-64 flex items-center justify-center">
-        {/* Layer 1: Outer Atmospheric Ring */}
-        <motion.div
-          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute inset-0 rounded-full bg-blue-100 blur-3xl"
-        />
+// const PortalLoader = () => {
+//   return (
+//     <div className="flex flex-col items-center justify-center min-h-[60vh] overflow-hidden">
+//       <div className="relative w-64 h-64 flex items-center justify-center">
+//         {/* Layer 1: Outer Atmospheric Ring */}
+//         <motion.div
+//           animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+//           transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+//           className="absolute inset-0 rounded-full bg-blue-100 blur-3xl"
+//         />
         
-        {/* Layer 2: The Portal "Lens" */}
-        <div className="relative w-48 h-48 rounded-full overflow-hidden border-4 border-white shadow-2xl bg-slate-200">
-          {/* Layer 3: The "Descending" Map Grid */}
-          <motion.div
-            animate={{ scale: [1.5, 1, 1.5], opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `radial-gradient(#94a3b8 1px, transparent 1px)`,
-              backgroundSize: '20px 20px',
-            }}
-          />
+//         {/* Layer 2: The Portal "Lens" */}
+//         <div className="relative w-48 h-48 rounded-full overflow-hidden border-4 border-white shadow-2xl bg-slate-200">
+//           {/* Layer 3: The "Descending" Map Grid */}
+//           <motion.div
+//             animate={{ scale: [1.5, 1, 1.5], opacity: [0.5, 1, 0.5] }}
+//             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+//             className="absolute inset-0"
+//             style={{
+//               backgroundImage: `radial-gradient(#94a3b8 1px, transparent 1px)`,
+//               backgroundSize: '20px 20px',
+//             }}
+//           />
           
-          {/* Layer 4: Scanning Beam */}
-          <motion.div
-            animate={{ top: ["-10%", "110%"] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent shadow-[0_0_15px_rgba(59,130,246,0.8)] z-10"
-          />
-        </div>
+//           {/* Layer 4: Scanning Beam */}
+//           <motion.div
+//             animate={{ top: ["-10%", "110%"] }}
+//             transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+//             className="absolute left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent shadow-[0_0_15px_rgba(59,130,246,0.8)] z-10"
+//           />
+//         </div>
         
-        {/* Pulsing Pin Icon */}
-        <motion.div
-          animate={{ y: [0, -10, 0] }}
-          transition={{ duration: 1, repeat: Infinity }}
-          className="absolute z-20"
-        >
-          <MapPin className="w-10 h-10 text-blue-600 fill-blue-100" />
-        </motion.div>
-      </div>
-      <motion.p 
-        animate={{ opacity: [0.4, 1, 0.4] }}
-        transition={{ duration: 2, repeat: Infinity }}
-        className="mt-8 text-slate-500 font-medium tracking-widest uppercase text-xs"
-      >
-        Locating Saved Experts...
-      </motion.p>
-    </div>
-  );
-};
+//         {/* Pulsing Pin Icon */}
+//         <motion.div
+//           animate={{ y: [0, -10, 0] }}
+//           transition={{ duration: 1, repeat: Infinity }}
+//           className="absolute z-20"
+//         >
+//           <MapPin className="w-10 h-10 text-blue-600 fill-blue-100" />
+//         </motion.div>
+//       </div>
+//       <motion.p 
+//         animate={{ opacity: [0.4, 1, 0.4] }}
+//         transition={{ duration: 2, repeat: Infinity }}
+//         className="mt-8 text-slate-500 font-medium tracking-widest uppercase text-xs"
+//       >
+//       </motion.p>
+//     </div>
+//   );
+// };
 
 export default function Favorites() {
   const [providers, setProviders] = useState([]);
@@ -113,7 +113,7 @@ export default function Favorites() {
             exit={{ opacity: 0, scale: 0.95 }}
           >
             <div className="relative">
-              <PortalLoader />
+              <Loader text="Loading your favorites..." />
 
               <div className="opacity-30 absolute inset-0">
                 {/* optional faint background */}

@@ -424,27 +424,30 @@
 /* ==================== RESPONSIVE ==================== */
 @media (max-width: 480px) {
   .chatbot-window {
-    width: 100vw;
-    height: 100vh;
-    max-height: 100vh;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    border-radius: 16px 16px 0 0;
-    margin: 0;
+    width: 92vw;                 /* smaller width */
+    max-height: 75vh;            /* not full screen */
+    bottom: 80px;                /* keep above button */
+    right: 4vw;
+    left: 4vw;
+    border-radius: 16px;
   }
 
   .chatbot-floating-btn {
-    bottom: 24px;
+    bottom: 20px;
     right: 16px;
   }
 
+  .chatbot-messages {
+    max-height: 55vh;            /* prevent overflow */
+  }
+
   .chatbot-categories {
-    max-height: 190px;
+    max-height: 160px;
   }
 
   .chatbot-text {
     max-width: 95%;
+    font-size: 13px;
   }
 
   .chatbot-actions {
@@ -457,34 +460,36 @@
 
   .chatbot-close-btn {
     top: 10px;
-    right: 12px;
-    width: 32px;
-    height: 32px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
   }
 }
 
 @media (max-width: 768px) and (min-width: 481px) {
   .chatbot-window {
-    width: min(420px, 92vw);
+    width: 88vw;                 /* slightly smaller */
+    max-width: 400px;            /* control size */
+    bottom: 80px;                /* above button */
     right: 4vw;
     left: auto;
-    bottom: 16px;
-    border-radius: 20px;
-    max-height: calc(100vh - 32px);
+    border-radius: 18px;
+
+    max-height: 70vh;            /* 🔥 key fix */
   }
 
   .chatbot-floating-btn {
-    bottom: 24px;
+    bottom: 20px;
     right: 16px;
   }
 
   .chatbot-messages {
-    padding: 16px 18px;
-    gap: 10px;
+    max-height: 50vh;            /* prevent stretching */
+    padding: 14px;
   }
 
   .chatbot-input-area {
-    padding: 12px 14px 16px;
+    padding: 10px 12px 14px;
   }
 
   .chatbot-option-btn,
@@ -494,9 +499,12 @@
     padding: 10px 12px;
   }
 
-  .chatbot-service-toggle {
-    font-size: 14px;
-    padding: 12px 14px;
+  .chatbot-actions {
+    grid-template-columns: 1fr 1fr;   /* better for tablet */
+  }
+
+  .chatbot-action-btn {
+    font-size: 12px;
   }
 }
 

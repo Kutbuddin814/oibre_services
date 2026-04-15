@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import api from "../config/axios";
 import "../styles/search.css";
 import "../styles/search-page-layout.css";
+import Loader from "../components/Loader";
 
 const TIME_SLOTS = [
   "6:00 AM - 9:00 AM",
@@ -361,7 +362,7 @@ export default function SearchResults() {
   //     ← Back
   //   </button>
   // );
-
+  if (loading) return <Loader text="Searching providers..." />;
   return (
     <>
       

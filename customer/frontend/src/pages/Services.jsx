@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../config/axios";
 import { BACKEND_BASE_URL } from "../config/api";
 import "../styles/Services.css";
+import Loader from "../components/Loader";
 
 const INITIAL_VISIBLE_COUNT = 6;
 const DEFAULT_ICON = "🔧";
@@ -89,7 +90,7 @@ export default function Services() {
 
       <section className="services-grid">
         <div className="services-container">
-          {loading && <p className="services-message">Loading services...</p>}
+          {loading && <Loader text="Loading services..." />}
           {!loading && error && <p className="services-message services-error">{error}</p>}
           {!loading && !error && visibleServices.length === 0 && (
             <p className="services-message">No services found.</p>

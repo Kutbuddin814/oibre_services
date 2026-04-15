@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "../config/axios";
 import "../styles/Contact.css";
+import Loader from "../components/Loader";
 
 const initialForm = {
   name: "",
@@ -135,6 +136,7 @@ export default function Contact() {
     }
   };
 
+  if (loading) return <Loader text="Sending message..." />;
   return (
     <div className="contact-page">
       <section className="contact-hero">

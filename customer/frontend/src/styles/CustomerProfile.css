@@ -438,3 +438,12 @@
   align-items: center;
   justify-content: flex-start;
 }
+.orders-header {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 20px auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}

@@ -7,6 +7,7 @@ import EmployeesOfMonth from "../components/EmployeesOfMonth";
 // import LocationModal from "../components/LocationModal";
 // import MapPicker from "../components/MapPicker";
 import { detectUserLocation } from "../utils/locationDetection";
+import Loader from "../components/Loader";
 
 export default function Home() {
   // MapPicker modal logic moved to App.jsx for global handling
@@ -22,6 +23,8 @@ export default function Home() {
   // Removed: showMenu, selectedLocation, locationQuery, locationResults, searchingLocations, detectingLocation, locationError, showNotifications (all unused)
   const [customerData, setCustomerData] = useState(null);
   const [notifications, setNotifications] = useState([]);
+
+  const [loading, setLoading] = useState(true);
 
   const menuRef = useRef();
   const notificationRef = useRef();
@@ -166,6 +169,9 @@ export default function Home() {
     } catch (err) {
       console.error("Failed to fetch customer data", err);
     }
+    finally {
+      setLoading(false);
+    }
   };
 
   const checkLocationModal = () => {
@@ -268,7 +274,9 @@ export default function Home() {
 
   /* ================= FETCH NOTIFICATIONS ================= */
   useEffect(() => {
-    if (!token) return;
+    if (!token) {
+      setLoading(false); // ✅ add this
+    }
 
     const fetchNotifications = async () => {
       try {
@@ -402,7 +410,7 @@ export default function Home() {
     navigate("/");
     window.location.reload();
   };
-
+  if (loading) return <Loader text="Loading home..." />;
   return (
     <div className="home">
       {/* ================= HERO ================= */}

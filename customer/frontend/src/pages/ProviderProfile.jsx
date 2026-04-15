@@ -4,6 +4,7 @@ import api from "../config/axios";
 import { BACKEND_BASE_URL } from "../config/api";
 import "../styles/providerProfile.css";
 import { useLocation } from "react-router-dom";
+import Loader from "../components/Loader";
 
 // Helper function to resolve image URLs (handles both Cloudinary and local paths)
 const resolveImageUrl = (imagePath) => {
@@ -522,7 +523,7 @@ export default function ProviderProfile() {
     }
   };
 
-  if (loading) return <p className="loading">Loading profile...</p>;
+  if (loading) return <Loader text="Loading provider..." />;
   if (!provider) return <p>Provider not found</p>;
 
   const availableRange = parseAvailableRange(provider?.availableTime);
