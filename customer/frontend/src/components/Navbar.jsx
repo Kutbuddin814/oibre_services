@@ -470,14 +470,19 @@ export default function Navbar() {
             }>
               📍 {location.locality || location.label || location.fullAddress || "Select Location"}
             </div>
-            <button
-              className="change-location-btn"
-              onClick={() => {
-                window.dispatchEvent(new Event("openMapPicker"));
-              }}
-            >
-              Change
-            </button>
+           <button
+            className="change-location-btn group relative"
+            onClick={() => {
+              window.dispatchEvent(new Event("openMapPicker"));
+            }}
+          >
+            Change
+
+            {/* Tooltip */}
+            <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs bg-black text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition hidden sm:block">
+              Change Address
+            </span>
+          </button>
           </div>
 
           {isLoggedIn ? (
@@ -499,20 +504,24 @@ export default function Navbar() {
                   </span>
                 </Link>
               {/* NOTIFICATION BELL */}
-              <div className="notification-wrapper" ref={notificationRef}>
+              <div className="notification-wrapper group relative" ref={notificationRef}>
                 <button
                   className="notification-btn"
                   onClick={() => {
                     setNotificationsOpen((prev) => !prev);
                     setProfileOpen(false);
                   }}
-                  title="Notifications"
                 >
                   <span className="notification-icon" aria-hidden="true">&#128276;</span>
                   {unreadCount > 0 && (
                     <span className="notification-badge">{unreadCount}</span>
                   )}
                 </button>
+
+                {/* Tooltip */}
+                <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs bg-black text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition hidden sm:block">
+                  Notifications
+                </span>
 
                 {notificationsOpen && (
                   <div className="notifications-dropdown">
@@ -600,17 +609,21 @@ export default function Navbar() {
               </div>
 
               {/* PROFILE MENU */}
-              <div className="profile-wrapper" ref={profileRef}>
-                <button
-                  className="profile-btn-circle"
-                  onClick={() => {
-                    setProfileOpen((prev) => !prev);
-                    setNotificationsOpen(false);
-                  }}
-                  title="Profile Menu"
-                >
-                  {customer?.name?.charAt(0)?.toUpperCase() || "U"}
-                </button>
+              <div className="profile-wrapper group relative" ref={profileRef}>
+                  <button
+                    className="profile-btn-circle"
+                    onClick={() => {
+                      setProfileOpen((prev) => !prev);
+                      setNotificationsOpen(false);
+                    }}
+                  >
+                    {customer?.name?.charAt(0)?.toUpperCase() || "U"}
+                  </button>
+
+                  {/* Tooltip */}
+                  <span className="absolute -bottom-8 right-0 text-xs bg-black text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition hidden sm:block">
+                    Profile Menu
+                  </span>
 
                 {profileOpen && (
                   <div className="profile-dropdown-new">

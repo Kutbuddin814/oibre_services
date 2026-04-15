@@ -182,13 +182,14 @@ export default function CustomerProfile() {
 
   return (
     <div className="profile-container">
-      <button
-        onClick={() => navigate(-1)}
-        className="customer-profile-back-button"
-        title="Go back"
-      >
-        Back
-      </button>
+      <div className="profile-header">
+        <button
+          onClick={() => navigate(-1)}
+          className="customer-profile-back-button"
+        >
+          ← Back
+        </button>
+      </div>
 
       <div className="profile-card">
         <div className="profile-avatar-wrapper">

@@ -656,8 +656,8 @@
   display: block;
   width: 100%;
   padding: 14px 16px;
-  color: #111827;
-  text-decoration: none;
+  text-decoration: none !important;
+  color: #111827 !important;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -671,6 +671,8 @@
 .profile-link:hover {
   background: #F3F4F6;
   padding-left: 20px;
+  text-decoration: none;
+  color: #000;
 }
 
 .profile-action-btn {
@@ -1338,4 +1340,21 @@
 
 .close-notifications-btn:hover {
   background: #f3f4f6;
+}
+.profile-link:visited,
+.profile-link:focus,
+.profile-link:active {
+  text-decoration: none;
+  color: #111827;
+}
+/* TOOLTIP FIX */
+.group span {
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translateY(5px);
+  transition: all 0.2s ease;
+}
+.group:hover span {
+  transform: translateY(0);
 }

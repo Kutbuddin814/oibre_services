@@ -51,8 +51,34 @@ export default function Favorites() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center mt-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="max-w-7xl mx-auto grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {[...Array(8)].map((_, i) => (
+            <div
+              key={i}
+              className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 animate-pulse skeleton"
+            >
+              {/* Avatar */}
+              <div className="w-14 h-14 bg-slate-200 rounded-2xl mb-4"></div>
+
+              {/* Title */}
+              <div className="h-4 bg-slate-200 rounded w-1/2 mb-2"></div>
+
+              {/* Subtitle */}
+              <div className="h-3 bg-slate-200 rounded w-1/3 mb-4"></div>
+
+              {/* Rating */}
+              <div className="flex gap-2 mb-4">
+                <div className="h-3 w-10 bg-slate-200 rounded"></div>
+                <div className="h-3 w-16 bg-slate-200 rounded"></div>
+              </div>
+
+              {/* Price */}
+              <div className="h-5 bg-slate-300 rounded w-1/3 mb-6"></div>
+
+              {/* Button */}
+              <div className="h-10 bg-slate-200 rounded-xl"></div>
+            </div>
+          ))}
         </div>
       ) : providers.length === 0 ? (
         <div className="max-w-md mx-auto flex flex-col items-center justify-center mt-20 p-10 bg-white rounded-3xl shadow-sm border border-dashed border-slate-300">
@@ -63,7 +89,7 @@ export default function Favorites() {
           <p className="text-slate-500 text-center mt-2">Start exploring and save your favorite providers for quick access.</p>
           <button 
             onClick={() => navigate('/services')}
-            className="mt-6 px-6 py-2 bg-slate-900 text-white rounded-full hover:bg-slate-800 transition shadow-lg"
+             className="mt-6 px-6 py-2 bg-slate-900 text-white rounded-full hover:bg-slate-800 transition shadow-lg"
           >
             Browse Services
           </button>
