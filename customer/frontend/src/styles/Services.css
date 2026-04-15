@@ -367,3 +367,11 @@
   justify-content: center;
   align-items: center;
 }
+.orders-header {
+  width: 100%;
+  max-width: 920px;   /* match orders-page */
+  margin: 0 auto 20px auto;
+
+  display: flex;
+  justify-content: flex-start;
+}

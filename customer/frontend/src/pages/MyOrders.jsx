@@ -231,13 +231,15 @@ export default function MyOrders() {
   )}
   return (
     <div className="orders-page">
-      <button
-        onClick={() => navigate(-1)}
-        className="back-button"
-        title="Go back"
-      >
-        {"<-"} Back
-      </button>
+
+      <div className="orders-header">
+        <button
+          onClick={() => navigate(-1)}
+          className="back-button"
+        >
+          ← Back
+        </button>
+      </div>
 
       <h1 className="orders-title">My Orders</h1>
       <p className="orders-subtitle">Track and manage your service bookings</p>
