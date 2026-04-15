@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../api";
+import Loader from "../components/Loader";
 
 const RemovalRequests = () => {
   const [requests, setRequests] = useState([]);
@@ -50,11 +51,7 @@ const RemovalRequests = () => {
     : requests.filter((r) => r.status === "pending");
 
   if (loading) {
-    return (
-      <div className="removal-requests">
-        <p>Loading...</p>
-      </div>
-    );
+    return <Loader text="Loading removal requests..." />;
   }
 
   return (

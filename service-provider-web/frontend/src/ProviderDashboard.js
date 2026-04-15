@@ -6,6 +6,7 @@ import { convertTo12HourFormat } from "./utils/timeUtils";
 import PaymentDetailsModal from "./PaymentDetailsModal";
 import PaymentDetailsReminder from "./PaymentDetailsReminder";
 import "./ProviderStyles.css";
+import Loader from "../components/Loader"; 
 
 const ProviderDashboard = () => {
   const [provider, setProvider] = useState(null);
@@ -597,11 +598,7 @@ const ProviderDashboard = () => {
   };
 
   if (loading) {
-    return (
-      <div className="loading-container">
-        <div className="spinner"></div>
-      </div>
-    );
+    return <Loader text="Loading dashboard..." />;
   }
 
   if (!provider) {

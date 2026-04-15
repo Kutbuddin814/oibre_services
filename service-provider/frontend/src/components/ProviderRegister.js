@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import api from "../config/axios";
 import "../styles/ProviderRegister.css";
+import Loader from "../components/Loader";
 
 /* VALIDATION HELPERS */
 // Validate Indian phone number format
@@ -586,6 +587,7 @@ const ProviderRegister = ({ onSuccess }) => {
     }
   };
 
+  if (loading) return <Loader text="Submitting your application..." />;
   return (
     <div className="register-container">
       <form className="register-form" onSubmit={handleSubmit}>

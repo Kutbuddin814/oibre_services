@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "./config/axios";
 import "./ProviderStyles.css";
+import Loader from "../components/Loader";
 
 const formatTime = (dateValue) => {
   if (!dateValue) return "";
@@ -151,7 +152,7 @@ const ProviderMessages = () => {
               <span className="provider-conversation-count">{conversations.length}</span>
             </div>
             {loadingConversations ? (
-              <p className="provider-chat-muted">Loading...</p>
+              <Loader text="Loading chats..." />
             ) : conversations.length === 0 ? (
               <p className="provider-chat-muted">No chats yet.</p>
             ) : (
@@ -211,7 +212,7 @@ const ProviderMessages = () => {
 
                 <div className="provider-chat-messages">
                   {loadingMessages ? (
-                    <p className="provider-chat-muted">Loading messages...</p>
+                    <Loader text="Loading messages..." />
                   ) : messages.length === 0 ? (
                     <p className="provider-chat-muted">No messages yet.</p>
                   ) : (

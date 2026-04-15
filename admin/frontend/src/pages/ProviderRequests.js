@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../api";
+import Loader from "../components/Loader";
 
 const ProviderRequests = () => {
   const [requests, setRequests] = useState([]);
@@ -60,11 +61,7 @@ const ProviderRequests = () => {
     : requests.filter((r) => r.status === "pending");
 
   if (loading) {
-    return (
-      <div className="provider-requests">
-        <p>Loading...</p>
-      </div>
-    );
+    return <Loader text="Loading requests..." />;
   }
 
   return (

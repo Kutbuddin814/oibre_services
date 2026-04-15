@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import api from "../api";
+import Loader from "../components/Loader";
 
 const statusOptions = ["new", "in_progress", "closed"];
 
@@ -222,7 +223,7 @@ export default function ContactMessages() {
       </div>
 
       {loading ? (
-        <div className="cm-empty">Loading messages...</div>
+        <Loader text="Loading messages..." />
       ) : filtered.length === 0 ? (
         <div className="cm-empty">No contact messages found.</div>
       ) : (

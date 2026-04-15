@@ -1,10 +1,17 @@
 import React from "react";
 import "../styles/SplashScreen.css";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 export default function SplashScreen({ onStart }) {
   return (
     <div className="splash-container">
       <div className="splash-content">
+        <DotLottieReact
+          src="https://lottie.host/6fa1a899-d8e9-44c5-b08e-7ede3bcb7adf/xbcOg7nIzQ.lottie"
+          loop
+          autoplay
+          style={{ width: 200, margin: "0 auto" }}
+        />
         <h1>Oibre Service Provider</h1>
         <p>Join our network of trusted service providers</p>
 

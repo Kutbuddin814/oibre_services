@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import api from "../api";
+import Loader from "../components/Loader";
 
 const Providers = () => {
   const AUTO_REFRESH_MS = 15000;
@@ -145,11 +146,7 @@ const Providers = () => {
   };
 
   if (loading) {
-    return (
-      <div className="providers-page">
-        <p>Loading...</p>
-      </div>
-    );
+    return <Loader text="Loading providers..." />;
   }
 
   return (

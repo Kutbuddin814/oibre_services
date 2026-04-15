@@ -2,6 +2,7 @@ import { useState } from "react";
 import api from "./config/axios";
 import { useNavigate } from "react-router-dom";
 import "./ProviderStyles.css";
+import Loader from "../components/Loader";
 
 const ProviderLogin = () => {
   const [email, setEmail] = useState("");
@@ -78,7 +79,9 @@ const ProviderLogin = () => {
           {error && <div className="error-message">{error}</div>}
 
           <button type="submit" className="login-btn" disabled={loading}>
-            {loading ? "Logging in..." : "Login"}
+            <button type="submit" className="login-btn" disabled={loading}>
+              {loading ? <Loader text="Logging in..." /> : "Login"}
+            </button>
           </button>
         </form>
       </div>

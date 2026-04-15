@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import api from "../api";
 import "../styles/AdminPayoutsPanel.css";
+import Loader from "../components/Loader";
 
 const AdminPayoutsPanel = () => {
   const [payouts, setPayouts] = useState([]);
@@ -154,12 +155,7 @@ const AdminPayoutsPanel = () => {
   };
 
   if (loading && tab === "pending") {
-    return (
-      <div className="payouts-loading">
-        <div className="payouts-spinner" />
-        <div className="payouts-loading-text">Loading payouts...</div>
-      </div>
-    );
+    return <Loader text="Loading payouts..." />;
   }
 
   return (

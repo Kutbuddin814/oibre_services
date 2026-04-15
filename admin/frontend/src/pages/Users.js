@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../api";
+import Loader from "../components/Loader";
 
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -122,11 +123,7 @@ const Users = () => {
   });
 
   if (loading) {
-    return (
-      <div className="users-page">
-        <p>Loading...</p>
-      </div>
-    );
+    return <Loader text="Loading users..." />;
   }
 
   return (

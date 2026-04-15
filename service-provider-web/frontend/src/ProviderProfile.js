@@ -3,6 +3,7 @@ import api from "./config/axios";
 import { useNavigate } from "react-router-dom";
 import "./ProviderStyles.css";
 import PaymentDetailsModal from "./PaymentDetailsModal";
+import Loader from "../components/Loader";
 
 const ProviderProfile = () => {
   const [provider, setProvider] = useState(null);
@@ -549,11 +550,7 @@ const ProviderProfile = () => {
   }, [locationQuery, showLocationModal]);
 
   if (loading) {
-    return (
-      <div className="loading-container">
-        <div className="spinner"></div>
-      </div>
-    );
+    return <Loader text="Loading profile..." />;
   }
 
   if (!provider) return null;

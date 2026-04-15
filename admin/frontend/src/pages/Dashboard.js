@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../api";
+import Loader from "../components/Loader";
 
 const Dashboard = ({ setCurrentPage }) => {
   const [stats, setStats] = useState({
@@ -61,11 +62,7 @@ const Dashboard = ({ setCurrentPage }) => {
   };
 
   if (loading) {
-    return (
-      <div className="dashboard">
-        <p>Loading...</p>
-      </div>
-    );
+    return <Loader text="Loading dashboard..." />;
   }
 
   return (

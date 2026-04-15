@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import api from "./config/axios";
 import "./ProviderStyles.css";
+import Loader from "../components/Loader";
 
 const ProviderEarnings = () => {
   const [earnings, setEarnings] = useState(null);
@@ -63,11 +64,7 @@ const ProviderEarnings = () => {
   };
 
   if (loading) {
-    return (
-      <div style={{ padding: "2rem", textAlign: "center" }}>
-        <p>Loading earnings...</p>
-      </div>
-    );
+    return <Loader text="Loading earnings..." />;
   }
 
   return (

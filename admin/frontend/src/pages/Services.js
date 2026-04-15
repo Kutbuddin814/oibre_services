@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../api";
+import Loader from "../components/Loader";
 
 const Services = () => {
   const [services, setServices] = useState([]);
@@ -134,7 +135,7 @@ const Services = () => {
   };
 
   if (loading) {
-    return <div className="services-page"><p>Loading...</p></div>;
+    return <Loader text="Loading services..." />;
   }
 
   return (
