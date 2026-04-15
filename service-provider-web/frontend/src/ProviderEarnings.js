@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import api from "./config/axios";
 import "./ProviderStyles.css";
 import Loader from "../components/Loader";
+import OverlayLoader from "../components/OverlayLoader";
 
 const ProviderEarnings = () => {
   const [earnings, setEarnings] = useState(null);
@@ -63,9 +64,7 @@ const ProviderEarnings = () => {
     });
   };
 
-  if (loading) {
-    return <Loader text="Loading earnings..." />;
-  }
+  {loading && <OverlayLoader text="Loading earnings..." />}
 
   return (
     <div style={{ padding: "1.5rem", maxWidth: "1200px", margin: "0 auto" }}>

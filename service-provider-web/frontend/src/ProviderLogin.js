@@ -3,6 +3,7 @@ import api from "./config/axios";
 import { useNavigate } from "react-router-dom";
 import "./ProviderStyles.css";
 import Loader from "../components/Loader";
+import OverlayLoader from "../components/OverlayLoader";
 
 const ProviderLogin = () => {
   const [email, setEmail] = useState("");
@@ -38,6 +39,7 @@ const ProviderLogin = () => {
   };
 
   return (
+    
     <div className="provider-login">
       <div className="login-card">
         <h2>Service Provider Login</h2>
@@ -79,9 +81,7 @@ const ProviderLogin = () => {
           {error && <div className="error-message">{error}</div>}
 
           <button type="submit" className="login-btn" disabled={loading}>
-            <button type="submit" className="login-btn" disabled={loading}>
-              {loading ? <Loader text="Logging in..." /> : "Login"}
-            </button>
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
       </div>

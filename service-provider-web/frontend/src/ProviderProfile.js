@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import "./ProviderStyles.css";
 import PaymentDetailsModal from "./PaymentDetailsModal";
 import Loader from "../components/Loader";
+import OverlayLoader from "../components/OverlayLoader";
 
 const ProviderProfile = () => {
   const [provider, setProvider] = useState(null);
@@ -549,9 +550,7 @@ const ProviderProfile = () => {
     return () => clearTimeout(t);
   }, [locationQuery, showLocationModal]);
 
-  if (loading) {
-    return <Loader text="Loading profile..." />;
-  }
+  {loading && <OverlayLoader text="Loading profile..." />}
 
   if (!provider) return null;
 

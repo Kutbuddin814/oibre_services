@@ -7,6 +7,7 @@ import PaymentDetailsModal from "./PaymentDetailsModal";
 import PaymentDetailsReminder from "./PaymentDetailsReminder";
 import "./ProviderStyles.css";
 import Loader from "../components/Loader"; 
+import OverlayLoader from "../components/OverlayLoader";
 
 const ProviderDashboard = () => {
   const [provider, setProvider] = useState(null);
@@ -597,9 +598,7 @@ const ProviderDashboard = () => {
     }
   };
 
-  if (loading) {
-    return <Loader text="Loading dashboard..." />;
-  }
+  {loading && <OverlayLoader text="Loading dashboard..." />}
 
   if (!provider) {
     return (
