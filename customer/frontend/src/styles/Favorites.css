@@ -10,9 +10,9 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255,255,255,0.6),
+   rgba(255,255,255,0.8),
     transparent
-  );
+    );
   animation: shimmer 1.5s infinite;
   transform: translateX(-100%);
 }
