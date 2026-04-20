@@ -351,6 +351,7 @@
   justify-content: space-between;
   gap: 8px;
   margin-bottom: 5px;
+  flex-wrap: wrap;
 }
 
 .notification-tag {
@@ -1262,8 +1263,8 @@
 
   /* ===== DROPDOWNS ===== */
   .notifications-dropdown {
-    position: fixed;
-    top: 70px;
+    position: absolute;
+    top: 45px;
     right: 10px;
     width: min(92vw, 360px);
     max-height: 70vh;
@@ -1284,6 +1285,7 @@
   .notification-item {
     border-radius: 10px;
     padding: 12px;
+    overflow: hidden; 
   }
 
   .profile-header {

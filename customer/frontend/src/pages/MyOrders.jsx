@@ -224,11 +224,11 @@ export default function MyOrders() {
     }
   };
 
-  {loading && (
-    <div className="overlay-loader">
-      <Loader text="Loading your bookings..." />
-    </div>
-  )}
+  // {loading && (
+  //   <div className="overlay-loader">
+  //     <Loader text="Loading your bookings..." />
+  //   </div>
+  // )}
   return (
     <div className="orders-page">
 
