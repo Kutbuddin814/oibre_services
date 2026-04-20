@@ -443,7 +443,11 @@ export default function Navbar() {
           <button
             className={`mobile-menu-toggle md:hidden p-2 rounded-lg hover:bg-white/10 ${mobileMenuOpen ? "is-open" : ""}`}
             type="button"
-            onClick={() => setMobileMenuOpen((prev) => !prev)}
+            onClick={() => {
+              setMobileMenuOpen((prev) => !prev);
+              setNotificationsOpen(false);   // ✅ close notifications
+              setProfileOpen(false);         // ✅ close profile also
+            }}
             aria-label="Toggle navigation menu"
             aria-expanded={mobileMenuOpen}
           >
@@ -463,219 +467,260 @@ export default function Navbar() {
         </div>
 
         {/* RIGHT */}
-        <div className="nav-actions flex items-center gap-2 sm:gap-3">
-          <div className="location-wrapper">
-            <div className="location-pill" title={
-              location.locality || location.label || location.fullAddress || "Select Location"
-            }>
-              📍 {location.locality || location.label || location.fullAddress || "Select Location"}
-            </div>
-           <button
-            className="change-location-btn group relative"
-            onClick={() => {
-              window.dispatchEvent(new Event("openMapPicker"));
-            }}
+       {!mobileMenuOpen && (
+  <div className="nav-actions flex items-center gap-2 sm:gap-3">
+
+    {/* LOCATION */}
+    <div className="location-wrapper">
+      <div
+        className="location-pill"
+        title={
+          location.locality ||
+          location.label ||
+          location.fullAddress ||
+          "Select Location"
+        }
+      >
+        📍 {location.locality || location.label || location.fullAddress || "Select Location"}
+      </div>
+
+      <button
+        className="change-location-btn group relative"
+        onClick={() => {
+          window.dispatchEvent(new Event("openMapPicker"));
+        }}
+      >
+        Change
+        <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs bg-black text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition hidden sm:block">
+          Change Address
+        </span>
+      </button>
+    </div>
+
+    {/* ===== LOGGED IN ===== */}
+    {isLoggedIn ? (
+        <>
+          {/* FAVORITES */}
+          <Link
+            to="/favorites"
+            className="relative flex items-center justify-center w-10 h-10 rounded-full 
+                      bg-white/5 hover:bg-white/10 
+                      text-slate-300 hover:text-rose-400 
+                      transition-all duration-200 group"
           >
-            Change
-
-            {/* Tooltip */}
-            <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs bg-black text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition hidden sm:block">
-              Change Address
+            <Heart className="w-5 h-5 transition-transform group-hover:scale-110" />
+            <span className="absolute -bottom-8 text-xs bg-black text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition hidden sm:block">
+              Favorites
             </span>
-          </button>
-          </div>
+          </Link>
 
-          {isLoggedIn ? (
-            /* WHEN LOGGED IN - NOTIFICATION + PROFILE */
-            <>
-            {/* Favorites Link */}
-                <Link
-                  to="/favorites"
-                  className="relative flex items-center justify-center w-10 h-10 rounded-full 
-                            bg-white/5 hover:bg-white/10 
-                            text-slate-300 hover:text-rose-400 
-                            transition-all duration-200 group"
-                >
-                  <Heart className="w-5 h-5 transition-transform group-hover:scale-110" />
+          {/* NOTIFICATION */}
+          <div className="notification-wrapper group relative" ref={notificationRef}>
+            <button
+              className="notification-btn"
+              onClick={() => {
+                setNotificationsOpen((prev) => !prev);
+                setProfileOpen(false);
+              }}
+            >
+              <span className="notification-icon">&#128276;</span>
+              {unreadCount > 0 && (
+                <span className="notification-badge">{unreadCount}</span>
+              )}
+            </button>
 
-                  {/* Tooltip (desktop only) */}
-                  <span className="absolute -bottom-8 text-xs bg-black text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition hidden sm:block">
-                    Favorites
-                  </span>
-                </Link>
-              {/* NOTIFICATION BELL */}
-              <div className="notification-wrapper group relative" ref={notificationRef}>
-                <button
-                  className="notification-btn"
-                  onClick={() => {
-                    setNotificationsOpen((prev) => !prev);
-                    setProfileOpen(false);
-                  }}
-                >
-                  <span className="notification-icon" aria-hidden="true">&#128276;</span>
-                  {unreadCount > 0 && (
-                    <span className="notification-badge">{unreadCount}</span>
-                  )}
-                </button>
+            <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs bg-black text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition hidden sm:block">
+              Notifications
+            </span>
 
-                {/* Tooltip */}
-                <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs bg-black text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition hidden sm:block">
-                  Notifications
-                </span>
-
-                {notificationsOpen && (
-                  <div className="notifications-dropdown">
-                    <div className="notifications-header">
-                      <div className="notifications-header-copy">
-                        <span className="notifications-title">Notifications</span>
-                        <span className="notifications-subtitle">Service and booking updates</span>
-                      </div>
-
-                      <div style={{ display: "flex", gap: "6px" }}>
-                        {notifications.length > 0 && (
-                          <button
-                            className="clear-notifications-btn"
-                            onClick={clearNotifications}
-                          >
-                            Clear
-                          </button>
-                        )}
-
-                        {/* 🔥 CLOSE BUTTON */}
-                        <button
-                          className="close-notifications-btn"
-                          onClick={() => setNotificationsOpen(false)}
-                        >
-                          ✕
-                        </button>
-                      </div>
+            {notificationsOpen && !mobileMenuOpen && (
+              <div className="notifications-dropdown">
+                <div className="notifications-header">
+                  <div className="notifications-header-copy">
+                    <span className="notifications-title">Notifications</span>
+                    <span className="notifications-subtitle">
+                      Service and booking updates
+                    </span>
                   </div>
-                    {notifications.length === 0 ? (
-                      <div className="no-notifications">
-                        <div className="no-notifications-icon">N</div>
-                        <p className="no-notifications-title">No notifications yet</p>
-                        <p className="no-notifications-text">Booking and payment updates will appear here.</p>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="notifications-list">
-                          {(showAllNotifications ? notifications : notifications.slice(0, 4)).map((n) => (
-                            <button
-                              key={n._id}
-                              className={`notification-item ${n.read ? "read" : "unread"}`}
-                              onClick={() => {
-                                if (!n.read) markNotificationRead(n._id);
-                                setNotificationsOpen(false);
-                                navigate("/orders");
-                              }}
-                              type="button"
-                            >
-                              {(() => {
-                                const meta = getNotificationMeta(n.message);
-                                return (
-                                  <>
-                                    <span className={`notification-marker ${meta.tone}`}>{meta.marker}</span>
-                                    <div className="notification-content">
-                                      <div className="notification-top-row">
-                                        <span className={`notification-tag ${meta.tone}`}>{meta.tag}</span>
-                                        <span className="notification-time">{formatNotificationTime(n.createdAt)}</span>
-                                      </div>
-                                      <span className="notification-message">{n.message}</span>
-                                    </div>
-                                  </>
-                                );
-                              })()}
-                            </button>
-                          ))}
-                        </div>
 
-                        {notifications.length > 4 && (
-                          <button
-                            type="button"
-                            className="more-notifications-btn"
-                            onClick={() => {
-                              setShowAllNotifications((prev) => !prev);
-                            }}
-                          >
-                            {showAllNotifications
-                              ? "Show less"
-                              : `More notifications (${notifications.length - 4})`}
-                          </button>
-                        )}
-                      </>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* PROFILE MENU */}
-              <div className="profile-wrapper group relative" ref={profileRef}>
-                  <button
-                    className="profile-btn-circle"
-                    onClick={() => {
-                      setProfileOpen((prev) => !prev);
-                      setNotificationsOpen(false);
-                    }}
-                  >
-                    {customer?.name?.charAt(0)?.toUpperCase() || "U"}
-                  </button>
-
-                  {/* Tooltip */}
-                  <span className="absolute -bottom-8 right-0 text-xs bg-black text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition hidden sm:block">
-                    Profile Menu
-                  </span>
-
-                {profileOpen && (
-                  <div className="profile-dropdown-new">
-                    <div className="profile-header">
-                      <div className="profile-avatar">
-                        {customer?.name?.[0]?.toUpperCase() || "U"}
-                      </div>
-                      <div>
-                        <p className="profile-name">{customer?.name}</p>
-                        <p className="profile-mobile">{customer?.mobile}</p>
-                      </div>
-                    </div>
-                    <hr />
-                    <Link to="/profile" className="profile-link" onClick={() => setProfileOpen(false)}>
-                      View Profile
-                    </Link>
-                    <Link to="/orders" className="profile-link" onClick={() => setProfileOpen(false)}>
-                      My Orders
-                    </Link>
-                    {canChangePassword && (
+                  <div style={{ display: "flex", gap: "6px" }}>
+                    {notifications.length > 0 && (
                       <button
-                        type="button"
-                        className="profile-action-btn"
-                        onClick={() => {
-                          setProfileOpen(false);
-                          handleOpenChangePassword();
-                        }}
+                        className="clear-notifications-btn"
+                        onClick={clearNotifications}
                       >
-                        Change Password
+                        Clear
                       </button>
                     )}
+
                     <button
-                      onClick={() => {
-                        setProfileOpen(false);
-                        handleLogout();
-                      }}
-                      className="logout-btn"
+                      className="close-notifications-btn"
+                      onClick={() => setNotificationsOpen(false)}
                     >
-                      Logout
+                      ✕
                     </button>
                   </div>
+                </div>
+
+                {notifications.length === 0 ? (
+                  <div className="no-notifications">
+                    <div className="no-notifications-icon">N</div>
+                    <p className="no-notifications-title">
+                      No notifications yet
+                    </p>
+                    <p className="no-notifications-text">
+                      Booking and payment updates will appear here.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="notifications-list">
+                      {(showAllNotifications
+                        ? notifications
+                        : notifications.slice(0, 4)
+                      ).map((n) => (
+                        <button
+                          key={n._id}
+                          className={`notification-item ${
+                            n.read ? "read" : "unread"
+                          }`}
+                          onClick={() => {
+                            if (!n.read) markNotificationRead(n._id);
+                            setNotificationsOpen(false);
+                            navigate("/orders");
+                          }}
+                          type="button"
+                        >
+                          {(() => {
+                            const meta = getNotificationMeta(n.message);
+                            return (
+                              <>
+                                <span
+                                  className={`notification-marker ${meta.tone}`}
+                                >
+                                  {meta.marker}
+                                </span>
+                                <div className="notification-content">
+                                  <div className="notification-top-row">
+                                    <span
+                                      className={`notification-tag ${meta.tone}`}
+                                    >
+                                      {meta.tag}
+                                    </span>
+                                    <span className="notification-time">
+                                      {formatNotificationTime(n.createdAt)}
+                                    </span>
+                                  </div>
+                                  <span className="notification-message">
+                                    {n.message}
+                                  </span>
+                                </div>
+                              </>
+                            );
+                          })()}
+                        </button>
+                      ))}
+                    </div>
+
+                    {notifications.length > 4 && (
+                      <button
+                        type="button"
+                        className="more-notifications-btn"
+                        onClick={() =>
+                          setShowAllNotifications((prev) => !prev)
+                        }
+                      >
+                        {showAllNotifications
+                          ? "Show less"
+                          : `More notifications (${notifications.length - 4})`}
+                      </button>
+                    )}
+                  </>
                 )}
               </div>
-            </>
-          ) : (
-            /* WHEN NOT LOGGED IN */
-            <Link to="/auth" className="block sm:inline-block">
-              <button className="login-btn px-6 py-2 sm:py-3 text-sm font-semibold rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all bg-blue-600 hover:bg-blue-700">Login / Signup</button>
-            </Link>
-          )}
-        </div>
-      </nav>
+            )}
+          </div>
+
+          {/* PROFILE */}
+          <div className="profile-wrapper group relative" ref={profileRef}>
+            <button
+              className="profile-btn-circle"
+              onClick={() => {
+                setProfileOpen((prev) => !prev);
+                setNotificationsOpen(false);
+              }}
+            >
+              {customer?.name?.charAt(0)?.toUpperCase() || "U"}
+            </button>
+
+            <span className="absolute -bottom-8 right-0 text-xs bg-black text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition hidden sm:block">
+              Profile Menu
+            </span>
+
+            {profileOpen && (
+              <div className="profile-dropdown-new">
+                <div className="profile-header">
+                  <div className="profile-avatar">
+                    {customer?.name?.[0]?.toUpperCase() || "U"}
+                  </div>
+                  <div>
+                    <p className="profile-name">{customer?.name}</p>
+                    <p className="profile-mobile">{customer?.mobile}</p>
+                  </div>
+                </div>
+
+                <hr />
+
+                <Link
+                  to="/profile"
+                  className="profile-link"
+                  onClick={() => setProfileOpen(false)}
+                >
+                  View Profile
+                </Link>
+
+                <Link
+                  to="/orders"
+                  className="profile-link"
+                  onClick={() => setProfileOpen(false)}
+                >
+                  My Orders
+                </Link>
+
+                {canChangePassword && (
+                  <button
+                    className="profile-action-btn"
+                    onClick={() => {
+                      setProfileOpen(false);
+                      handleOpenChangePassword();
+                    }}
+                  >
+                    Change Password
+                  </button>
+                )}
+
+                <button
+                  onClick={() => {
+                    setProfileOpen(false);
+                    handleLogout();
+                  }}
+                  className="logout-btn"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        </>
+      ) : (
+        <Link to="/auth">
+          <button className="login-btn px-6 py-2 text-sm font-semibold rounded-xl bg-blue-600 hover:bg-blue-700">
+            Login / Signup
+          </button>
+        </Link>
+      )}
+    </div>
+  )}
 
       {showChangePasswordModal && (
         <div className="modal-backdrop" onClick={handleCloseChangePassword}>
