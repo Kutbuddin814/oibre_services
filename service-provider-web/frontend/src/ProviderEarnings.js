@@ -64,7 +64,9 @@ const ProviderEarnings = () => {
     });
   };
 
-  {loading && <OverlayLoader text="Loading earnings..." />}
+  if (loading) {
+    return <Loader text="Loading earnings..." />;
+  }
 
   return (
     <div style={{ padding: "1.5rem", maxWidth: "1200px", margin: "0 auto" }}>

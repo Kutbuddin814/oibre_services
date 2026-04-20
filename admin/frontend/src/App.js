@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import AdminDashboard from "./AdminDashboard";
 import AdminAuth from "./components/AdminAuth";
 import api from "./api";
+import Loader from "../components/Loader";
 
 function App() {
   const [admin, setAdmin] = useState(null);
@@ -27,7 +28,7 @@ function App() {
   };
 
   if (loading) {
-    return <div style={{ padding: 20 }}>Loading...</div>;
+    return <Loader text="Loading dashboard..." />;
   }
 
   if (!admin) {

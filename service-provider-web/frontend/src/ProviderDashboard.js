@@ -141,7 +141,11 @@ const ProviderDashboard = () => {
         headers: { Authorization: `Bearer ${token}` }
       }
     );
-    setRequests(formatRequests(res.data));
+    setRequests(
+      Array.isArray(res.data)
+        ? formatRequests(res.data)
+        : formatRequests(res.data?.requests || [])
+    );
   }, [token]);
 
   const reverseGeocode = async (lat, lng) => {
@@ -370,9 +374,7 @@ const ProviderDashboard = () => {
      FETCH SERVICE REQUESTS
   ========================== */
   useEffect(() => {
-    if (!provider) return;
-
-    const fetchRequests = async () => {
+  const fetchRequests = async () => {
       try {
         await refreshRequests();
       } catch (err) {
@@ -382,7 +384,11 @@ const ProviderDashboard = () => {
       }
     };
 
-    fetchRequests();
+    if (provider) {
+      fetchRequests();
+    } else {
+      setLoading(false); // 🔥 important fallback
+    }
   }, [provider, token, refreshRequests]);
 
   useEffect(() => {
@@ -598,7 +604,11 @@ const ProviderDashboard = () => {
     }
   };
 
-  {loading && <OverlayLoader text="Loading dashboard..." />}
+  
+
+  if (loading) {
+    return <Loader text="Loading dashboard..." />;
+  }
 
   if (!provider) {
     return (

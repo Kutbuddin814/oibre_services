@@ -1263,15 +1263,17 @@
 
   /* ===== DROPDOWNS ===== */
   .notifications-dropdown {
-    position: absolute;
-    top: 45px;
-    right: 10px;
-    width: min(92vw, 360px);
+    position: fixed;   /* 🔥 CHANGE THIS */
+    left: 10px;        /* 🔥 ADD */
+    right: 10px;       /* 🔥 ADD */
+    top: 70px;         /* adjust if needed */
+
+    width: auto;       /* 🔥 IMPORTANT */
     max-height: 70vh;
     overflow-y: auto;
+
     z-index: 3000;
     border-radius: 16px;
-    animation: dropdownFade 0.2s ease;
   }
 
   .notifications-dropdown,

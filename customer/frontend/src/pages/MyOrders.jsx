@@ -38,7 +38,7 @@ export default function MyOrders() {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      setOrders(res.data);
+      setOrders(Array.isArray(res.data) ? res.data : res.data?.requests || []);
     } catch (err) {
       console.error("Fetch orders error", err);
     } finally {
@@ -224,14 +224,14 @@ export default function MyOrders() {
     }
   };
 
-  // {loading && (
-  //   <div className="overlay-loader">
-  //     <Loader text="Loading your bookings..." />
-  //   </div>
-  // )}
+  
   return (
     <div className="orders-page">
-
+      {loading && (
+        <div className="overlay-loader">
+          <Loader text="Loading your bookings..." />
+        </div>
+      )}
       <div className="orders-header">
         <button
           onClick={() => navigate(-1)}

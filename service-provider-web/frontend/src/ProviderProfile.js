@@ -550,9 +550,13 @@ const ProviderProfile = () => {
     return () => clearTimeout(t);
   }, [locationQuery, showLocationModal]);
 
-  {loading && <OverlayLoader text="Loading profile..." />}
+  if (loading) {
+    return <Loader text="Loading profile..." />;
+  }
 
-  if (!provider) return null;
+  if (!provider) {
+    return <div className="loading-container">Unable to load profile</div>;
+  }
 
   const profileImageUrl = provider.profilePhoto
     ? provider.profilePhoto.startsWith('http')
