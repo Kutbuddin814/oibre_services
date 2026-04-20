@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import api from "./config/axios";
 import OverlayLoader from "../components/OverlayLoader";
+import Loader from "./components/Loader"; 
 
 const PaymentDetailsModal = ({ isOpen, onClose, onSave }) => {
   const [formData, setFormData] = useState({

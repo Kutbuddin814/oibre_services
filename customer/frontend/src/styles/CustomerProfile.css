@@ -106,11 +106,11 @@
 
 .profile-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   gap: 10px;
   padding: 12px 0;
   border-bottom: 1px solid #e5e7eb;
+  flex-wrap: wrap; 
 }
 
 .profile-item:last-child {
@@ -127,7 +127,7 @@
 }
 .profile-item-value {
   flex: 1;
-  text-align: right;
+  text-align: left;
   word-break: break-word;
 
   font-size: 15px;
@@ -425,7 +425,7 @@
   }
 
   .profile-item-value {
-    text-align: right;
+    text-align: left;
     font-size: 13px;
   }
 }

@@ -3,8 +3,7 @@ import api from "./config/axios";
 import { useNavigate } from "react-router-dom";
 import "./ProviderStyles.css";
 import PaymentDetailsModal from "./PaymentDetailsModal";
-import Loader from "../components/Loader";
-import OverlayLoader from "../components/OverlayLoader";
+import Loader from "./components/Loader"; 
 
 const ProviderProfile = () => {
   const [provider, setProvider] = useState(null);

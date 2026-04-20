@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "./config/axios";
 import "./ProviderStyles.css";
-import Loader from "../components/Loader";
+import Loader from "./components/Loader"; 
 
 const formatTime = (dateValue) => {
   if (!dateValue) return "";

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import api from "./config/axios";
 import "./ProviderStyles.css";
-import Loader from "../components/Loader";
-import OverlayLoader from "../components/OverlayLoader";
+import Loader from "./components/Loader";
 
 const ProviderEarnings = () => {
   const [earnings, setEarnings] = useState(null);

@@ -351,7 +351,8 @@
   justify-content: space-between;
   gap: 8px;
   margin-bottom: 5px;
-  flex-wrap: wrap;
+  flex-wrap: wrap; 
+  
 }
 
 .notification-tag {
@@ -407,8 +408,8 @@
   color: #334155;
   line-height: 1.45;
   white-space: normal;
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  word-break: break-word;     /* ✅ IMPORTANT */
+  overflow-wrap: anywhere; 
 }
 
 .more-notifications-btn {
@@ -1088,26 +1089,32 @@
     display: flex;
     flex-direction: column;
 
-    position: fixed; /* 🔥 IMPORTANT */
-    top: 70px;
-    left: 0;
-    right: 0;
+    position: fixed;
+    top: 80px;              /* 🔥 increase top spacing */
+    left: 12px;
+    right: 12px;
+    border-radius: 14px;
 
     background: #1f2937;
-    padding: 16px;
-    gap: 12px;
+    padding: 24px 20px;     /* 🔥 more spacing inside */
 
-    z-index: 2000; /* 🔥 IMPORTANT */
+    gap: 18px;
+
+    z-index: 2000;
+
+    align-items: flex-end;  /* 🔥 move items to RIGHT */
   }
 
   .nav-links a {
+    text-align: right;   /* 🔥 align text right */
     width: 100%;
+    font-size: 15px;
     padding: 10px 8px;
     border-radius: 8px;
   }
 
   .nav-links a:hover {
-    background: #1f2937;
+    background: #374151;
   }
 
   .nav-actions {
@@ -1263,17 +1270,17 @@
 
   /* ===== DROPDOWNS ===== */
   .notifications-dropdown {
-    position: fixed;   /* 🔥 CHANGE THIS */
-    left: 10px;        /* 🔥 ADD */
-    right: 10px;       /* 🔥 ADD */
-    top: 70px;         /* adjust if needed */
-
-    width: auto;       /* 🔥 IMPORTANT */
+    position: absolute;   /* 🔥 attach to bell */
+    top: 48px; 
+    right: 0px; 
+     width: min(92vw, 360px);  
+     min-width: 260px;        /* responsive width */
+    max-width: 360px;
     max-height: 70vh;
     overflow-y: auto;
-
     z-index: 3000;
     border-radius: 16px;
+    animation: dropdownFade 0.2s ease;
   }
 
   .notifications-dropdown,
@@ -1283,11 +1290,33 @@
     box-shadow: 0 20px 50px rgba(0,0,0,0.25);
     border: 1px solid rgba(255,255,255,0.08);
   }
+  .notification-wrapper {
+    position: relative;   /* anchor */
+  }
 
   .notification-item {
     border-radius: 10px;
     padding: 12px;
-    overflow: hidden; 
+    overflow: visible; 
+  }
+  .profile-wrapper {
+    position: relative;   /* anchor */
+  }
+
+  .profile-dropdown-new {
+    position: absolute;
+
+    top: 48px;   /* below profile button */
+    right: 0;    /* align with button */
+
+    width: min(92vw, 300px);
+    min-width: 220px;
+
+    max-height: 70vh;
+    overflow-y: auto;
+
+    z-index: 3000;
+    border-radius: 16px;
   }
 
   .profile-header {
