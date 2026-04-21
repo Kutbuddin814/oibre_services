@@ -418,6 +418,7 @@
   word-break: break-word;
   overflow-wrap: anywhere;
   max-width: 100%;
+  cursor: grab;   
 }
 
 .more-notifications-btn {
@@ -438,7 +439,9 @@
 .notification-message::-webkit-scrollbar {
   height: 4px;
 }
-
+.notification-message:active {
+  cursor: grabbing;          /* 🔥 ADD THIS */
+}
 .notification-message::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 10px;
@@ -1294,9 +1297,9 @@
   /* ===== DROPDOWNS ===== */
   .notifications-dropdown {
     position: absolute;   /* 🔥 change from fixed */
-    top: 50px;            /* below bell */
-    right: 10px;     
-    margin-right: 12px;    /* align to right */
+    top: 80px;     /* 🔥 match profile */
+    right: 10px;    
+    margin-right: 0;   /* align to right */
      left: auto;  
      min-width: 260px;     
      width: 320px;      /* responsive width */
@@ -1327,6 +1330,8 @@
     overflow: visible; 
     box-sizing: border-box;
     overflow-x: auto;   
+    cursor: default; 
+    touch-action: pan-x; 
   }
   .profile-wrapper {
     position: relative;   /* anchor */
