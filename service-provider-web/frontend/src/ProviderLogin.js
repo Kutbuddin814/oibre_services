@@ -2,8 +2,6 @@ import { useState } from "react";
 import api from "./config/axios";
 import { useNavigate } from "react-router-dom";
 import "./ProviderStyles.css";
-import Loader from "../components/Loader";
-import OverlayLoader from "../components/OverlayLoader";
 
 const ProviderLogin = () => {
   const [email, setEmail] = useState("");

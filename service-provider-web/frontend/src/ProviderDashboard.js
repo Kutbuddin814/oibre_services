@@ -6,8 +6,7 @@ import { convertTo12HourFormat } from "./utils/timeUtils";
 import PaymentDetailsModal from "./PaymentDetailsModal";
 import PaymentDetailsReminder from "./PaymentDetailsReminder";
 import "./ProviderStyles.css";
-import Loader from "../components/Loader"; 
-import OverlayLoader from "../components/OverlayLoader";
+import Loader from "./components/Loader"; 
 
 const ProviderDashboard = () => {
   const [provider, setProvider] = useState(null);

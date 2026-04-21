@@ -639,6 +639,7 @@ export default function Navbar() {
                 )}
               </div>
             )}
+            
           </div>
 
           {/* PROFILE */}
@@ -721,6 +722,7 @@ export default function Navbar() {
       )}
     </div>
   )}
+  </nav>  
 
       {showChangePasswordModal && (
         <div className="modal-backdrop" onClick={handleCloseChangePassword}>
