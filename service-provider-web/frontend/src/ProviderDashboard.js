@@ -373,7 +373,9 @@ const ProviderDashboard = () => {
      FETCH SERVICE REQUESTS
   ========================== */
   useEffect(() => {
-  const fetchRequests = async () => {
+    if (!provider) return; // ✅ wait until provider loads
+
+    const fetchRequests = async () => {
       try {
         await refreshRequests();
       } catch (err) {
@@ -383,11 +385,7 @@ const ProviderDashboard = () => {
       }
     };
 
-    if (provider) {
-      fetchRequests();
-    } else {
-      setLoading(false); // 🔥 important fallback
-    }
+    fetchRequests();
   }, [provider, token, refreshRequests]);
 
   useEffect(() => {
@@ -605,16 +603,8 @@ const ProviderDashboard = () => {
 
   
 
-  if (loading) {
+  if (loading || !provider) {
     return <Loader text="Loading dashboard..." />;
-  }
-
-  if (!provider) {
-    return (
-      <div className="loading-container">
-        <p>Unable to load dashboard</p>
-      </div>
-    );
   }
 
   return (

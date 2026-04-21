@@ -156,11 +156,14 @@
 .notifications-dropdown {
   position: absolute;
   top: 48px;
-  right: 0;
+  right: 10px;
   background: #FFFFFF;
   color: #000000;
-  width: min(90vw, 390px);
+  width: 320px;
+  max-width: 90vw;
   min-width: 280px;
+  max-height: 70vh;
+  overflow-y: auto;
   border-radius: 14px;
   box-shadow: 0 18px 44px rgba(15, 23, 42, 0.2);
   border: 1px solid #e2e8f0;
@@ -405,13 +408,18 @@
 }
 
 .notification-message {
-  display: block;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
   font-size: 12px;
   color: #334155;
-  line-height: 1.45;
-  white-space: normal;
-  word-break: break-word;     /* ✅ IMPORTANT */
-  overflow-wrap: anywhere; 
+  line-height: 1.5;
+
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  max-width: 100%;
 }
 
 .more-notifications-btn {
@@ -1145,11 +1153,11 @@
     max-width: none;
   }
 
-  .notifications-dropdown,
+  /* .notifications-dropdown,
   .profile-dropdown-new,
   .location-dropdown,
   .profile-dropdown {
-    width: min(94vw, 340px);
+    width: calc(100vw - 24px); 
     min-width: 0;
     position: fixed;
     left: 10px;
@@ -1158,7 +1166,7 @@
     top: 84px;
     max-height: calc(100vh - 84px);
     overflow-y: auto;
-  }
+  } */
 }
 
 @media (max-width: 640px) {
@@ -1279,13 +1287,13 @@
 
   /* ===== DROPDOWNS ===== */
   .notifications-dropdown {
-    position: fixed;   /* 🔥 attach to bell */
-    top: 80px;                    /* below navbar */
-    right: 0;
+    position: absolute;   /* 🔥 change from fixed */
+    top: 50px;            /* below bell */
+    right: 10px;     
     margin-right: 12px;    /* align to right */
      left: auto;  
-     width: min(92vw, 360px);  
-     min-width: 260px;        /* responsive width */
+     min-width: 260px;     
+     width: 320px;      /* responsive width */
     max-width: 360px;
     max-height: 70vh;
     overflow-y: auto;
@@ -1295,13 +1303,13 @@
     transform: none; 
   }
 
-  .notifications-dropdown,
+  /* .notifications-dropdown,
   .profile-dropdown-new {
     border-radius: 18px;
     backdrop-filter: blur(10px);
     box-shadow: 0 20px 50px rgba(0,0,0,0.25);
     border: 1px solid rgba(255,255,255,0.08);
-  }
+  } */
   .notification-wrapper {
     position: relative;   /* anchor */
   }
@@ -1310,24 +1318,20 @@
     border-radius: 10px;
     padding: 12px;
     overflow: hidden; 
+    box-sizing: border-box;
   }
   .profile-wrapper {
     position: relative;   /* anchor */
   }
 
   .profile-dropdown-new {
-    position: fixed;   /* attach to profile button */
-
-     top: 80px;                /* below navbar */
-     left: 50%; 
-     transform: translateX(-50%);   /* align with button */
-
+    position: absolute;   /* attach to profile button */
+    top: 80px;    
+    right: 10px;             /* below navbar */
     width: min(92vw, 300px);
     min-width: 220px;
-
     max-height: 70vh;
     overflow-y: auto;
-
     z-index: 3000;
     border-radius: 16px;
   }
