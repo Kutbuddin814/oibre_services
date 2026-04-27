@@ -43,11 +43,11 @@ export default function Footer() {
             <div className="footer-column">
               <h4>Social</h4>
               <ul>
-                <li><a href="https://facebook.com/oibre" target="_blank" rel="noopener noreferrer">Facebook</a></li>
-                <li><a href="https://instagram.com/oibre" target="_blank" rel="noopener noreferrer">Instagram</a></li>
-                <li><a href="https://linkedin.com/company/oibre" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
-                <li><a href="https://twitter.com/oibre" target="_blank" rel="noopener noreferrer">Twitter</a></li>
-                <li><a href="https://youtube.com/@oibre" target="_blank" rel="noopener noreferrer">Youtube</a></li>
+                <li><a href="https://facebook.com/" target="_blank" rel="noopener noreferrer">Facebook</a></li>
+                <li><a href="https://instagram.com/" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+                <li><a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+                <li><a href="https://twitter.com/" target="_blank" rel="noopener noreferrer">Twitter</a></li>
+                <li><a href="https://youtube.com/" target="_blank" rel="noopener noreferrer">Youtube</a></li>
               </ul>
             </div>
 

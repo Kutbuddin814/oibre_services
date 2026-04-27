@@ -517,15 +517,24 @@ export default function Navbar() {
           {/* NOTIFICATION */}
           <div className="notification-wrapper group relative" ref={notificationRef}>
             <button
-              className="notification-btn"
+              className="relative flex items-center justify-center w-10 h-10 rounded-full 
+                        bg-white/5 hover:bg-white/10 
+                        text-slate-300 hover:text-blue-400 
+                        transition-all duration-200 group"
               onClick={() => {
                 setNotificationsOpen((prev) => !prev);
                 setProfileOpen(false);
               }}
             >
-              <span className="notification-icon">&#128276;</span>
+              <span className="text-lg transition-transform group-hover:scale-110">
+                🔔
+              </span>
+
               {unreadCount > 0 && (
-                <span className="notification-badge">{unreadCount}</span>
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] 
+                                px-1.5 py-0.5 rounded-full font-bold">
+                  {unreadCount}
+                </span>
               )}
             </button>
 
