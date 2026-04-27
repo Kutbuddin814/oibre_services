@@ -181,7 +181,7 @@
 /* STEPS */
 .steps {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(4, 1fr); /* force 4 in one row */
   gap: 30px;
   margin-top: 32px;
   width: min(1240px, 100%);
@@ -389,4 +389,27 @@
     padding: 12px 24px;
     font-size: 14px;
   }
+}
+.btn-primary {
+  background: #111827;
+  color: #FFFFFF;
+  text-decoration: none;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #111827;
+  border: 2px solid #111827;
+  text-decoration: none;
+}
+/* Remove link default styles completely */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Also handle hover state */
+a:hover {
+  text-decoration: none;
+  color: inherit;
 }

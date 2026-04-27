@@ -23,6 +23,8 @@ const Chatbot = () => {
   const [showMapPicker, setShowMapPicker] = useState(false);
   const chatEndRef = useRef(null);
   const [portalContainer, setPortalContainer] = useState(null);
+const [totalServices, setTotalServices] = useState(0);
+
   const navigate = useNavigate();
 const formattedService = selectedService
   ? selectedService.charAt(0).toUpperCase() +
@@ -147,7 +149,7 @@ const formattedService = selectedService
   // Load categories on first open
   useEffect(() => {
     if (isOpen && categories.length === 0) {
-      loadCategories();
+      loadCategories(false);
       addInitialGreeting();
     }
   }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -164,9 +166,15 @@ const formattedService = selectedService
     });
   };
 
-  const loadCategories = async () => {
+  const loadCategories = async (showAll = false) => {
+    
     try {
-      const res = await api.get("/chatbot/services/categories");
+      const res = await api.get("/chatbot/services/categories", {
+        params: {
+          limit: showAll ? totalServices : 4  // 🔥 key fix
+        }
+      });
+      setTotalServices(res.data.total);
       if (res.data.success) {
         const fetched = res.data.categories || {};
         const keys = Object.keys(fetched);
@@ -182,7 +190,7 @@ const formattedService = selectedService
         }
       }
     } catch (err) {
-      console.error("Error loading problems:", err?.message);
+      console.error("Error loading categories:", err?.message);
 
       const fallbackCategories = DEFAULT_CATEGORY_OPTIONS.reduce((acc, name) => {
         acc[name] = [];
@@ -414,7 +422,7 @@ const formattedService = selectedService
       }
 
     } catch (err) {   // ✅ NOW CORRECT
-      console.error("Error loading providers:", err?.message);
+      console.error("Error loading categories:", err?.message);
       addMessage({
         type: "bot",
         text: "❌ No providers found. Try changing location or urgency.",
@@ -493,55 +501,15 @@ const formattedService = selectedService
       navigate(`/provider/${provider._id}`, {
         state: { openChat: true }
       });
-    } else if (action === "book") {
-      addMessage({ type: "bot", text: "Checking availability..." });
+    }else if (action === "book") {
+      addMessage({ type: "bot", text: "Opening provider details..." });
 
-      try {
-        const check = await api.post("/chatbot/check/availability", {
-          serviceType: formattedService,
-          urgency: urgencyMap[_selectedUrgency]
-        });
-
-        if (!check.data.hasProviders) {
-          addMessage({
-            type: "bot",
-            text: check.data.message || "❌ No providers available right now",
-            options: [
-              { label: "Request callback", value: "callback" },
-              { label: "Try different service", value: "try-different-service" }
-            ]
-          });
-          return; // ❌ STOP BOOKING
+      navigate(`/provider/${provider._id}`, {
+        state: {
+          autoOpenBooking: true,   // optional (for auto booking UI)
+          providerData: provider   // optional (extra data)
         }
-
-        // ✅ IF AVAILABLE → CONTINUE BOOKING
-        addMessage({ type: "bot", text: "Booking your service..." });
-
-        const token = localStorage.getItem("customerToken");
-
-        await api.post(
-          "/booking/create",
-          {
-            providerId,
-            serviceType: formattedService,
-            urgency: urgencyMap[_selectedUrgency],
-            location: userLocation
-          },
-          token ? { headers: { Authorization: `Bearer ${token}` } } : {}
-        );
-
-        addMessage({
-          type: "bot",
-          text: "✅ Booking request sent! Provider will contact you soon."
-        });
-
-      } catch (err) {
-        console.error(err);
-        addMessage({
-          type: "bot",
-          text: "❌ Could not book at this time. Please try again later."
-        });
-      }
+      });
     }else if (action === "save") {
       try {
         const token = localStorage.getItem("customerToken");
@@ -603,7 +571,7 @@ const formattedService = selectedService
   };
 
   const categoryKeys = Object.keys(categories || {});
-  const visibleCategoryKeys = showAllServices ? categoryKeys : categoryKeys.slice(0, 4);
+  const visibleCategoryKeys = categoryKeys;
 
   if (!portalContainer) {
     return null;
@@ -766,13 +734,17 @@ const formattedService = selectedService
                       ))}
                     </div>
 
-                    {categoryKeys.length > 4 && (
+                    {totalServices > 4 && (
                       <button
                         type="button"
                         className="chatbot-show-more-btn"
-                        onClick={() => setShowAllServices((prev) => !prev)}
+                        onClick={() => {
+                          const next = !showAllServices;
+                          setShowAllServices(next);
+                          loadCategories(next); // 🔥 fetch from DB
+                        }}
                       >
-                        {showAllServices ? "Show less" : `Show more (${categoryKeys.length - 4})`}
+                        {showAllServices ? "Show less" : `Show more (${totalServices - 4})`}
                       </button>
                     )}
                   </div>

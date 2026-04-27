@@ -10,17 +10,23 @@ const DEFAULT_ICON = "🔧";
 const ICON_BASE_URL = `${BACKEND_BASE_URL}/uploads`;
 
 const SERVICE_ICON_FALLBACKS = {
-  "ac service": "\u2744\uFE0F",
-  "appliance repair": "\uD83D\uDEE0\uFE0F",
-  babysitter: "\uD83D\uDC76",
-  carpenter: "\uD83E\uDE9A",
-  cleaning: "\uD83E\uDDF9",
-  electrician: "\u26A1",
-  plumbing: "\uD83D\uDD27",
-  mechanic: "\uD83D\uDD29",
-  laundry: "\uD83E\uDDFA",
-  taxi: "\uD83D\uDE95"
+  "ac service": "❄️",
+  "appliance repair": "🛠️",
+  babysitter: "👶",
+  carpenter: "🪚",
+  cleaning: "🧹",
+  electrician: "⚡",
+  plumber: "🔧",
+  mechanic: "🔩",
+  laundry: "🧺",
+  taxi: "🚕",
+  painter: "🎨",
+  "pest control": "🐜",
+  tutor: "📚",
+  "salon at home": "💇‍♀️",
+  "mover & packer": "📦"
 };
+
 
 const toUtf8FromLatin1 = (value) => {
   try {
@@ -33,22 +39,18 @@ const toUtf8FromLatin1 = (value) => {
 
 const normalizeIcon = (serviceName, icon) => {
   const normalizedName = String(serviceName || "").trim().toLowerCase();
-  const fallbackByName = SERVICE_ICON_FALLBACKS[normalizedName] || DEFAULT_ICON;
 
-  if (!icon || typeof icon !== "string") return fallbackByName;
-  const raw = icon.trim();
-  if (!raw) return fallbackByName;
+  const fallback =
+  SERVICE_ICON_FALLBACKS[normalizedName] || DEFAULT_ICON;
 
-  let fixed = raw;
-  if (/[ÃÂâð]/.test(fixed)) {
-    fixed = toUtf8FromLatin1(fixed);
-    if (/[ÃÂâð]/.test(fixed)) {
-      fixed = toUtf8FromLatin1(fixed);
-    }
+  const raw = icon || "";
+
+  // detect broken encoding like ðŸ...
+  if (!raw || /Ã|ðŸ|â|Â/.test(raw)) {
+    return fallback;
   }
 
-  if (!fixed || /[ÃÂâð�]/.test(fixed)) return fallbackByName;
-  return fixed;
+  return raw;
 };
 
 export default function Services() {

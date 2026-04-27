@@ -63,6 +63,14 @@ export default function ProviderProfile() {
     window.history.replaceState({}, document.title);
   }
 }, [provider]);
+useEffect(() => {
+  if (location.state?.autoOpenBooking && provider?._id) {
+    handleBookServiceClick();
+
+    // optional: clean state so it doesn't reopen on refresh
+    window.history.replaceState({}, document.title);
+  }
+}, [provider]);
 
   const getTodayIsoLocal = () => {
     const now = new Date();

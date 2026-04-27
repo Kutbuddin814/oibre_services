@@ -110,7 +110,7 @@ export default function About() {
           <h2>Ready to Get Started?</h2>
           <p>Join thousands of customers who trust Oibre for their service needs.</p>
           <div className="cta-buttons">
-            <a href="/" className="btn btn-primary">Find Services</a>
+            <a href="/services" className="btn btn-primary">Find Services</a>
             <a href="/contact" className="btn btn-secondary">Contact Us</a>
           </div>
         </section>
