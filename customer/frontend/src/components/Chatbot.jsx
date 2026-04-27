@@ -171,7 +171,7 @@ const formattedService = selectedService
     try {
       const res = await api.get("/chatbot/services/categories", {
         params: {
-          limit: showAll ? totalServices : 4  // 🔥 key fix
+          limit: showAll ? 100 : 4
         }
       });
       setTotalServices(res.data.total);

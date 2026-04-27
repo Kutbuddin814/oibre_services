@@ -10,27 +10,26 @@ const CallbackRequest = require("../models/CallbackRequest");
 // ==================== SERVICE CATEGORIES ====================
 router.get("/services/categories", async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit) || 4;
-
     const categories = await Service.find({ isActive: true })
       .select("name category icon description estimatedPrice")
-      .sort({ name: 1 })
-      .limit(limit);
-
-    const total = await Service.countDocuments({ isActive: true });
+      .sort({ name: 1 });
 
     const grouped = {};
     categories.forEach((cat) => {
-      const key = String(cat.category || cat.name || "General").trim();
-      if (!grouped[key]) grouped[key] = [];
-      grouped[key].push(cat);
+      const categoryKey = String(cat.category || cat.name || "General").trim();
+      if (!grouped[categoryKey]) {
+        grouped[categoryKey] = [];
+      }
+      grouped[categoryKey].push(cat);
     });
 
-    res.json({
-      success: true,
-      categories: grouped,
-      total
-    });
+    const total = categories.length;
+
+      res.json({
+        success: true,
+        categories: grouped,
+        total
+      });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
