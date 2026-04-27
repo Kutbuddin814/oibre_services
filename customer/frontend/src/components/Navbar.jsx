@@ -538,9 +538,10 @@ export default function Navbar() {
               )}
             </button>
 
-            <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs bg-black text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition hidden sm:block">
+            <span className="tooltip absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs bg-black text-white px-2 py-1 rounded hidden sm:block">
               Notifications
             </span>
+                        
 
             {notificationsOpen && !mobileMenuOpen && (
               <div className="notifications-dropdown">

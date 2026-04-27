@@ -1417,7 +1417,7 @@
   color: #111827;
 }
 /* TOOLTIP FIX */
-.group span {
+/* .group span {
   white-space: nowrap;
   pointer-events: none;
   z-index: 9999;
@@ -1426,4 +1426,17 @@
 }
 .group:hover span {
   transform: translateY(0);
+} */
+ .tooltip {
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translateY(5px);
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+.group:hover .tooltip {
+  transform: translateY(0);
+  opacity: 1;
 }
